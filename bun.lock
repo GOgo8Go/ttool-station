@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "omnitool-station",
+      "name": "tool-station",
       "dependencies": {
         "@zip.js/zip.js": "^2.8.11",
         "crypto-js": "^4.2.0",

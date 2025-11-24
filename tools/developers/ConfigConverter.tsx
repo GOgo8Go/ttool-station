@@ -23,11 +23,11 @@ const FORMATS: { value: Format; label: string; color: string }[] = [
 ];
 
 const EXAMPLE_DATA = {
-  json: '{\n  "app": "OmniTool",\n  "version": 1.0,\n  "features": ["convert", "edit"]\n}',
-  yaml: 'app: OmniTool\nversion: 1.0\nfeatures:\n  - convert\n  - edit',
-  toml: 'app = "OmniTool"\nversion = 1.0\nfeatures = [ "convert", "edit" ]',
-  xml: '<root>\n  <app>OmniTool</app>\n  <version>1</version>\n  <features>convert</features>\n  <features>edit</features>\n</root>',
-  ini: 'app=OmniTool\nversion=1.0\n\n[features]\n0=convert\n1=edit'
+  json: '{\n  "app": "Tool",\n  "version": 1.0,\n  "features": ["convert", "edit"]\n}',
+  yaml: 'app: Tool\nversion: 1.0\nfeatures:\n  - convert\n  - edit',
+  toml: 'app = "Tool"\nversion = 1.0\nfeatures = [ "convert", "edit" ]',
+  xml: '<root>\n  <app>Tool</app>\n  <version>1</version>\n  <features>convert</features>\n  <features>edit</features>\n</root>',
+  ini: 'app=Tool\nversion=1.0\n\n[features]\n0=convert\n1=edit'
 };
 
 const ConfigConverter: React.FC = () => {

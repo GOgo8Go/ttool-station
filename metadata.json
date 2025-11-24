@@ -1,5 +1,5 @@
 {
-  "name": "OmniTool Station",
-  "description": "A modular, extensible utility station featuring a categorized collection of developer and productivity tools with a modern, responsive interface and dark mode support.",
+  "name": "Tool Station",
+  "description": "A modular, extensible utility station featuring a categorized collection of developer and productivity tools.",
   "requestFramePermissions": []
 }

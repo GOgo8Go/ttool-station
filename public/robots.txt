@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.zinc233.top/sitemap.xml
+
+# Host
+Host: https://www.zinc233.top
