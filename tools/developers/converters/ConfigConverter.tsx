@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
 import { ArrowRight, ArrowLeftRight, Copy, AlertCircle, FileJson, FileCode, Check } from 'lucide-react';
 // @ts-ignore
 import yaml from 'js-yaml';

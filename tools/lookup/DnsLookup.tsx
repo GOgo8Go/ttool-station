@@ -19,8 +19,8 @@ interface DnsResponse {
     Authority?: DnsRecord[];
 }
 
-// 添加DNS提供商类型（移除了cloudflare和dnspod）
-type DnsProvider = 'google' | 'alidns';
+// DNS 提供商类型 - 只包含支持浏览器 CORS 访问的 DoH 服务商
+type DnsProvider = 'google' | 'cloudflare' | 'alidns';
 
 const RECORD_TYPES: { value: RecordType; label: string; typeNum: number }[] = [
     { value: 'A', label: 'A', typeNum: 1 },
@@ -34,10 +34,12 @@ const RECORD_TYPES: { value: RecordType; label: string; typeNum: number }[] = [
     { value: 'CAA', label: 'CAA', typeNum: 257 },
 ];
 
-// 添加DNS提供商配置（移除了cloudflare和dnspod）
-const DNS_PROVIDERS: { value: DnsProvider; label: string; url: string }[] = [
-    { value: 'google', label: 'Google DNS', url: 'https://dns.google/resolve' },
-    { value: 'alidns', label: 'AliDNS', url: 'https://dns.alidns.com/resolve' },
+// DNS over HTTPS (DoH) 提供商配置
+// 只包含确认支持浏览器 CORS 访问的服务商
+const DNS_PROVIDERS: { value: DnsProvider; label: string; url: string; useJsonApi?: boolean }[] = [
+    { value: 'google', label: 'Google DNS', url: 'https://dns.google/resolve', useJsonApi: true },
+    { value: 'cloudflare', label: 'Cloudflare (1.1.1.1)', url: 'https://cloudflare-dns.com/dns-query', useJsonApi: false },
+    { value: 'alidns', label: 'AliDNS (阿里)', url: 'https://dns.alidns.com/resolve', useJsonApi: true },
 ];
 
 const DnsLookup: React.FC = () => {
@@ -62,17 +64,27 @@ const DnsLookup: React.FC = () => {
         try {
             const typeNum = RECORD_TYPES.find(rt => rt.value === recordType)?.typeNum || 1;
             const provider = DNS_PROVIDERS.find(p => p.value === dnsProvider);
-            
+
             if (!provider) {
                 throw new Error('Invalid DNS provider');
             }
 
             let url: string;
-            
-            // 构建URL
-            url = `${provider.url}?name=${encodeURIComponent(domain)}&type=${typeNum}`;
+            let headers: HeadersInit = {};
 
-            const response = await fetch(url);
+            // 构建URL和请求头
+            if (provider.useJsonApi) {
+                // Google DNS 和 AliDNS 使用 JSON API
+                url = `${provider.url}?name=${encodeURIComponent(domain)}&type=${typeNum}`;
+            } else {
+                // Cloudflare 和 DNSPod 使用标准 DoH 格式
+                url = `${provider.url}?name=${encodeURIComponent(domain)}&type=${typeNum}`;
+                headers = {
+                    'Accept': 'application/dns-json'
+                };
+            }
+
+            const response = await fetch(url, { headers });
 
             if (!response.ok) {
                 throw new Error(`DNS query failed with status ${response.status}`);
@@ -144,8 +156,8 @@ const DnsLookup: React.FC = () => {
                                     key={rt.value}
                                     onClick={() => setRecordType(rt.value)}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${recordType === rt.value
-                                            ? 'bg-primary-600 text-white'
-                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                        ? 'bg-primary-600 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                         }`}
                                 >
                                     {rt.label}
@@ -165,8 +177,8 @@ const DnsLookup: React.FC = () => {
                                     key={provider.value}
                                     onClick={() => setDnsProvider(provider.value)}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${dnsProvider === provider.value
-                                            ? 'bg-primary-600 text-white'
-                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                        ? 'bg-primary-600 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                         }`}
                                 >
                                     {provider.label}

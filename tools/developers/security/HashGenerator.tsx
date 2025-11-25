@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { Copy, FileText, Upload, Fingerprint, Check, AlertCircle, Loader2, Search } from 'lucide-react';
 // @ts-ignore
 import CryptoJS from 'crypto-js';

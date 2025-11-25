@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { Button } from '../../../components/ui/Button';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { Copy, Trash2, CheckCircle, AlertCircle, Code, AlignLeft, FileJson, X } from 'lucide-react';
 
 type IndentType = 2 | 4 | 'tab';
@@ -171,9 +171,10 @@ const JsonFormatter: React.FC = () => {
               setViewMode(v);
             }}
             options={[
-              { value: 'text', label: t('common.editor') },
-              { value: 'code', label: t('common.colorized') },
+              { value: 'text', label: <><AlignLeft className="w-4 h-4 flex-shrink-0" /><span className="ml-1 whitespace-nowrap">{t('common.editor')}</span></> },
+              { value: 'code', label: <><FileJson className="w-4 h-4 flex-shrink-0" /><span className="ml-1 whitespace-nowrap">{t('common.colorized')}</span></> },
             ]}
+            className="min-h-[32px]"
           />
         </div>
 

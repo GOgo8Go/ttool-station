@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
 import {
   Monitor, Cpu, Globe, Wifi, Battery, Layers, Copy,
   Check, Info, Smartphone, Eye

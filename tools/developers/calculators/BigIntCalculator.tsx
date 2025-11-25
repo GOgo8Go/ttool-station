@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
 import { Copy, Trash2, Calculator, AlertCircle, Check } from 'lucide-react';
 
 type Operation = '+' | '-' | '*' | '/' | '%' | '**' | 'gcd' | 'lcm';

@@ -1,40 +1,11 @@
-import { Code2, FileText, Timer, Calculator, Settings, Braces, Image as ImageIcon, ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode, FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma } from 'lucide-react';
+import { Code2, FileText, Timer, Calculator, Settings, Braces, Image as ImageIcon, ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode, FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint, Zap, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma, SquareFunction, Mic, Headphones, Mouse, Keyboard, Gamepad2, Monitor, Key, Clock, Terminal, Database, Type, FileJson, AlignLeft, Shield, Network, Cpu, Link, MapPin } from 'lucide-react';
 import { ToolCategory } from '../types';
 
-// Import tool components
-import JsonFormatter from './developers/JsonFormatter';
-import ConfigConverter from './developers/ConfigConverter';
-import BrowserInfo from './developers/BrowserInfo';
-import CodeBeautifier from './developers/CodeBeautifier';
-import RegexTester from './developers/RegexTester';
-import UuidGenerator from './developers/UuidGenerator';
-import HashGenerator from './developers/HashGenerator';
-import EncodingConverter from './developers/EncodingConverter';
-import CodeDiff from './developers/CodeDiff';
-import BaseConverter from './developers/BaseConverter';
-import BaseCalculator from './developers/BaseCalculator';
-import BitwiseCalculator from './developers/BitwiseCalculator';
-import BigIntCalculator from './developers/BigIntCalculator';
-import HttpStatus from './lookup/HttpStatus';
-import DnsLookup from './lookup/DnsLookup';
-import DnsRecordsInfo from './lookup/DnsRecordsInfo';
-import WordCounter from './productivity/WordCounter';
-import Pomodoro from './productivity/Pomodoro';
-import ImageConverter from './image/ImageConverter';
-import IcoConverter from './image/IcoConverter';
-import IcoViewer from './image/IcoViewer';
-import ImageEditor from './image/ImageEditor';
-import MetadataViewer from './image/MetadataViewer';
-import SimplePaint from './image/SimplePaint';
-import ColorConverter from './image/ColorConverter';
-import QrBarCode from './image/QrBarCode';
-import PdfTools from './pdf/PdfTools';
-import ArchiveExtractor from './files/ArchiveExtractor';
-
+// 工具注册表 - 使用动态导入而不是直接导入所有组件
 export const toolRegistry: ToolCategory[] = [
   {
-    id: 'developers',
-    name: 'category.developers',
+    id: 'coding',
+    name: 'category.coding',
     icon: Code2,
     tools: [
       {
@@ -42,91 +13,168 @@ export const toolRegistry: ToolCategory[] = [
         name: 'tool.json-formatter.name',
         description: 'tool.json-formatter.desc',
         icon: Braces,
-        component: JsonFormatter,
-      },
-      {
-        id: 'base-converter',
-        name: 'tool.base-converter.name',
-        description: 'tool.base-converter.desc',
-        icon: ArrowLeftRight,
-        component: BaseConverter,
-      },
-      {
-        id: 'base-calculator',
-        name: 'tool.base-calculator.name',
-        description: 'tool.base-calculator.desc',
-        icon: Calculator,
-        component: BaseCalculator,
-      },
-      {
-        id: 'bigint-calculator',
-        name: 'tool.bigint-calculator.name',
-        description: 'tool.bigint-calculator.desc',
-        icon: Sigma,
-        component: BigIntCalculator,
-      },
-      {
-        id: 'bitwise-calculator',
-        name: 'tool.bitwise-calculator.name',
-        description: 'tool.bitwise-calculator.desc',
-        icon: Binary,
-        component: BitwiseCalculator,
+        component: () => import('./developers/formatters/JsonFormatter'),
       },
       {
         id: 'code-diff',
         name: 'tool.code-diff.name',
         description: 'tool.code-diff.desc',
         icon: GitCompare,
-        component: CodeDiff,
-      },
-      {
-        id: 'hash-generator',
-        name: 'tool.hash-generator.name',
-        description: 'tool.hash-generator.desc',
-        icon: Hash,
-        component: HashGenerator,
-      },
-      {
-        id: 'encoding-converter',
-        name: 'tool.encoding-converter.name',
-        description: 'tool.encoding-converter.desc',
-        icon: Binary,
-        component: EncodingConverter,
-      },
-      {
-        id: 'uuid-generator',
-        name: 'tool.uuid-generator.name',
-        description: 'tool.uuid-generator.desc',
-        icon: Fingerprint,
-        component: UuidGenerator,
-      },
-      {
-        id: 'regex-tester',
-        name: 'tool.regex-tester.name',
-        description: 'tool.regex-tester.desc',
-        icon: Regex,
-        component: RegexTester,
+        component: () => import('./developers/formatters/CodeDiff'),
       },
       {
         id: 'code-beautifier',
         name: 'tool.code-beautifier.name',
         description: 'tool.code-beautifier.desc',
         icon: Camera,
-        component: CodeBeautifier,
+        component: () => import('./developers/formatters/CodeBeautifier'),
+      },
+      {
+        id: 'sql-formatter',
+        name: 'tool.sql-formatter.name',
+        description: 'tool.sql-formatter.desc',
+        icon: Database,
+        component: () => import('./developers/formatters/SqlFormatter'),
+      },
+      {
+        id: 'latex-editor',
+        name: 'tool.latex-editor.name',
+        description: 'tool.latex-editor.desc',
+        icon: SquareFunction,
+        component: () => import('./developers/formatters/LatexEditor'),
+      },
+    ],
+  },
+  {
+    id: 'calculators',
+    name: 'category.calculators',
+    icon: Calculator,
+    tools: [
+      {
+        id: 'base-calculator',
+        name: 'tool.base-calculator.name',
+        description: 'tool.base-calculator.desc',
+        icon: Calculator,
+        component: () => import('./developers/calculators/BaseCalculator'),
+      },
+      {
+        id: 'bigint-calculator',
+        name: 'tool.bigint-calculator.name',
+        description: 'tool.bigint-calculator.desc',
+        icon: Sigma,
+        component: () => import('./developers/calculators/BigIntCalculator'),
+      },
+      {
+        id: 'bitwise-calculator',
+        name: 'tool.bitwise-calculator.name',
+        description: 'tool.bitwise-calculator.desc',
+        icon: Binary,
+        component: () => import('./developers/calculators/BitwiseCalculator'),
+      },
+    ],
+  },
+  {
+    id: 'converters',
+    name: 'category.converters',
+    icon: ArrowLeftRight,
+    tools: [
+      {
+        id: 'base-converter',
+        name: 'tool.base-converter.name',
+        description: 'tool.base-converter.desc',
+        icon: ArrowLeftRight,
+        component: () => import('./developers/converters/BaseConverter'),
+      },
+      {
+        id: 'encoding-converter',
+        name: 'tool.encoding-converter.name',
+        description: 'tool.encoding-converter.desc',
+        icon: Binary,
+        component: () => import('./developers/converters/EncodingConverter'),
       },
       {
         id: 'config-converter',
         name: 'tool.config-converter.name',
         description: 'tool.config-converter.desc',
         icon: FileCode,
-        component: ConfigConverter,
+        component: () => import('./developers/converters/ConfigConverter'),
       },
+      {
+        id: 'curl-converter',
+        name: 'tool.curl-converter.name',
+        description: 'tool.curl-converter.desc',
+        icon: Terminal,
+        component: () => import('./developers/converters/CurlConverter'),
+      },
+    ],
+  },
+  {
+    id: 'generators',
+    name: 'category.generators',
+    icon: Fingerprint,
+    tools: [
+      {
+        id: 'uuid-generator',
+        name: 'tool.uuid-generator.name',
+        description: 'tool.uuid-generator.desc',
+        icon: Fingerprint,
+        component: () => import('./developers/generators/UuidGenerator'),
+      },
+      {
+        id: 'cron-generator',
+        name: 'tool.cron-generator.name',
+        description: 'tool.cron-generator.desc',
+        icon: Clock,
+        component: () => import('./developers/generators/CronGenerator'),
+      },
+    ],
+  },
+  {
+    id: 'security-dev',
+    name: 'category.security-dev',
+    icon: Shield,
+    tools: [
+      {
+        id: 'hash-generator',
+        name: 'tool.hash-generator.name',
+        description: 'tool.hash-generator.desc',
+        icon: Hash,
+        component: () => import('./developers/security/HashGenerator'),
+      },
+      {
+        id: 'jwt-decoder',
+        name: 'tool.jwt-decoder.name',
+        description: 'tool.jwt-decoder.desc',
+        icon: Key,
+        component: () => import('./developers/security/JwtDecoder'),
+      },
+    ],
+  },
+  {
+    id: 'regex',
+    name: 'category.regex',
+    icon: Regex,
+    tools: [
+      {
+        id: 'regex-tester',
+        name: 'tool.regex-tester.name',
+        description: 'tool.regex-tester.desc',
+        icon: Regex,
+        component: () => import('./developers/misc/RegexTester'),
+      },
+    ],
+  },
+  {
+    id: 'system-info',
+    name: 'category.system-info',
+    icon: Info,
+    tools: [
       {
         id: 'browser-info',
         name: 'tool.browser-info.name',
         description: 'tool.browser-info.desc',
         icon: Globe,
-        component: BrowserInfo,
+        component: () => import('./developers/misc/BrowserInfo'),
       },
     ],
   },
@@ -140,14 +188,84 @@ export const toolRegistry: ToolCategory[] = [
         name: 'tool.archive-extractor.name',
         description: 'tool.archive-extractor.desc',
         icon: FileArchive,
-        component: ArchiveExtractor,
+        component: () => import('./files/ArchiveExtractor'),
       },
       {
         id: 'pdf-tools',
         name: 'tool.pdf-tools.name',
         description: 'tool.pdf-tools.desc',
         icon: FileStack,
-        component: PdfTools,
+        component: () => import('./pdf/PdfTools'),
+      },
+    ],
+  },
+  {
+    id: 'device',
+    name: 'category.device',
+    icon: Headphones,
+    tools: [
+      {
+        id: 'screen-test',
+        name: 'tool.screen-test.name',
+        description: 'tool.screen-test.desc',
+        icon: Monitor,
+        component: () => import('./device/ScreenTest'),
+      },
+      {
+        id: 'camera-test',
+        name: 'tool.camera-test.name',
+        description: 'tool.camera-test.desc',
+        icon: Camera,
+        component: () => import('./device/CameraTest'),
+      },
+      {
+        id: 'mic-test',
+        name: 'tool.mic-test.name',
+        description: 'tool.mic-test.desc',
+        icon: Mic,
+        component: () => import('./device/MicrophoneTest'),
+      },
+      {
+        id: 'mouse-test',
+        name: 'tool.mouse-test.name',
+        description: 'tool.mouse-test.desc',
+        icon: Mouse,
+        component: () => import('./device/MouseTest'),
+      },
+      {
+        id: 'keyboard-test',
+        name: 'tool.keyboard-test.name',
+        description: 'tool.keyboard-test.desc',
+        icon: Keyboard,
+        component: () => import('./device/KeyboardTest'),
+      },
+      {
+        id: 'gamepad-test',
+        name: 'tool.gamepad-test.name',
+        description: 'tool.gamepad-test.desc',
+        icon: Gamepad2,
+        component: () => import('./device/GamepadTest'),
+      },
+      {
+        id: 'touch-test',
+        name: 'tool.touch-test.name',
+        description: 'tool.touch-test.desc',
+        icon: Fingerprint,
+        component: () => import('./device/TouchTester'),
+      },
+      {
+        id: 'sensor-test',
+        name: 'tool.sensor-test.name',
+        description: 'tool.sensor-test.desc',
+        icon: Zap,
+        component: () => import('./device/SensorTest'),
+      },
+      {
+        id: 'speaker-test',
+        name: 'tool.speaker-test.name',
+        description: 'tool.speaker-test.desc',
+        icon: Headphones,
+        component: () => import('./device/SpeakerTest'),
       },
     ],
   },
@@ -157,25 +275,39 @@ export const toolRegistry: ToolCategory[] = [
     icon: Search,
     tools: [
       {
-        id: 'http-status',
-        name: 'tool.http-status.name',
-        description: 'tool.http-status.desc',
-        icon: Globe,
-        component: HttpStatus,
-      },
-      {
         id: 'dns-lookup',
         name: 'tool.dns-lookup.name',
         description: 'tool.dns-lookup.desc',
         icon: Globe,
-        component: DnsLookup,
+        component: () => import('./lookup/DnsLookup'),
+      },
+      {
+        id: 'certificate-search',
+        name: 'tool.certificate-search.name',
+        description: 'tool.certificate-search.desc',
+        icon: Shield,
+        component: () => import('./lookup/CertificateSearch'),
+      },
+      {
+        id: 'ip-lookup',
+        name: 'tool.ip-lookup.name',
+        description: 'tool.ip-lookup.desc',
+        icon: MapPin,
+        component: () => import('./lookup/IpLookup'),
+      },
+      {
+        id: 'http-status',
+        name: 'tool.http-status.name',
+        description: 'tool.http-status.desc',
+        icon: Globe,
+        component: () => import('./lookup/HttpStatus'),
       },
       {
         id: 'dns-records-info',
         name: 'tool.dns-records-info.name',
         description: 'tool.dns-records-info.desc',
         icon: FileText,
-        component: DnsRecordsInfo,
+        component: () => import('./lookup/DnsRecordsInfo'),
       },
     ],
   },
@@ -189,14 +321,14 @@ export const toolRegistry: ToolCategory[] = [
         name: 'tool.word-counter.name',
         description: 'tool.word-counter.desc',
         icon: FileText,
-        component: WordCounter,
+        component: () => import('./productivity/WordCounter'),
       },
       {
         id: 'pomodoro',
         name: 'tool.pomodoro.name',
         description: 'tool.pomodoro.desc',
         icon: Timer,
-        component: Pomodoro,
+        component: () => import('./productivity/Pomodoro'),
       },
     ],
   },
@@ -210,56 +342,155 @@ export const toolRegistry: ToolCategory[] = [
         name: 'tool.qr-barcode.name',
         description: 'tool.qr-barcode.desc',
         icon: QrCode,
-        component: QrBarCode,
+        component: () => import('./image/QrBarCode'),
       },
       {
         id: 'paint',
         name: 'tool.paint.name',
         description: 'tool.paint.desc',
         icon: Brush,
-        component: SimplePaint,
+        component: () => import('./image/SimplePaint'),
       },
       {
         id: 'color-converter',
         name: 'tool.color-converter.name',
         description: 'tool.color-converter.desc',
         icon: Palette,
-        component: ColorConverter,
+        component: () => import('./image/ColorConverter'),
       },
       {
         id: 'editor',
         name: 'tool.editor.name',
         description: 'tool.editor.desc',
         icon: Crop,
-        component: ImageEditor,
+        component: () => import('./image/ImageEditor'),
       },
       {
         id: 'converter',
         name: 'tool.converter.name',
         description: 'tool.converter.desc',
         icon: ArrowLeftRight,
-        component: ImageConverter,
+        component: () => import('./image/ImageConverter'),
       },
       {
         id: 'ico-converter',
         name: 'tool.ico-converter.name',
         description: 'tool.ico-converter.desc',
         icon: FileImage,
-        component: IcoConverter,
+        component: () => import('./image/IcoConverter'),
       },
       {
         id: 'ico-viewer',
         name: 'tool.ico-viewer.name',
         description: 'tool.ico-viewer.desc',
         icon: View,
-        component: IcoViewer,
+        component: () => import('./image/IcoViewer'),
       },
       {
         id: 'metadata',
         name: 'tool.metadata.name',
         description: 'tool.metadata.desc',
         icon: Info,
-        component: MetadataViewer,
+        component: () => import('./image/MetadataViewer'),
+      },
+    ],
+  },
+
+  {
+    id: 'text',
+    name: 'category.text',
+    icon: Type,
+    tools: [
+      {
+        id: 'case-converter',
+        name: 'tool.case-converter.name',
+        description: 'tool.case-converter.desc',
+        icon: Type,
+        component: () => import('./text/CaseConverter'),
+      },
+      {
+        id: 'csv-json',
+        name: 'tool.csv-json.name',
+        description: 'tool.csv-json.desc',
+        icon: FileJson,
+        component: () => import('./text/CsvJsonConverter'),
+      },
+      {
+        id: 'lorem-ipsum',
+        name: 'tool.lorem-ipsum.name',
+        description: 'tool.lorem-ipsum.desc',
+        icon: AlignLeft,
+        component: () => import('./text/LoremIpsum'),
+      },
+      {
+        id: 'text-escaper',
+        name: 'tool.text-escaper.name',
+        description: 'tool.text-escaper.desc',
+        icon: Code2,
+        component: () => import('./text/TextEscaper'),
+      },
+    ],
+  },
+  {
+    id: 'network',
+    name: 'category.network',
+    icon: Network,
+    tools: [
+      {
+        id: 'ip-subnet',
+        name: 'tool.ip-subnet.name',
+        description: 'tool.ip-subnet.desc',
+        icon: Network,
+        component: () => import('./network/IpSubnet'),
+      },
+      {
+        id: 'unix-timestamp',
+        name: 'tool.unix-timestamp.name',
+        description: 'tool.unix-timestamp.desc',
+        icon: Clock,
+        component: () => import('./network/UnixTimestamp'),
+      },
+      {
+        id: 'user-agent',
+        name: 'tool.user-agent.name',
+        description: 'tool.user-agent.desc',
+        icon: Monitor,
+        component: () => import('./network/UserAgentParser'),
+      },
+    ],
+  },
+  {
+    id: 'security',
+    name: 'category.security',
+    icon: Shield,
+    tools: [
+      {
+        id: 'password-generator',
+        name: 'tool.password-generator.name',
+        description: 'tool.password-generator.desc',
+        icon: Key,
+        component: () => import('./security/PasswordGenerator'),
+      },
+      {
+        id: 'rsa-generator',
+        name: 'tool.rsa-generator.name',
+        description: 'tool.rsa-generator.desc',
+        icon: Shield,
+        component: () => import('./security/RsaGenerator'),
+      },
+    ],
+  },
+  {
+    id: 'math',
+    name: 'category.math',
+    icon: Calculator,
+    tools: [
+      {
+        id: 'unit-converter',
+        name: 'tool.unit-converter.name',
+        description: 'tool.unit-converter.desc',
+        icon: ArrowLeftRight,
+        component: () => import('./math/UnitConverter'),
       },
     ],
   },

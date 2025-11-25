@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
-import { Card } from '../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
+import { Card } from '../../../components/ui/Card';
 import {
   Play, Download, Copy, Check, FileCode, Palette,
   Image as ImageIcon, Wand2, Loader2, AlertCircle, WrapText, AlignLeft
@@ -30,9 +30,27 @@ import Prism from 'prismjs';
 import html2canvas from 'html2canvas';
 
 // Side-effect imports for Prism languages
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-graphql';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-rust';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-bash';
+import 'prismjs/themes/prism-tomorrow.css';
 
-
-type Language = 'javascript' | 'typescript' | 'html' | 'css' | 'json' | 'yaml' | 'graphql' | 'python' | 'java' | 'c' | 'cpp' | 'csharp' | 'go' | 'rust' | 'sql' | 'bash';
+type Language = 'javascript' | 'typescript' | 'jsx' | 'tsx' | 'markup' | 'css' | 'json' | 'yaml' | 'graphql' | 'python' | 'java' | 'c' | 'cpp' | 'csharp' | 'go' | 'rust' | 'sql' | 'bash';
 
 interface LanguageConfig {
   value: Language;
@@ -44,7 +62,9 @@ interface LanguageConfig {
 const LANGUAGES: LanguageConfig[] = [
   { value: 'javascript', label: 'JavaScript', parser: 'babel', plugins: [parserBabel, parserEstree] },
   { value: 'typescript', label: 'TypeScript', parser: 'babel-ts', plugins: [parserBabel, parserEstree] },
-  { value: 'html', label: 'HTML', parser: 'html', plugins: [parserHtml] },
+  { value: 'jsx', label: 'JSX', parser: 'babel', plugins: [parserBabel, parserEstree] },
+  { value: 'tsx', label: 'TSX', parser: 'babel-ts', plugins: [parserBabel, parserEstree] },
+  { value: 'markup', label: 'HTML', parser: 'html', plugins: [parserHtml] },
   { value: 'css', label: 'CSS', parser: 'css', plugins: [parserPostcss] },
   { value: 'json', label: 'JSON', parser: 'json', plugins: [parserBabel, parserEstree] },
   { value: 'yaml', label: 'YAML', parser: 'yaml', plugins: [parserYaml] },
@@ -128,6 +148,11 @@ const CodeBeautifier: React.FC = () => {
       setCode(formatted);
       // Immediately update debounced to avoid flicker/delay after explicit format action
       setDebouncedCode(formatted);
+      
+      // Re-highlight after formatting
+      setTimeout(() => {
+        if (codeBlockRef.current) Prism.highlightElement(codeBlockRef.current);
+      }, 0);
     } catch (err: any) {
       console.error(err);
       setError(err.message);
@@ -142,9 +167,39 @@ const CodeBeautifier: React.FC = () => {
     try {
       const element = previewRef.current;
 
+      // Check if code is too large for image generation
+      if (debouncedCode.length > 100000) { // 100KB limit
+        throw new Error(t('tool.code-beautifier.code_too_large_for_image'));
+      }
+
+      // Force reflow to ensure all content is visible
+      const preElement = element.querySelector('pre');
+      let originalOverflow = '';
+      let originalOverflowX = '';
+      let originalOverflowY = '';
+      
+      if (preElement) {
+        // Temporarily disable overflow to ensure all content is visible
+        originalOverflow = preElement.style.overflow;
+        originalOverflowX = preElement.style.overflowX;
+        originalOverflowY = preElement.style.overflowY;
+        preElement.style.overflow = 'visible';
+        preElement.style.overflowX = 'visible';
+        preElement.style.overflowY = 'visible';
+        
+        // Wait a tick for the changes to take effect
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
       // Calculate optimized scale to prevent browser crash on huge images
       const { scrollWidth, scrollHeight } = element;
       const area = scrollWidth * scrollHeight;
+      
+      // Check if area is too large
+      if (area > 16000000) { // 16 megapixels
+        throw new Error(t('tool.code-beautifier.code_too_large_for_image'));
+      }
+      
       // Max safe area ~ 16 megapixels roughly? limit scale if huge.
       let scale = 2; // Default retina
       if (area > 4000000) scale = 1; // Drop to 1x if > 4MP
@@ -170,8 +225,33 @@ const CodeBeautifier: React.FC = () => {
             clonedEl.style.display = 'inline-block'; // Forces expansion
             clonedEl.style.margin = '0'; // Reset margin to ensure capture starts at 0,0
           }
+          
+          // Also handle the pre element in the cloned document
+          const clonedPre = clonedDoc.querySelector('pre');
+          if (clonedPre) {
+            clonedPre.style.overflow = 'visible';
+            clonedPre.style.height = 'auto';
+            clonedPre.style.maxHeight = 'none';
+            clonedPre.style.whiteSpace = 'pre-wrap';
+            clonedPre.style.wordBreak = 'break-all';
+          }
+          
+          // Handle code element in the cloned document
+          const clonedCode = clonedDoc.querySelector('code');
+          if (clonedCode) {
+            clonedCode.style.overflow = 'visible';
+            clonedCode.style.height = 'auto';
+            clonedCode.style.maxHeight = 'none';
+          }
         }
       });
+
+      // Restore original overflow settings
+      if (preElement) {
+        preElement.style.overflow = originalOverflow;
+        preElement.style.overflowX = originalOverflowX;
+        preElement.style.overflowY = originalOverflowY;
+      }
 
       const url = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -182,7 +262,20 @@ const CodeBeautifier: React.FC = () => {
       document.body.removeChild(link);
     } catch (err: any) {
       console.error(err);
-      alert(t('tool.code-beautifier.image_generation_failed'));
+      // Show more specific error message
+      const errorMessage = err.message || t('tool.code-beautifier.image_generation_failed');
+      alert(errorMessage);
+      
+      // Restore original overflow settings in case of error
+      const element = previewRef.current;
+      if (element) {
+        const preElement = element.querySelector('pre');
+        if (preElement) {
+          preElement.style.overflow = '';
+          preElement.style.overflowX = '';
+          preElement.style.overflowY = '';
+        }
+      }
     } finally {
       setIsExporting(false);
     }
@@ -329,7 +422,7 @@ const CodeBeautifier: React.FC = () => {
                   <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
                   <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
                   <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-                  <div className="flex-1 text-center text-xs text-gray-500 font-mono opacity-0">code.{language === 'javascript' ? 'js' : language === 'typescript' ? 'ts' : language}</div>
+                  <div className="flex-1 text-center text-xs text-gray-500 font-mono opacity-0">code.{language === 'javascript' ? 'js' : language === 'typescript' ? 'ts' : language === 'jsx' ? 'jsx' : language === 'tsx' ? 'tsx' : language}</div>
                 </div>
 
                 <div className={`p-4 ${wrapLines ? '' : 'overflow-x-auto'}`}>
@@ -337,10 +430,12 @@ const CodeBeautifier: React.FC = () => {
                     className={`language-${language} !bg-transparent !m-0 !p-0 !text-sm !shadow-none`}
                     style={{
                       whiteSpace: wrapLines ? 'pre-wrap' : 'pre',
-                      wordBreak: wrapLines ? 'break-all' : 'normal'
+                      wordBreak: wrapLines ? 'break-all' : 'normal',
+                      overflow: 'visible',
+                      maxHeight: 'none'
                     }}
                   >
-                    <code ref={codeBlockRef} className={`language-${language}`}>
+                    <code ref={codeBlockRef} className={`language-${language} !leading-normal`} style={{ overflow: 'visible' }}>
                       {debouncedCode}
                     </code>
                   </pre>

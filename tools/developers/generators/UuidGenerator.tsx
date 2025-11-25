@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { Slider } from '../../components/ui/Slider';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { Slider } from '../../../components/ui/Slider';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { Copy, RefreshCw, Trash2, Download, Check, Fingerprint, Hash } from 'lucide-react';
 // @ts-ignore
 import { v1, v4, v3, v5, NIL } from 'uuid';
@@ -130,6 +130,12 @@ const UuidGenerator: React.FC = () => {
                 options={[
                   { value: 'v3', label: t('tool.uuid-generator.v3_label') },
                   { value: 'v5', label: t('tool.uuid-generator.v5_label') },
+                ]}
+              />
+              <SegmentedControl<UuidVersion>
+                value={version}
+                onChange={setVersion}
+                options={[
                   { value: 'nil', label: t('tool.uuid-generator.nil_label') },
                 ]}
               />

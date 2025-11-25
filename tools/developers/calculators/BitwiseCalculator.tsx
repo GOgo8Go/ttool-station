@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { Card } from '../../../components/ui/Card';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { Binary, ArrowDown, Delete } from 'lucide-react';
 
 type Format = 'bin' | 'dec' | 'hex';

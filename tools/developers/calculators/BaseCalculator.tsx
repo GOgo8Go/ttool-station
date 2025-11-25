@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { SegmentedControl, Option } from '../../components/ui/SegmentedControl';
+import { Card } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { SegmentedControl, Option } from '../../../components/ui/SegmentedControl';
 import { Calculator, Delete, ArrowRight, HelpCircle, AlertCircle, Cpu, Hash } from 'lucide-react';
 
 type Operation = 'add' | 'sub' | 'mul' | 'div';

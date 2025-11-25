@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
 import { Copy, ArrowRightLeft, Check, AlertCircle, FileText, Upload } from 'lucide-react';
 
 type EncodingType = 'base64' | 'base64url' | 'base32' | 'url' | 'hex' | 'binary' | 'ascii' | 'unicode' | 'octal' | 'html';

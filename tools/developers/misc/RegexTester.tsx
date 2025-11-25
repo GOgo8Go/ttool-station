@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { AlertCircle, Check, Copy, Info, X, Zap } from 'lucide-react';
 
 const FLAGS = [

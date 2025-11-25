@@ -6,7 +6,7 @@ export interface ToolMetadata {
   name: string;
   description: string;
   icon: LucideIcon;
-  component: React.ComponentType;
+  component: React.ComponentType | (() => Promise<{ default: React.ComponentType }>);
 }
 
 export interface ToolCategory {
