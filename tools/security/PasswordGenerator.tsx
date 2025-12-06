@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { RefreshCw, Copy, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Copy, RefreshCw, Check, Shield } from 'lucide-react';
 
 const PasswordGenerator: React.FC = () => {
     const { t } = useTranslation();
@@ -15,13 +15,44 @@ const PasswordGenerator: React.FC = () => {
         symbols: true,
     });
     const [copied, setCopied] = useState(false);
+    const [customSymbols, setCustomSymbols] = useState({
+        '!': true,
+        '@': true,
+        '#': true,
+        '$': true,
+        '%': true,
+        '^': true,
+        '&': true,
+        '*': true,
+        '(': true,
+        ')': true,
+        '_': true,
+        '+': true,
+        '~': true,
+        '`': true,
+        '|': true,
+        '}': true,
+        '{': true,
+        ']': true,
+        '[': true,
+        ':': true,
+        ';': true,
+        '?': true,
+        '>': true,
+        '<': true,
+        ',': true,
+        '.': true,
+        '/': true,
+        '-': true,
+        '=': true,
+    });
 
     const generatePassword = () => {
         const charset = {
             uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             lowercase: 'abcdefghijklmnopqrstuvwxyz',
             numbers: '0123456789',
-            symbols: '!@#$%^&*()_+~`|}{[]:;?><,./-=',
+            symbols: Object.keys(customSymbols).filter(key => customSymbols[key]).join(''),
         };
 
         let chars = '';
@@ -49,7 +80,7 @@ const PasswordGenerator: React.FC = () => {
 
     useEffect(() => {
         generatePassword();
-    }, [length, options]);
+    }, [length, options, customSymbols]);
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(password);
@@ -65,6 +96,29 @@ const PasswordGenerator: React.FC = () => {
         if (options.numbers) score++;
         if (options.symbols) score++;
         return score;
+    };
+
+    const toggleSymbol = (symbol: string) => {
+        setCustomSymbols(prev => ({
+            ...prev,
+            [symbol]: !prev[symbol]
+        }));
+    };
+
+    const selectAllSymbols = () => {
+        const updatedSymbols = Object.keys(customSymbols).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+        }, {} as Record<string, boolean>);
+        setCustomSymbols(updatedSymbols);
+    };
+
+    const deselectAllSymbols = () => {
+        const updatedSymbols = Object.keys(customSymbols).reduce((acc, key) => {
+            acc[key] = false;
+            return acc;
+        }, {} as Record<string, boolean>);
+        setCustomSymbols(updatedSymbols);
     };
 
     const strength = calculateStrength();
@@ -126,6 +180,45 @@ const PasswordGenerator: React.FC = () => {
                             </label>
                         ))}
                     </div>
+
+                    {options.symbols && (
+                        <div className="mt-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {t('tool.password-generator.customize-symbols')}
+                                </h3>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={selectAllSymbols}
+                                        className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                    >
+                                        {t('tool.password-generator.select-all')}
+                                    </button>
+                                    <button 
+                                        onClick={deselectAllSymbols}
+                                        className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
+                                    >
+                                        {t('tool.password-generator.deselect-all')}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {Object.entries(customSymbols).map(([symbol, enabled]) => (
+                                    <button
+                                        key={symbol}
+                                        onClick={() => toggleSymbol(symbol)}
+                                        className={`w-8 h-8 flex items-center justify-center rounded-md border transition-colors ${
+                                            enabled 
+                                                ? 'bg-blue-500 border-blue-600 text-white' 
+                                                : 'bg-gray-100 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500'
+                                        }`}
+                                    >
+                                        {symbol}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Card>
         </div>

@@ -291,6 +291,9 @@ const resources = {
           "lowercase": "Lowercase Letters",
           "numbers": "Numbers",
           "symbols": "Symbols",
+          "customize-symbols": "Customize Symbols",
+          "select-all": "Select All",
+          "deselect-all": "Deselect All",
           "strength": {
             "weak": "Weak",
             "medium": "Medium",
@@ -1678,6 +1681,9 @@ const resources = {
           "lowercase": "小写字母",
           "numbers": "数字",
           "symbols": "符号",
+          "customize-symbols": "自定义符号",
+          "select-all": "全选",
+          "deselect-all": "取消全选",
           "strength": {
             "weak": "弱",
             "medium": "中等",
