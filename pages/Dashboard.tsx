@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
 import { getToolById } from '../tools/registry';
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC<{ isWideMode?: boolean }> = ({ isWideMode = false }) => {
   const { t } = useTranslation();
   const [favoriteTools, setFavoriteTools] = useState<Set<string>>(new Set());
 
@@ -27,13 +27,13 @@ export const Dashboard: React.FC = () => {
   const toggleFavorite = (categoryId: string, toolId: string) => {
     const toolKey = `${categoryId}/${toolId}`;
     const newFavorites = new Set(favoriteTools);
-    
+
     if (newFavorites.has(toolKey)) {
       newFavorites.delete(toolKey);
     } else {
       newFavorites.add(toolKey);
     }
-    
+
     setFavoriteTools(newFavorites);
     localStorage.setItem('favoriteTools', JSON.stringify(Array.from(newFavorites)));
     // 触发自定义事件，通知其他组件收藏状态已更新
@@ -50,15 +50,15 @@ export const Dashboard: React.FC = () => {
       const category = toolRegistry.find(cat => cat.id === categoryId);
       return tool && category ? { ...tool, categoryId, categoryIcon: category.icon } : null;
     })
-    .filter(Boolean) as (ReturnType<typeof getToolById> & { 
-      categoryId: string; 
-      categoryIcon: React.ElementType 
+    .filter(Boolean) as (ReturnType<typeof getToolById> & {
+      categoryId: string;
+      categoryIcon: React.ElementType
     })[];
 
   return (
     <>
       <SEO />
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className={`mx-auto space-y-8 ${isWideMode ? 'w-full' : 'max-w-6xl'}`}>
         <div className="space-y-2">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{t('app.welcome')}</h2>
           <p className="text-gray-500 dark:text-gray-400">{t('app.subtitle')}</p>
@@ -77,7 +77,7 @@ export const Dashboard: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
               {favoriteToolsDetails.map((tool) => {
                 const toolKey = `${tool.categoryId}/${tool.id}`;
-                
+
                 return (
                   <div key={toolKey} className="relative">
                     <Link to={`/tools/${tool.categoryId}/${tool.id}`}>
@@ -107,7 +107,7 @@ export const Dashboard: React.FC = () => {
                 {category.tools.map((tool) => {
                   const toolKey = `${category.id}/${tool.id}`;
                   const isFavorite = favoriteTools.has(toolKey);
-                  
+
                   return (
                     <div key={tool.id} className="relative">
                       <Link to={`/tools/${category.id}/${tool.id}`}>
@@ -126,11 +126,10 @@ export const Dashboard: React.FC = () => {
                               aria-label={isFavorite ? t('app.remove_favorite') : t('app.add_favorite')}
                             >
                               <Star
-                                className={`w-5 h-5 ${
-                                  isFavorite
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'text-gray-300 dark:text-gray-600'
-                                }`}
+                                className={`w-5 h-5 ${isFavorite
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-gray-300 dark:text-gray-600'
+                                  }`}
                               />
                             </button>
                           </div>

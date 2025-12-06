@@ -13,7 +13,9 @@ const AppContent: React.FC<{
   setSidebarOpen: (open: boolean) => void;
   pageTitle: string;
   setPageTitle: (title: string) => void;
-}> = ({ isSidebarOpen, setSidebarOpen, pageTitle, setPageTitle }) => {
+  isWideMode: boolean;
+  setIsWideMode: (wide: boolean) => void;
+}> = ({ isSidebarOpen, setSidebarOpen, pageTitle, setPageTitle, isWideMode, setIsWideMode }) => {
   const location = useLocation();
 
   return (
@@ -35,18 +37,20 @@ const AppContent: React.FC<{
         <Header
           onMenuClick={() => setSidebarOpen(true)}
           title={pageTitle}
+          isWideMode={isWideMode}
+          onToggleWideMode={() => setIsWideMode(!isWideMode)}
         />
 
         <main className="flex-1 overflow-y-auto scroll-smooth">
           <div className="min-h-full flex flex-col">
             <div className="flex-1 p-4 md:p-8">
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Dashboard isWideMode={isWideMode} />} />
                 <Route
                   path="/tools/:categoryId/:toolId"
-                  element={<ToolContainer setTitle={setPageTitle} key={location.pathname} />}
+                  element={<ToolContainer setTitle={setPageTitle} key={location.pathname} isWideMode={isWideMode} />}
                 />
-                <Route path="*" element={<Dashboard />} />
+                <Route path="*" element={<Dashboard isWideMode={isWideMode} />} />
               </Routes>
             </div>
 
@@ -61,6 +65,15 @@ const AppContent: React.FC<{
 const App: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [pageTitle, setPageTitle] = useState('');
+  const [isWideMode, setIsWideMode] = useState(() => {
+    const saved = localStorage.getItem('app_wide_mode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const handleSetWideMode = (wide: boolean) => {
+    setIsWideMode(wide);
+    localStorage.setItem('app_wide_mode', JSON.stringify(wide));
+  };
 
   return (
     <HelmetProvider>
@@ -70,6 +83,8 @@ const App: React.FC = () => {
           setSidebarOpen={setSidebarOpen}
           pageTitle={pageTitle}
           setPageTitle={setPageTitle}
+          isWideMode={isWideMode}
+          setIsWideMode={handleSetWideMode}
         />
       </Router>
     </HelmetProvider>

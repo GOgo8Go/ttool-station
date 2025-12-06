@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Languages, Search } from 'lucide-react';
+import { Menu, Languages, Search, Maximize2, Minimize2 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ColorPalette } from './ColorPalette';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,11 @@ import { useNavigate } from 'react-router-dom';
 interface HeaderProps {
   onMenuClick: () => void;
   title?: string;
+  isWideMode: boolean;
+  onToggleWideMode: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, title, isWideMode, onToggleWideMode }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -183,6 +185,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          onClick={onToggleWideMode}
+          className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors hidden sm:flex items-center gap-1"
+          aria-label={isWideMode ? t('app.exit_wide_mode') : t('app.enter_wide_mode')}
+          title={isWideMode ? t('app.exit_wide_mode') : t('app.enter_wide_mode')}
+        >
+          {isWideMode ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+        </button>
         <button
           onClick={toggleLanguage}
           className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"

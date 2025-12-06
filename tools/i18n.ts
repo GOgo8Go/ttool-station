@@ -21,7 +21,9 @@ const resources = {
         common_tools: "Common Tools",
         favorite_tools: "Favorite Tools",
         add_favorite: "Add to favorites",
-        remove_favorite: "Remove from favorites"
+        remove_favorite: "Remove from favorites",
+        enter_wide_mode: "Enter Wide Mode",
+        exit_wide_mode: "Exit Wide Mode"
       },
       common: {
         copy: "Copy",
@@ -917,10 +919,28 @@ const resources = {
             "quarter": "Quarter (25%)",
             "high": "High (30%)",
             "copy_image": "Copy Image",
-            "download_png": "Download PNG"
+            "download_png": "Download PNG",
+            "style_settings": "Style Settings",
+            "dots_style": "Dots Style",
+            "corners_square_style": "Corners Square Style",
+            "corners_dot_style": "Corners Dot Style",
+            "center_image": "Center Image",
+            "background_image": "Background Image",
+            "styles": {
+              "square": "Square",
+              "dots": "Dots",
+              "rounded": "Rounded",
+              "classy": "Classy",
+              "classy_rounded": "Classy Rounded",
+              "extra_rounded": "Extra Rounded",
+              "dot": "Dot"
+            },
+            "upload_image": "Upload Image",
+            "remove_image": "Remove Image"
           },
           "scanner": {
             "title": "Code Scanner",
+            "allow_camera": "Please allow camera access.",
             "camera": "Camera",
             "upload_image": "Upload Image",
             "start_scanning": "Start Scanning",
@@ -1355,7 +1375,9 @@ const resources = {
         common_tools: "常用工具",
         favorite_tools: "收藏工具",
         add_favorite: "添加到收藏",
-        remove_favorite: "从收藏中移除"
+        remove_favorite: "从收藏中移除",
+        enter_wide_mode: "进入宽屏模式",
+        exit_wide_mode: "退出宽屏模式"
       },
       common: {
         copy: "复制",
@@ -2254,10 +2276,28 @@ const resources = {
             "quarter": "四分之一 (25%)",
             "high": "高 (30%)",
             "copy_image": "复制图像",
-            "download_png": "下载 PNG"
+            "download_png": "下载 PNG",
+            "style_settings": "样式设置",
+            "dots_style": "点样式",
+            "corners_square_style": "定位点边框样式",
+            "corners_dot_style": "定位点中心样式",
+            "center_image": "中心图片",
+            "background_image": "背景图片",
+            "styles": {
+              "square": "方块",
+              "dots": "圆点",
+              "rounded": "圆角",
+              "classy": "优雅",
+              "classy_rounded": "优雅圆角",
+              "extra_rounded": "超圆",
+              "dot": "点"
+            },
+            "upload_image": "上传图片",
+            "remove_image": "移除图片"
           },
           "scanner": {
             "title": "代码扫描器",
+            "allow_camera": "请允许访问摄像头。",
             "camera": "摄像头",
             "upload_image": "上传图像",
             "start_scanning": "开始扫描",

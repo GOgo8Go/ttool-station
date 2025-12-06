@@ -6,7 +6,7 @@ import { Card } from '../components/ui/Card';
 import { SEO } from '../components/SEO';
 import { getToolKeywords } from '../utils/seoKeywords';
 
-export const ToolContainer: React.FC<{ setTitle: (t: string) => void }> = ({ setTitle }) => {
+export const ToolContainer: React.FC<{ setTitle: (t: string) => void; isWideMode?: boolean }> = ({ setTitle, isWideMode = false }) => {
   const { categoryId, toolId } = useParams<{ categoryId: string; toolId: string }>();
   const { t } = useTranslation();
 
@@ -41,7 +41,7 @@ export const ToolContainer: React.FC<{ setTitle: (t: string) => void }> = ({ set
         toolId={toolId}
         categoryId={categoryId}
       />
-      <div className="max-w-5xl mx-auto flex flex-col">
+      <div className={`mx-auto flex flex-col ${isWideMode ? 'w-full' : 'max-w-5xl'}`}>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
