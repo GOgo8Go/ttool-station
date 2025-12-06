@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme Color Variables */
+:root {
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-900: #0c4a6e;
+
+    /* Dark mode background colors (will be updated dynamically) */
+    --color-dark-bg-900: rgb(17, 24, 39);
+    /* gray-900 equivalent */
+    --color-dark-bg-800: rgb(31, 41, 55);
+    /* gray-800 equivalent */
+    --color-dark-bg-700: rgb(55, 65, 81);
+    /* gray-700 equivalent */
+}
+
+/* Utility classes for dynamic dark mode backgrounds */
+.dark .bg-theme-dark-900 {
+    background-color: var(--color-dark-bg-900);
+}
+
+.dark .bg-theme-dark-800 {
+    background-color: var(--color-dark-bg-800);
+}
+
+.dark .bg-theme-dark-800\/50 {
+    background-color: var(--color-dark-bg-800);
+    opacity: 0.5;
+}
+
+.dark .border-theme-dark-700 {
+    border-color: var(--color-dark-bg-700);
+}
+
 /* Global Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;

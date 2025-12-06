@@ -17,7 +17,7 @@ const AppContent: React.FC<{
   const location = useLocation();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 bg-theme-dark-900 transition-colors duration-200">
       {/* Overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div

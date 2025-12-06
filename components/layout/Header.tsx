@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Languages, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { ColorPalette } from './ColorPalette';
 import { useTranslation } from 'react-i18next';
 import { toolRegistry } from '../../tools/registry';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredTools, setFilteredTools] = useState<{categoryId: string, toolId: string, name: string}[]>([]);
+  const [filteredTools, setFilteredTools] = useState<{ categoryId: string, toolId: string, name: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -50,10 +51,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
     }
 
     const allTools = getAllTools();
-    const filtered = allTools.filter(tool => 
+    const filtered = allTools.filter(tool =>
       tool.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    
+
     setFilteredTools(filtered);
     setShowDropdown(true);
     setSelectedIndex(filtered.length > 0 ? 0 : -1); // 默认选中第一个
@@ -90,16 +91,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < filteredTools.length - 1 ? prev + 1 : prev
         );
         break;
-        
+
       case 'ArrowUp':
         e.preventDefault();
         setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
         break;
-        
+
       case 'Enter':
         e.preventDefault();
         if (selectedIndex >= 0 && filteredTools.length > 0) {
@@ -107,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
           handleToolSelect(selectedTool.categoryId, selectedTool.toolId);
         }
         break;
-        
+
       case 'Escape':
         setShowDropdown(false);
         setSelectedIndex(-1);
@@ -126,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
   }, [selectedIndex]);
 
   return (
-    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-6 transition-colors duration-200">
+    <header className="h-16 bg-white dark:bg-gray-900 bg-theme-dark-900 border-b border-gray-200 dark:border-gray-800 border-theme-dark-700 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-6 transition-colors duration-200">
       <div className="flex items-center">
         <button
           onClick={onMenuClick}
@@ -134,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
         >
           <Menu className="w-6 h-6" />
         </button>
-        
+
         {/* 搜索框 */}
         <div className="relative flex-1 max-w-md">
           <form onSubmit={handleSearchSubmit} className="relative">
@@ -162,11 +163,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                       key={`${tool.categoryId}-${tool.toolId}`}
                       ref={el => dropdownItemRefs.current[index] = el}
                       onClick={() => handleToolSelect(tool.categoryId, tool.toolId)}
-                      className={`block w-full text-left px-4 py-2 text-sm ${
-                        index === selectedIndex 
-                          ? 'bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100' 
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
+                      className={`block w-full text-left px-4 py-2 text-sm ${index === selectedIndex
+                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
                     >
                       {tool.name}
                     </button>
@@ -181,7 +181,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
           )}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2">
         <button
           onClick={toggleLanguage}
@@ -192,6 +192,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
           <Languages className="w-5 h-5" />
           <span className="text-xs font-medium uppercase">{i18n.language.startsWith('zh') ? 'ZH' : 'EN'}</span>
         </button>
+        <ColorPalette />
         <ThemeToggle />
       </div>
     </header>
