@@ -4,10 +4,7 @@
     "welcome": "편리한 프론트엔드 유틸리티에 오신 것을 환영합니다",
     "subtitle": "사이드바에서 도구를 선택하거나 아래에서 하나를 골라 시작하세요.",
     "footer": {
-      "copyright": "Zinc233",
-      "info": "React로 제작",
-      "icp": "苏ICP备2025209618号-1",
-      "police_filing": "苏公网安备32060202002684号"
+      "info": "React로 제작"
     },
     "not_found": "도구를 찾을 수 없음",
     "dashboard": "대시보드",

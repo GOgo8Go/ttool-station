@@ -4,10 +4,7 @@
     "welcome": "欢迎使用 简简单单的前端小工具",
     "subtitle": "从侧边栏选择一个工具或在下方选择以开始使用。",
     "footer": {
-      "copyright": "Zinc233",
-      "info": "基于 React 构建",
-      "icp": "苏ICP备2025209618号-1",
-      "police_filing": "苏公网安备32060202002684号"
+      "info": "基于 React 构建"
     },
     "not_found": "未找到工具",
     "dashboard": "仪表盘",
