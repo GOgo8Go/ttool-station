@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
                         © {currentYear} {t('app.footer.copyright')}
                     </a>
                     <span className="hidden sm:inline">•</span>
-                    <span className="text-xs">{t('app.footer.version')}</span>
+                    <span className="text-xs">{t('app.footer.version')} • {t('app.footer.info')}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                     <a

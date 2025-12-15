@@ -5,7 +5,8 @@
     "subtitle": "从侧边栏选择一个工具或在下方选择以开始使用。",
     "footer": {
       "copyright": "Zinc233",
-      "version": "v1.0.1 • 基于 React 构建",
+      "version": "v1.0.1",
+      "info": "基于 React 构建",
       "icp": "苏ICP备2025209618号-1",
       "police_filing": "苏公网安备32060202002684号"
     },

@@ -5,7 +5,8 @@
     "subtitle": "사이드바에서 도구를 선택하거나 아래에서 하나를 골라 시작하세요.",
     "footer": {
       "copyright": "Zinc233",
-      "version": "v1.0.1 • React로 제작",
+      "version": "v1.0.1",
+      "info": "React로 제작",
       "icp": "苏ICP备2025209618号-1",
       "police_filing": "苏公网安备32060202002684号"
     },

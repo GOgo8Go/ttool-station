@@ -5,7 +5,8 @@
     "subtitle": "Select a tool from the sidebar or choose one below to get started.",
     "footer": {
       "copyright": "Zinc233",
-      "version": "v1.0.1 • Built with React",
+      "version": "v1.0.1",
+      "info": "Built with React",
       "icp": "苏ICP备2025209618号-1",
       "police_filing": "苏公网安备32060202002684号"
     },
