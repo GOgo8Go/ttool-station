@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -17,6 +16,17 @@ const AppContent: React.FC<{
   setIsWideMode: (wide: boolean) => void;
 }> = ({ isSidebarOpen, setSidebarOpen, pageTitle, setPageTitle, isWideMode, setIsWideMode }) => {
   const location = useLocation();
+
+  // Update HTML lang attribute when language changes
+  useEffect(() => {
+    document.documentElement.lang = 'zh'; // 默认语言
+    
+    // 监听i18next语言变化（如果需要动态更新）
+    // 这里简化处理，实际可能需要从i18n实例获取当前语言
+    return () => {
+      document.documentElement.lang = 'zh';
+    };
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 bg-theme-dark-900 transition-colors duration-200">
@@ -76,18 +86,16 @@ const App: React.FC = () => {
   };
 
   return (
-    <HelmetProvider>
-      <Router>
-        <AppContent
-          isSidebarOpen={isSidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          pageTitle={pageTitle}
-          setPageTitle={setPageTitle}
-          isWideMode={isWideMode}
-          setIsWideMode={handleSetWideMode}
-        />
-      </Router>
-    </HelmetProvider>
+    <Router>
+      <AppContent
+        isSidebarOpen={isSidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        pageTitle={pageTitle}
+        setPageTitle={setPageTitle}
+        isWideMode={isWideMode}
+        setIsWideMode={handleSetWideMode}
+      />
+    </Router>
   );
 };
 
