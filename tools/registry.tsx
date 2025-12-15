@@ -1,4 +1,12 @@
-import { Code2, FileText, Timer, Calculator, Settings, Braces, Image as ImageIcon, ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode, FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint, Zap, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma, SquareFunction, Mic, Headphones, Mouse, Keyboard, Gamepad2, Monitor, Key, Clock, Terminal, Database, Type, FileJson, AlignLeft, Shield, Network, Cpu, Link, MapPin } from 'lucide-react';
+import { 
+  Code2, FileText, Timer, Calculator, Settings, Braces, ImageIcon, 
+  ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode, 
+  FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint, 
+  Zap, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma, 
+  SquareFunction, Mic, Headphones, Mouse, Keyboard, Gamepad2, Monitor, 
+  Key, Clock, Terminal, Database, Type, FileJson, AlignLeft, Shield, 
+  Network, Cpu, Link, MapPin, FileVideo, FileAudio 
+} from 'lucide-react';
 import { ToolCategory } from '../types';
 
 // 工具注册表 - 使用动态导入而不是直接导入所有组件
@@ -191,13 +199,13 @@ export const toolRegistry: ToolCategory[] = [
         component: () => import('./files/ArchiveExtractor'),
       },
       {
-        id: 'pdf-tools',
-        name: 'tool.pdf-tools.name',
-        description: 'tool.pdf-tools.desc',
-        icon: FileStack,
-        component: () => import('./pdf/PdfTools'),
-      },
-    ],
+        id: 'video-audio-converter',
+        name: 'tool.video-audio-converter.name',
+        description: 'tool.video-audio-converter.description',
+        icon: FileVideo,
+        component: () => import('./files/VideoAudioConverter'),
+      }
+    ]
   },
   {
     id: 'device',
