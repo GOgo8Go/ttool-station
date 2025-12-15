@@ -1402,6 +1402,25 @@
       "note-content": "Your files are processed locally in your browser. No data is sent to any server.",
       "change-file": "Change File",
       "auto-selected": "Auto Selected"
+    },
+    "ffmpeg": {
+      "name": "FFmpeg",
+      "description": "Run custom FFmpeg commands directly in your browser",
+      "command": "FFmpeg Command",
+      "command_placeholder": "e.g., -i input.mp4 -vf scale=1280:720 output.mp4",
+      "execute": "Execute FFmpeg Command",
+      "executing": "Executing...",
+      "files": "Files",
+      "drag_drop_files": "Drag & drop files here",
+      "or_click_select": "Or click to select files",
+      "select_files": "Select Files",
+      "no_files_added": "No files added yet",
+      "output_files": "Output Files",
+      "execution_logs": "Execution Logs",
+      "logs_empty": "Execution logs will appear here",
+      "writing_file": "Writing file: {{fileName}}",
+      "reading_output": "Reading output file: {{fileName}}",
+      "execution_completed": "Execution completed successfully"
     }
   }
 }
