@@ -20,13 +20,40 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title, isWideMode, 
   const [filteredTools, setFilteredTools] = useState<{ categoryId: string, toolId: string, name: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const languageButtonRef = useRef<HTMLButtonElement>(null);
 
-  const toggleLanguage = () => {
-    const nextLang = i18n.language.startsWith('zh') ? 'en' : 'zh';
-    i18n.changeLanguage(nextLang);
+  // 支持的语言列表
+  const languages = [
+    { code: 'zh', name: '中文', flag: '🇨🇳' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'jp', name: '日本語', flag: '🇯🇵' },
+    { code: 'kr', name: '한국어', flag: '🇰🇷' },
+    { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+  ];
+
+  // 切换语言
+  const changeLanguage = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+    setShowLanguageDropdown(false);
   };
+
+  // 点击其他地方关闭语言下拉菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (languageButtonRef.current && !languageButtonRef.current.contains(event.target as Node) && 
+          !(event.target as Element)?.closest('.language-dropdown')) {
+        setShowLanguageDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // 获取所有工具的扁平化列表
   const getAllTools = () => {
@@ -193,15 +220,44 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title, isWideMode, 
         >
           {isWideMode ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
         </button>
-        <button
-          onClick={toggleLanguage}
-          className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"
-          aria-label="Switch Language"
-          title={i18n.language.startsWith('zh') ? 'Switch to English' : '切换到中文'}
-        >
-          <Languages className="w-5 h-5" />
-          <span className="text-xs font-medium uppercase">{i18n.language.startsWith('zh') ? 'ZH' : 'EN'}</span>
-        </button>
+        
+        {/* 语言选择下拉菜单 */}
+        <div className="relative">
+          <button
+            ref={languageButtonRef}
+            onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"
+            aria-label="Switch Language"
+            title={t('common.switch_language')}
+          >
+            <Languages className="w-5 h-5" />
+            <span className="text-xs font-medium uppercase">
+              {languages.find(lang => lang.code === i18n.language)?.code || i18n.language}
+            </span>
+          </button>
+          
+          {showLanguageDropdown && (
+            <div className="language-dropdown absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+              <div className="py-1">
+                {languages.map((language) => (
+                  <button
+                    key={language.code}
+                    onClick={() => changeLanguage(language.code)}
+                    className={`block w-full text-left px-4 py-2 text-sm ${
+                      i18n.language === language.code
+                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <span className="mr-2">{language.flag}</span>
+                    {language.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
         <ColorPalette />
         <ThemeToggle />
       </div>
