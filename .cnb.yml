@@ -1,6 +1,6 @@
 main:
   push:
-    - imports: https://cnb.cool/zinc233/secrets/-/blob/main/tencent/edgeone.env
+    - imports: https://cnb.cool/zinc233/secrets/-/blob/main/tencent/edgeone.env.yml
     
       stages:
         - name: Build Current Project
