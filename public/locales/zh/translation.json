@@ -1573,7 +1573,9 @@
       "no_functions": "暂无可用功能",
       "apply": "应用",
       "select_option": "选择一个选项",
-      "file_placeholder": "选择一个文件"
+      "file_placeholder": "选择一个文件",
+      "upload_more": "上传更多",
+      "select_uploaded_file": "选择已上传的文件"
     }
   }
 }

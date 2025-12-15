@@ -204,6 +204,13 @@ export const toolRegistry: ToolCategory[] = [
         description: 'tool.video-audio-converter.description',
         icon: FileVideo,
         component: () => import('./files/VideoAudioConverter'),
+      },
+      {
+        id: 'ffmpeg',
+        name: 'tool.ffmpeg.name',
+        description: 'tool.ffmpeg.description',
+        icon: Terminal,
+        component: () => import('./files/FFmpeg'),
       }
     ]
   },
