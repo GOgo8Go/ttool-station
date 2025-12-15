@@ -8,5 +8,6 @@ main:
           script: node -v && npm install && npm run generate:sitemap && npm run build
 
         - name: Deploy to EdgeOne Pages
-          image: node:20
-          script: npx edgeone pages deploy dist -n tool-site -t $EDGEONE_API_TOKEN
+          image: tencentcom/deploy-eopages:latest
+          script: |
+            edgeone pages deploy dist -n tool-site -t $EDGEONE_PAGES_API_TOKEN
