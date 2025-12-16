@@ -1,30 +1,30 @@
 {
   "category": {
-    "coding": "",
-    "calculators": "",
-    "converters": "",
-    "generators": "",
-    "security-dev": "",
-    "regex": "",
-    "system-info": "",
-    "files": "",
-    "device": "",
-    "lookup": "",
-    "productivity": "",
-    "image": "",
-    "text": "",
-    "network": "",
-    "security": "",
-    "math": ""
+    "coding": "コーディング",
+    "calculators": "計算機",
+    "converters": "コンバータ",
+    "generators": "ジェネレータ",
+    "security-dev": "開発者向けセキュリティツール",
+    "regex": "正規表現",
+    "system-info": "システム情報",
+    "files": "ファイル処理",
+    "device": "デバイステスト",
+    "lookup": "検索ツール",
+    "productivity": "生産性ツール",
+    "image": "画像処理",
+    "text": "テキスト処理",
+    "network": "ネットワークツール",
+    "security": "セキュリティツール",
+    "math": "数学"
   },
   "tool": {
     "json-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "JSONフォーマッター",
+      "desc": "オンラインJSON解析・フォーマットツールで、JSON構文の正確性を検証できます"
     },
     "code-diff": {
-      "name": "",
-      "desc": "",
+      "name": "コード差分比較",
+      "desc": "2つのコード間の差分をオンラインで比較し、複数の表示モードと空白文字無視オプションをサポート",
       "split": "分割",
       "unified": "統合",
       "ignore_whitespace": "空白を無視",
@@ -37,8 +37,8 @@
       "no_diffs": "違いが見つからないか、入力が空です。"
     },
     "code-beautifier": {
-      "name": "",
-      "desc": "",
+      "name": "コード整形",
+      "desc": "複数のプログラミング言語のコードを整形し、シンタックスハイライトを適用",
       "paste_code_here": "// ここにコードを貼り付けてください",
       "unsupported_language": "未対応言語",
       "formatting_not_supported": "この言語のブラウザ内フォーマットは現在対応していません。",
@@ -64,12 +64,12 @@
       "preview": "プレビュー"
     },
     "sql-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "SQLフォーマッター",
+      "desc": "SQLクエリの整形とフォーマット"
     },
     "latex-editor": {
-      "name": "",
-      "desc": "",
+      "name": "LaTeXエディタ",
+      "desc": "LaTeX数式の編集とプレビュー",
       "render_error": "LaTeXレンダリングエラー。構文を確認してください。",
       "empty_placeholder": "LaTeXを入力するとプレビューが表示されます...",
       "export_error": "エクスポート失敗。もう一度試してください。",
@@ -102,8 +102,8 @@
       "square_root": "平方根"
     },
     "base-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "基数計算機",
+      "desc": "2進数、8進数、10進数、16進数間の変換と基本的な算術演算",
       "binary_addition": "2進数加算",
       "carries": "繰上がり",
       "binary_subtraction": "2進数減算",
@@ -127,8 +127,8 @@
       "division_by_zero": "ゼロ除算"
     },
     "bigint-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "BigInt計算機",
+      "desc": "大きな整数の基本的な算術演算と数論関数",
       "enter_value_a": "値Aを入力してください",
       "enter_value_b": "値Bを入力してください",
       "invalid_inputs": "入力は有効な整数である必要があります",
@@ -143,20 +143,20 @@
       "lcm": "最小公倍数"
     },
     "bitwise-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "ビット演算計算機",
+      "desc": "ビット単位の演算（AND、OR、XOR、NOT、左シフト、右シフトなど）をサポートする計算機で、32ビットの視覚化表示を提供します",
       "operand_a": "被演算子A",
       "shift_amount": "シフト量",
       "operand_b": "被演算子B",
       "visualization": "ビット演算視覚化(32ビット)"
     },
     "base-converter": {
-      "name": "",
-      "desc": ""
+      "name": "基数変換器",
+      "desc": "一般的な基数（2進数、8進数、10進数、16進数）とカスタム基数間の相互変換をサポート"
     },
     "encoding-converter": {
-      "name": "",
-      "desc": "",
+      "name": "エンコーディング変換器",
+      "desc": "Base64、URLエンコード、16進数、バイナリなどの複数のエンコード形式のエンコードおよびデコードをサポートするツールで、ブラウザ上でファイルをローカル処理します",
       "encodings": {
         "base64": "Base64",
         "base64_desc": "標準 Base64 エンコーディング",
@@ -197,8 +197,8 @@
       "info_text": "対応\"エンコーディング\": Base64(標準およびURLセーフ)、URLエンコーディング、16進数、バイナリ。すべての変換はブラウザ内でローカルに実行されます。入力、貼り付け、ドラッグ&ドロップ、ファイルアップロードが可能です。"
     },
     "config-converter": {
-      "name": "",
-      "desc": "",
+      "name": "設定ファイル変換器",
+      "desc": "JSON、YAML、TOML、XML、INIなどの複数の設定ファイル形式間の相互変換をサポート",
       "parse_error": "解析エラー",
       "parsed_content_empty": "解析されたコンテンツが空または無効です。",
       "toml_error": "TOML生成\"エラー\": {{error}}。データにnullや混合型配列が含まれていないことを確認してください。",
@@ -217,8 +217,8 @@
       "result_placeholder": "結果はここに表示されます..."
     },
     "curl-converter": {
-      "name": "",
-      "desc": "",
+      "name": "cURL変換器",
+      "desc": "cURLコマンスドをPython、JavaScript、PHPなどの複数のプログラミング言語のコードに変換",
       "invalid_curl": "無効なcURLコマンド",
       "curl_command": "Curlコマンド",
       "output_code": "出力コード",
@@ -1136,12 +1136,12 @@
       "gps": "GPS"
     },
     "case-converter": {
-      "name": "",
-      "desc": ""
+      "name": "ケース変換器",
+      "desc": "テキストの大文字小文字を変換（大文字、小文字、キャメルケース、パスカルケース、スネークケース、ケバブケースなど）"
     },
     "csv-json": {
-      "name": "",
-      "desc": "",
+      "name": "CSV/JSON変換器",
+      "desc": "CSVデータとJSONデータ間の相互変換をサポート",
       "error": {
         "conversion_failed": "変換失敗"
       },
@@ -1159,8 +1159,8 @@
       }
     },
     "lorem-ipsum": {
-      "name": "",
-      "desc": "",
+      "name": "Lorem Ipsum ジェネレータ",
+      "desc": "印刷業界やウェブデザイン業界で使用されるダミーテキストジェネレータ",
       "count": "数",
       "type": "タイプ",
       "paragraphs": "段落",
@@ -1168,8 +1168,8 @@
       "words": "語"
     },
     "text-escaper": {
-      "name": "",
-      "desc": "",
+      "name": "テキストエスケープツール",
+      "desc": "さまざまなプログラミング言語（Java、JavaScript、HTML、JSON、XML、SQLなど）用のテキストエスケープおよびアンエスケープ",
       "error_invalid_input": "エラー: 選択した操作に対して無効な入力です",
       "escape": "エスケープ",
       "unescape": "アンエスケープ",

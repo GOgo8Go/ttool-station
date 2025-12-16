@@ -1,30 +1,30 @@
 {
   "category": {
-    "coding": "",
-    "calculators": "",
-    "converters": "",
-    "generators": "",
-    "security-dev": "",
-    "regex": "",
-    "system-info": "",
-    "files": "",
-    "device": "",
-    "lookup": "",
-    "productivity": "",
-    "image": "",
-    "text": "",
-    "network": "",
-    "security": "",
-    "math": ""
+    "coding": "Coding",
+    "calculators": "Calculators",
+    "converters": "Converters",
+    "generators": "Generators",
+    "security-dev": "Developer Security Tools",
+    "regex": "Regular Expression",
+    "system-info": "System Information",
+    "files": "File Processing",
+    "device": "Device Testing",
+    "lookup": "Lookup Tools",
+    "productivity": "Productivity Tools",
+    "image": "Image Processing",
+    "text": "Text Processing",
+    "network": "Network Tools",
+    "security": "Security Tools",
+    "math": "Mathematics"
   },
   "tool": {
     "json-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "JSON Formatter",
+      "desc": "Online JSON parser and formatter with syntax validation support"
     },
     "code-diff": {
-      "name": "",
-      "desc": "",
+      "name": "Code Difference Checker",
+      "desc": "Compare differences between two pieces of code online with various display modes and whitespace ignore options",
       "split": "Split",
       "unified": "Unified",
       "ignore_whitespace": "Ignore Whitespace",
@@ -37,8 +37,8 @@
       "no_diffs": "No differences found or empty input."
     },
     "code-beautifier": {
-      "name": "",
-      "desc": "",
+      "name": "Code Beautifier",
+      "desc": "Code formatter and beautifier supporting multiple programming languages, can generate code screenshots",
       "paste_code_here": "// Paste your code here",
       "unsupported_language": "Unsupported language",
       "formatting_not_supported": "Formatting is not currently supported for this language in browser.",
@@ -64,12 +64,12 @@
       "preview": "Preview"
     },
     "sql-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "SQL Formatter",
+      "desc": "Online SQL statement formatter supporting multiple database dialects"
     },
     "latex-editor": {
-      "name": "",
-      "desc": "",
+      "name": "LaTeX Editor",
+      "desc": "Online LaTeX formula editor with real-time preview and export to multiple formats",
       "render_error": "LaTeX rendering error. Please check your syntax.",
       "empty_placeholder": "Enter LaTeX to see preview...",
       "export_error": "Export failed. Please try again.",
@@ -102,8 +102,8 @@
       "square_root": "Square root"
     },
     "base-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "Base Calculator",
+      "desc": "Basic mathematical operations supporting multiple bases (binary, octal, decimal, hexadecimal) with detailed calculation steps",
       "binary_addition": "Binary Addition",
       "carries": "Carries",
       "binary_subtraction": "Binary Subtraction",
@@ -127,8 +127,8 @@
       "division_by_zero": "Division by zero"
     },
     "bigint-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "Big Number Calculator",
+      "desc": "Calculator supporting arbitrary precision integer operations including addition, subtraction, multiplication, division, power operations, modulo operations, and greatest common divisor and least common multiple calculations",
       "enter_value_a": "Please enter value A",
       "enter_value_b": "Please enter value B",
       "invalid_inputs": "Inputs must be valid integers",
@@ -143,20 +143,20 @@
       "lcm": "LCM (Least Multiple)"
     },
     "bitwise-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "Bitwise Calculator",
+      "desc": "Calculator supporting multiple bitwise operations (AND, OR, XOR, NOT, left shift, right shift, etc.) with 32-bit visualization",
       "operand_a": "Operand A",
       "shift_amount": "Shift Amount",
       "operand_b": "Operand B",
       "visualization": "Bitwise Visualization (32-bit)"
     },
     "base-converter": {
-      "name": "",
-      "desc": ""
+      "name": "Base Converter",
+      "desc": "Mutual conversion between common bases (binary, octal, decimal, hexadecimal) and custom bases"
     },
     "encoding-converter": {
-      "name": "",
-      "desc": "",
+      "name": "Encoding Converter",
+      "desc": "Encoding and decoding tool supporting multiple encoding formats (Base64, URL encoding, hexadecimal, binary, etc.) processed locally in the browser",
       "encodings": {
         "base64": "Base64",
         "base64_desc": "Standard Base64 encoding",
@@ -197,8 +197,8 @@
       "info_text": "Supported \"Encodings\": Base64 (standard and URL-safe), URL encoding, Hexadecimal, and Binary. All conversions are performed locally in your browser. You can type, paste, drag & drop, or upload files."
     },
     "config-converter": {
-      "name": "",
-      "desc": "",
+      "name": "Configuration File Converter",
+      "desc": "Converter supporting mutual conversion between multiple configuration file formats including JSON, YAML, TOML, XML and INI",
       "parse_error": "Parse Error",
       "parsed_content_empty": "Parsed content is empty or invalid.",
       "toml_error": "TOML Generation \"Error\": {{error}}. Ensure data doesn't contain nulls or mixed-type arrays.",
@@ -217,8 +217,8 @@
       "result_placeholder": "Result will appear here..."
     },
     "curl-converter": {
-      "name": "",
-      "desc": "",
+      "name": "cURL Converter",
+      "desc": "Convert cURL commands to Python, JavaScript, PHP and other programming languages",
       "invalid_curl": "Invalid cURL command",
       "curl_command": "Curl Command",
       "output_code": "Output Code",
@@ -228,8 +228,8 @@
       "generated_code_placeholder": "// Generated code will appear here"
     },
     "uuid-generator": {
-      "name": "",
-      "desc": "",
+      "name": "UUID Generator",
+      "desc": "Online generator for universally unique identifiers (UUIDs)",
       "invalid_namespace": "Invalid Namespace UUID",
       "version": "Version",
       "v1_label": "v1 (Time)",
@@ -258,8 +258,8 @@
       "ready_to_generate": "Ready to generate."
     },
     "cron-generator": {
-      "name": "",
-      "desc": "",
+      "name": "Cron Generator",
+      "desc": "Online generator for cron expressions",
       "invalid_cron": "Invalid Cron Expression",
       "every_minute": "Every minute",
       "every_hour": "Every hour",
@@ -271,8 +271,8 @@
       "every_month_1st": "1st of every month"
     },
     "hash-generator": {
-      "name": "",
-      "desc": "",
+      "name": "Hash Generator",
+      "desc": "Online generator for various hash functions",
       "copy_all": "Copy All",
       "error_reading_file": "Error reading file",
       "text_input": "Text Input",
@@ -287,8 +287,8 @@
       "enter_text_or_file": "Enter text or upload a file to generate hashes."
     },
     "jwt-decoder": {
-      "name": "",
-      "desc": "",
+      "name": "JWT Decoder",
+      "desc": "Online decoder for JSON Web Tokens (JWT)",
       "invalid_token": "Invalid Token",
       "token_label": "JWT Token",
       "placeholder": "Paste JWT Token here...",
@@ -296,8 +296,8 @@
       "valid": "Valid"
     },
     "regex-tester": {
-      "name": "",
-      "desc": "",
+      "name": "Regex Tester",
+      "desc": "Online tester for regular expressions",
       "match": "Match",
       "index": "Index",
       "regex_input": "Regular Expression",
@@ -315,8 +315,8 @@
       "click_append": "Click to append"
     },
     "browser-info": {
-      "name": "",
-      "desc": "",
+      "name": "Browser Info",
+      "desc": "Online tool to display information about your browser",
       "unknown": "Unknown",
       "system_browser": "System & Browser",
       "browser": "Browser",
@@ -364,8 +364,8 @@
       "copy_report": "Copy Report"
     },
     "archive-extractor": {
-      "name": "",
-      "desc": "",
+      "name": "Archive Extractor",
+      "desc": "Online tool to extract files from ZIP archives",
       "unknown_error": "Unknown error",
       "invalid_zip_error": "Invalid or corrupted ZIP file. Please ensure it is a valid .zip archive (RAR and 7z are not supported).",
       "read_error": "Failed to read \"archive\": {{error}}",
@@ -392,8 +392,8 @@
       "unlock": "Unlock"
     },
     "pdf-tools": {
-      "name": "",
-      "desc": "",
+      "name": "PDF Tools",
+      "desc": "Online tool to merge, edit, and extract pages from PDF files",
       "errors": {
         "merge_min_files": "Please select at least 2 PDF files to merge.",
         "merge_failed": "Failed to merge PDFs. Please ensure files are not password protected or corrupted.",
@@ -424,8 +424,8 @@
       "save_pdf": "Save PDF"
     },
     "video-audio-converter": {
-      "name": "",
-      "description": "",
+      "name": "Video/Audio Converter",
+      "description": "Online tool to convert video and audio files between various formats",
       "conversion-success": "Conversion completed successfully!",
       "conversion-error": "Error during conversion",
       "change-file": "Change File",
@@ -471,8 +471,8 @@
       "note-content": "Your files are processed locally in your browser. No data is sent to any server."
     },
     "ffmpeg": {
-      "name": "",
-      "description": "",
+      "name": "FFmpeg",
+      "description": "Online tool to run FFmpeg commands for video and audio processing",
       "categories": {
         "format_conversion": "Format Conversion",
         "video_processing": "Video Processing",
@@ -647,8 +647,8 @@
       "output_files": "Output Files"
     },
     "screen-test": {
-      "name": "",
-      "desc": "",
+      "name": "Screen Test",
+      "desc": "Online tool to test your screen for dead pixels and other issues",
       "black": "Black",
       "check_bright_spots": "Check for bright/white pixels",
       "white": "White",
@@ -726,8 +726,8 @@
       "test_patterns": "Test Patterns"
     },
     "camera-test": {
-      "name": "",
-      "desc": "",
+      "name": "Camera Test",
+      "desc": "Online tool to test your camera",
       "access_error": "Could not access camera. Please check permissions.",
       "click_start": "Click 'Start Camera' to begin testing",
       "permission_hint": "Please allow camera access in your browser settings.",
@@ -741,8 +741,8 @@
       "discard": "Discard"
     },
     "mic-test": {
-      "name": "",
-      "desc": "",
+      "name": "Microphone Test",
+      "desc": "Online tool to test your microphone",
       "access_error": "Could not access microphone. Please check permissions.",
       "visualizer": "Audio Visualizer",
       "volume": "Volume",
@@ -759,8 +759,8 @@
       "start_record": "Start Recording"
     },
     "mouse-test": {
-      "name": "",
-      "desc": "",
+      "name": "Mouse Test",
+      "desc": "Online tool to test your mouse",
       "coordinates": "Coordinates",
       "polling_rate": "Polling Rate",
       "buttons_pressed": "Buttons",
@@ -777,8 +777,8 @@
       "draw_hint": "Click and drag to draw"
     },
     "keyboard-test": {
-      "name": "",
-      "desc": "",
+      "name": "Keyboard Test",
+      "desc": "Online tool to test your keyboard",
       "last_key": "Last Key Pressed",
       "lock_hint": "Toggle Prevent Default (Lock browser shortcuts)",
       "reset": "Reset Test",
@@ -787,8 +787,8 @@
       "instruction": "Press keys on your keyboard to test them. Green indicates the key has been tested."
     },
     "gamepad-test": {
-      "name": "",
-      "desc": "",
+      "name": "Gamepad Test",
+      "desc": "Online tool to test your gamepad",
       "no_gamepad": "No Gamepad Detected",
       "connect_hint": "Connect your gamepad via USB or Bluetooth and press any button to activate it.",
       "press_button_hint": "If connected but not showing, try pressing a button on the controller.",
@@ -801,8 +801,8 @@
       "circularity_hint": "Rotate sticks in full circles to test circularity. Ideal is 0% error (perfect circle)."
     },
     "touch-test": {
-      "name": "",
-      "desc": "",
+      "name": "Touch Test",
+      "desc": "Online tool to test your touch screen",
       "toggle_info": "Toggle Info Panel",
       "exit_fullscreen": "Exit Fullscreen",
       "enter_fullscreen": "Enter Fullscreen",
@@ -814,8 +814,8 @@
       "no_events": "No events yet"
     },
     "sensor-test": {
-      "name": "",
-      "desc": "",
+      "name": "Sensor Test",
+      "desc": "Online tool to test your device sensors",
       "title": "Device Sensors Test",
       "permission_denied": "Permission Denied",
       "permission_hint": "Please enable device sensor access in your browser settings to use this feature.",
@@ -845,8 +845,8 @@
       "hint": "Click \"Start Listening\" to begin testing device sensors. Move your device to see orientation and acceleration data."
     },
     "speaker-test": {
-      "name": "",
-      "desc": "",
+      "name": "Speaker Test",
+      "desc": "Online tool to test your speakers",
       "stereo_test": "Stereo Speaker Test",
       "stereo_desc": "Click the buttons below to test Left, Right, or Both channels.",
       "left": "Left Channel",
@@ -858,8 +858,8 @@
       "waveform": "Waveform"
     },
     "dns-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "DNS Lookup",
+      "desc": "Online tool to query DNS records",
       "error": {
         "empty_domain": "Please enter a domain name",
         "query_failed": "DNS query failed. Please check the domain name.",
@@ -879,8 +879,8 @@
       "info_text": "This tool queries DNS records using DNS-over-HTTPS (DoH) from multiple \"providers\": Google DNS, Cloudflare, and AliDNS. All queries are performed securely over HTTPS. Common record \"types\": A (IPv4), AAAA (IPv6), MX (Mail), TXT (Text), CNAME (Alias), NS (Name Server)."
     },
     "certificate-search": {
-      "name": "",
-      "desc": "",
+      "name": "Certificate Search",
+      "desc": "Online tool to search for SSL/TLS certificates",
       "enter_domain": "Please enter a domain name",
       "error": "Failed to fetch certificates. Please try again.",
       "domain": "Domain",
@@ -897,8 +897,8 @@
       "no_results": "No certificates found for this domain"
     },
     "ip-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "IP Lookup",
+      "desc": "Online tool to lookup IP information",
       "error": "Failed to fetch IP information. Please try again.",
       "ip_address": "IP Address",
       "my_ip": "My IP",
@@ -925,8 +925,8 @@
       "raw_data": "Raw Data"
     },
     "http-status": {
-      "name": "",
-      "desc": "",
+      "name": "HTTP Status Codes",
+      "desc": "Online tool to lookup HTTP status codes",
       "ui": {
         "search_placeholder": "Search by code (404), status (Not Found), or description...",
         "all_codes": "All Codes",
@@ -935,8 +935,8 @@
       }
     },
     "dns-records-info": {
-      "name": "",
-      "desc": "",
+      "name": "DNS Record Types",
+      "desc": "Online tool to lookup DNS record types",
       "search_placeholder": "Search record types...",
       "no_records_found": "No matching record types found",
       "title": "DNS Record Types",
@@ -945,8 +945,8 @@
       "useCase": "Use Case"
     },
     "word-counter": {
-      "name": "",
-      "desc": "",
+      "name": "Word Counter",
+      "desc": "Online tool to count words, characters, lines, and paragraphs",
       "words": "Words",
       "characters": "Characters",
       "lines": "Lines",
@@ -954,8 +954,8 @@
       "placeholder": "Start typing or paste text to analyze..."
     },
     "pomodoro": {
-      "name": "",
-      "desc": "",
+      "name": "Pomodoro Timer",
+      "desc": "Online tool to manage your time with the Pomodoro Technique",
       "work": "Work",
       "break": "Break",
       "pause": "Pause",
@@ -963,8 +963,8 @@
       "reset": "Reset"
     },
     "qr-barcode": {
-      "name": "",
-      "desc": "",
+      "name": "QR & Barcode Generator",
+      "desc": "Generate customizable QR codes and barcodes from text or URLs",
       "scanner": {
         "select_image": "Select Image",
         "copy_text": "Copy Text",
@@ -1035,8 +1035,8 @@
       }
     },
     "color-converter": {
-      "name": "",
-      "desc": "",
+      "name": "Color Format Converter",
+      "desc": "Convert between different color formats including HEX, RGB, HSL, HSV and CMYK",
       "hex_color": "HEX Color",
       "copy_hex": "Copy HEX",
       "rgb": "RGB",
@@ -1104,8 +1104,8 @@
       }
     },
     "ico-converter": {
-      "name": "",
-      "desc": "Create multi-size ICO files for website favicons.",
+      "name": "ICO Converter",
+      "desc": "Convert images to ICO format for favicons and Windows applications",
       "upload_image": "Upload Image",
       "convert_to_ico": "Convert to ICO",
       "icon_sizes": "Icon Sizes",
@@ -1113,15 +1113,15 @@
       "download_ico": "Download .ICO File"
     },
     "ico-viewer": {
-      "name": "",
-      "desc": "",
+      "name": "ICO Viewer",
+      "desc": "View detailed information about ICO files including embedded images and metadata",
       "save": "Save",
       "view_ico": "View ICO File",
       "icons_found": "Icons Found"
     },
     "metadata": {
-      "name": "Metadata Viewer",
-      "desc": "",
+      "name": "Image Metadata Viewer",
+      "desc": "Extract and display EXIF, IPTC and other metadata from image files",
       "no_gps_data": "No GPS data found in this image",
       "view_metadata": "View Image Metadata",
       "camera": "Camera",
@@ -1187,8 +1187,8 @@
       }
     },
     "ip-subnet": {
-      "name": "",
-      "desc": "",
+      "name": "IP Subnet Calculator",
+      "desc": "Calculate subnet information including network address, broadcast address and host range",
       "ip_address": "IP Address",
       "subnet_mask": "Subnet Mask (CIDR)",
       "calculate": "Calculate",
@@ -1202,8 +1202,8 @@
       "total_hosts": "Total Hosts"
     },
     "unix-timestamp": {
-      "name": "",
-      "desc": "",
+      "name": "Unix Timestamp Converter",
+      "desc": "Convert between Unix timestamps and human-readable dates",
       "current_timestamp": "Current Unix Timestamp",
       "resume": "Resume",
       "pause": "Pause",
@@ -1213,8 +1213,8 @@
       "enter_date": "Date & Time"
     },
     "user-agent": {
-      "name": "",
-      "desc": "",
+      "name": "User Agent Parser",
+      "desc": "Parse User-Agent strings to extract browser, operating system and device information",
       "user_agent_string": "User Agent String",
       "use_my_ua": "Use My User Agent",
       "browser": "Browser",
@@ -1232,8 +1232,8 @@
       "architecture": "Architecture"
     },
     "password-generator": {
-      "name": "",
-      "desc": "",
+      "name": "Password Generator",
+      "desc": "Generate secure passwords with customizable length and character sets",
       "strength": {
         "weak": "Weak",
         "medium": "Medium",
@@ -1245,8 +1245,8 @@
       "deselect-all": "Deselect All"
     },
     "rsa-generator": {
-      "name": "",
-      "desc": "",
+      "name": "RSA Key Generator",
+      "desc": "Generate RSA public and private key pairs for encryption and digital signatures",
       "key_size": "Key Size",
       "generating": "Generating...",
       "public_key": "Public Key",
