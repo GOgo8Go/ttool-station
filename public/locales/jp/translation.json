@@ -228,8 +228,8 @@
       "generated_code_placeholder": "// 生成されたコードはここに表示されます"
     },
     "uuid-generator": {
-      "name": "",
-      "desc": "",
+      "name": "UUID生成器",
+      "desc": "様々なバージョンのUUIDを生成し、名前空間ベースの生成をサポート",
       "invalid_namespace": "無効な名前空間UUID",
       "version": "バージョン",
       "v1_label": "v1 (時間ベース)",
@@ -258,8 +258,8 @@
       "ready_to_generate": "生成準備完了。"
     },
     "cron-generator": {
-      "name": "",
-      "desc": "",
+      "name": "Cron生成器",
+      "desc": "Cron式を生成し、説明を表示",
       "invalid_cron": "無効なCron式",
       "every_minute": "毎分",
       "every_hour": "毎時",
@@ -271,8 +271,8 @@
       "every_month_1st": "毎月1日"
     },
     "hash-generator": {
-      "name": "",
-      "desc": "",
+      "name": "ハッシュ生成器",
+      "desc": "様々なアルゴリズムのハッシュを生成",
       "copy_all": "すべてコピー",
       "error_reading_file": "ファイル読み取りエラー",
       "text_input": "テキスト入力",
@@ -287,8 +287,8 @@
       "enter_text_or_file": "ハッシュを生成するためにテキストを入力するかファイルをアップロードしてください。"
     },
     "jwt-decoder": {
-      "name": "",
-      "desc": "",
+      "name": "JWTデコーダー",
+      "desc": "JWTトークンをデコードし、検証",
       "invalid_token": "無効なトークン",
       "token_label": "JWTトークン",
       "placeholder": "JWTトークンをここに貼り付けてください...",
@@ -296,8 +296,8 @@
       "valid": "有効"
     },
     "regex-tester": {
-      "name": "",
-      "desc": "",
+      "name": "正規表現テスター",
+      "desc": "正規表現をテストし、検証",
       "match": "一致",
       "index": "インデックス",
       "regex_input": "正規表現",
@@ -315,8 +315,8 @@
       "click_append": "クリックして追加"
     },
     "browser-info": {
-      "name": "",
-      "desc": "",
+      "name": "ブラウザ情報",
+      "desc": "ブラウザとオペレーティングシステムの情報を表示",
       "unknown": "不明",
       "system_browser": "システム&ブラウザ",
       "browser": "ブラウザ",
@@ -364,8 +364,8 @@
       "copy_report": "レポートをコピー"
     },
     "archive-extractor": {
-      "name": "",
-      "desc": "",
+      "name": "アーカイブ抽出器",
+      "desc": "様々なアーカイブ形式からファイルを抽出",
       "unknown_error": "不明なエラー",
       "invalid_zip_error": "無効または破損したZIPファイル。有効な.zipアーカイブであることを確認してください(RARと7zは未対応)。",
       "read_error": "\"アーカイブ\"読み取り失敗: {{error}}",
@@ -392,8 +392,8 @@
       "unlock": "ロック解除"
     },
     "pdf-tools": {
-      "name": "",
-      "desc": "",
+      "name": "PDFツール",
+      "desc": "PDFファイル操作用のツール群",
       "errors": {
         "merge_min_files": "結合するには少なくとも2つのPDFファイルを選択してください。",
         "merge_failed": "PDFの結合に失敗しました。ファイルがパスワード保護または破損していないか確認してください。",
@@ -421,8 +421,8 @@
       "save_pdf": "PDFを保存"
     },
     "video-audio-converter": {
-      "name": "",
-      "description": "",
+      "name": "動画・音声変換器",
+      "description": "様々な形式間で動画・音声ファイルを変換",
       "conversion-success": "変換が正常に完了しました!",
       "conversion-error": "変換中にエラーが発生しました",
       "change-file": "ファイルを変更",
@@ -468,8 +468,8 @@
       "note-content": "ファイルはブラウザ内でローカルに処理されます。サーバーへのデータ送信はありません。"
     },
     "ffmpeg": {
-      "name": "",
-      "description": "",
+      "name": "FFmpeg",
+      "description": "マルチメディアファイル操作のための強力なコマンドラインツール",
       "categories": {
         "format_conversion": "フォーマット変換",
         "video_processing": "動画処理",
@@ -644,8 +644,8 @@
       "output_files": "出力ファイル"
     },
     "screen-test": {
-      "name": "",
-      "desc": "",
+      "name": "画面テスト",
+      "desc": "モニター画面の様々な色とパターンをテスト",
       "black": "黒",
       "check_bright_spots": "明るい/白いピクセルを確認",
       "white": "白",
@@ -723,8 +723,8 @@
       "test_patterns": "テストパターン"
     },
     "camera-test": {
-      "name": "",
-      "desc": "",
+      "name": "カメラテスト",
+      "desc": "ウェブカメラをテストし、ビデオストリームを表示",
       "access_error": "カメラにアクセスできませんでした。権限を確認してください。",
       "click_start": "「カメラ開始」をクリックしてテストを開始",
       "permission_hint": "ブラウザ設定でカメラアクセスを許可してください。",
@@ -738,8 +738,8 @@
       "discard": "破棄"
     },
     "mic-test": {
-      "name": "",
-      "desc": "",
+      "name": "マイクテスト",
+      "desc": "マイクをテストし、音量レベルを表示",
       "access_error": "マイクにアクセスできませんでした。権限を確認してください。",
       "visualizer": "オーディオビジュアライザー",
       "volume": "音量",
@@ -756,8 +756,8 @@
       "start_record": "録音開始"
     },
     "mouse-test": {
-      "name": "",
-      "desc": "",
+      "name": "マウステスト",
+      "desc": "マウスボタンとホイールをテスト",
       "coordinates": "座標",
       "polling_rate": "ポーリングレート",
       "buttons_pressed": "ボタン",
@@ -774,8 +774,8 @@
       "draw_hint": "クリック&ドラッグして描画"
     },
     "keyboard-test": {
-      "name": "",
-      "desc": "",
+      "name": "キーボードテスト",
+      "desc": "キーボードのすべてのキーをテスト",
       "last_key": "最後に押されたキー",
       "lock_hint": "プリベントデフォルト切替(ブラウザショートカットをロック)",
       "reset": "テストをリセット",
@@ -784,8 +784,8 @@
       "instruction": "キーボードのキーを押してテストします。緑色はキーがテストされたことを示します。"
     },
     "gamepad-test": {
-      "name": "",
-      "desc": "",
+      "name": "ゲームパッドテスト",
+      "desc": "ゲームコントローラーをテストし、ボタンの状態を表示",
       "no_gamepad": "ゲームパッドが検出されません",
       "connect_hint": "USBまたはBluetooth経由でゲームパッドを接続し、いずれかのボタンを押してアクティブ化します。",
       "press_button_hint": "接続されているが表示されない場合は、コントローラーのボタンを押してみてください。",
@@ -798,8 +798,8 @@
       "circularity_hint": "完全な円を描くようにスティックを回転させて円形度をテストします。理想的には0%エラー(完璧な円)です。"
     },
     "touch-test": {
-      "name": "",
-      "desc": "",
+      "name": "タッチスクリーンテスト",
+      "desc": "タッチスクリーとマルチタッチジェスチャーをテスト",
       "toggle_info": "情報パネル切替",
       "exit_fullscreen": "全画面終了",
       "enter_fullscreen": "全画面表示",
@@ -811,8 +811,8 @@
       "no_events": "まだイベントなし"
     },
     "sensor-test": {
-      "name": "",
-      "desc": "",
+      "name": "センサーテスト",
+      "desc": "デバイスセンサーデータを表示",
       "title": "デバイスセンサーテスト",
       "permission_denied": "権限拒否",
       "permission_hint": "この機能を使用するにはブラウザ設定でデバイスセンサーアクセスを有効にしてください。",
@@ -842,8 +842,8 @@
       "hint": "「リスニング開始」をクリックしてデバイスセンサーのテストを開始します。デバイスを動かして方向と加速度データを確認します。"
     },
     "speaker-test": {
-      "name": "",
-      "desc": "",
+      "name": "スピーカーテスト",
+      "desc": "スピーカーをテストし、テスト音を再生",
       "stereo_test": "ステレオスピーカーテスト",
       "stereo_desc": "下のボタンをクリックして左、右、または両方のチャンネルをテストします。",
       "left": "左チャンネル",
@@ -855,8 +855,8 @@
       "waveform": "波形"
     },
     "dns-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "DNS検索",
+      "desc": "ドメインのDNSレコードを検索",
       "error": {
         "empty_domain": "ドメイン名を入力してください",
         "query_failed": "DNS照会失敗。ドメイン名を確認してください。",
@@ -876,8 +876,8 @@
       "info_text": "このツールは複数の\"プロバイダー\": Google DNS、Cloudflare、AliDNSからのDNS-over-HTTPS(DoH)を使用してDNSレコードを照会します。すべての照会はHTTPS経由で安全に行われます。一般的なレコード\"タイプ\": A(IPv4)、AAAA(IPv6)、MX(メール)、TXT(テキスト)、CNAME(エイリアス)、NS(ネームサーバー)。"
     },
     "certificate-search": {
-      "name": "",
-      "desc": "",
+      "name": "証明書検索",
+      "desc": "ドメインのSSL/TLS証明書を検索し検証",
       "enter_domain": "ドメイン名を入力してください",
       "error": "証明書の取得に失敗しました。もう一度試してください。",
       "domain": "ドメイン",
@@ -894,8 +894,8 @@
       "no_results": "このドメインの証明書が見つかりません"
     },
     "ip-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "IP検索",
+      "desc": "IPアドレスに関する情報を取得",
       "error": "IP情報の取得に失敗しました。もう一度試してください。",
       "ip_address": "IPアドレス",
       "my_ip": "自分のIP",
@@ -922,8 +922,8 @@
       "raw_data": "生データ"
     },
     "http-status": {
-      "name": "",
-      "desc": "",
+      "name": "HTTPステータスコード",
+      "desc": "HTTPステータスコードとその意味の参考情報",
       "ui": {
         "search_placeholder": "コード(404)、ステータス(Not Found)、または説明で検索...",
         "all_codes": "すべてのコード",
@@ -932,8 +932,8 @@
       }
     },
     "dns-records-info": {
-      "name": "",
-      "desc": "",
+      "name": "DNSレコード情報",
+      "desc": "様々なDNSレコードタイプに関する詳細情報",
       "search_placeholder": "レコードタイプを検索...",
       "no_records_found": "一致するレコードタイプが見つかりません",
       "title": "DNSレコードタイプ",
@@ -942,8 +942,8 @@
       "useCase": "使用例"
     },
     "word-counter": {
-      "name": "",
-      "desc": "",
+      "name": "単語数カウンター",
+      "desc": "テキストの単語、文字、その他の統計を計算",
       "words": "単語",
       "characters": "文字",
       "lines": "行",
@@ -951,8 +951,8 @@
       "placeholder": "入力開始またはテキストを貼り付けて分析..."
     },
     "pomodoro": {
-      "name": "",
-      "desc": "",
+      "name": "ポモドーロタイマー",
+      "desc": "ポモドーロ時間管理法用のタイマー",
       "work": "作業",
       "break": "休憩",
       "pause": "一時停止",
@@ -960,8 +960,8 @@
       "reset": "リセット"
     },
     "qr-barcode": {
-      "name": "",
-      "desc": "",
+      "name": "QR・バーコード",
+      "desc": "QRコードとバーコードを生成・スキャン",
       "scanner": {
         "select_image": "画像を選択",
         "copy_text": "テキストをコピー",
@@ -1003,8 +1003,8 @@
       }
     },
     "paint": {
-      "name": "",
-      "desc": "",
+      "name": "ペイント",
+      "desc": "描画用のシンプルなグラフィックエディタ",
       "canvas": {
         "save_image": "画像を保存",
         "reset_counter": "カウンターをリセット",
@@ -1032,8 +1032,8 @@
       }
     },
     "color-converter": {
-      "name": "",
-      "desc": "",
+      "name": "カラーコンバーター",
+      "desc": "様々な形式間で色を変換",
       "hex_color": "HEXカラー",
       "copy_hex": "HEXをコピー",
       "rgb": "RGB",
@@ -1051,8 +1051,8 @@
       "common_colors": "一般的な色"
     },
     "editor": {
-      "name": "",
-      "desc": "",
+      "name": "画像エディタ",
+      "desc": "様々なフィルターと設定で画像を編集",
       "adjust": {
         "effects": "効果",
         "title": "調整",
@@ -1075,7 +1075,7 @@
       "export": "エクスポート"
     },
     "converter": {
-      "name": "",
+      "name": "画像変換器",
       "desc": "画像をPNG、JPEG、WEBP形式に変換します。",
       "resize": {
         "width": "幅",
@@ -1101,7 +1101,7 @@
       }
     },
     "ico-converter": {
-      "name": "",
+      "name": "ICO変換器",
       "desc": "ウェブサイトのファビコン用にマルチサイズICOファイルを作成します。",
       "upload_image": "画像をアップロード",
       "convert_to_ico": "ICOに変換",
@@ -1110,15 +1110,15 @@
       "download_ico": ".ICOファイルをダウンロード"
     },
     "ico-viewer": {
-      "name": "",
-      "desc": "",
+      "name": "ICOビューア",
+      "desc": "ICOファイルからアイコンを表示・抽出",
       "save": "保存",
       "view_ico": "ICOファイルを表示",
       "icons_found": "見つかったアイコン"
     },
     "metadata": {
       "name": "メタデータビューア",
-      "desc": "",
+      "desc": "画像EXIFおよびその他のメタデータ表示",
       "no_gps_data": "この画像にはGPSデータがありません",
       "view_metadata": "画像メタデータを表示",
       "camera": "カメラ",
@@ -1184,8 +1184,8 @@
       }
     },
     "ip-subnet": {
-      "name": "",
-      "desc": "",
+      "name": "IPサブネット",
+      "desc": "IPサブネットとサブネットマスク計算機",
       "ip_address": "IPアドレス",
       "subnet_mask": "サブネットマスク(CIDR)",
       "calculate": "計算",
@@ -1199,8 +1199,8 @@
       "total_hosts": "合計ホスト数"
     },
     "unix-timestamp": {
-      "name": "",
-      "desc": "",
+      "name": "Unixタイムスタンプ",
+      "desc": "Unixタイムスタンプ変換器",
       "current_timestamp": "現在のUnixタイムスタンプ",
       "resume": "再開",
       "pause": "一時停止",
@@ -1210,8 +1210,8 @@
       "enter_date": "日時"
     },
     "user-agent": {
-      "name": "",
-      "desc": "",
+      "name": "ユーザーエージェント",
+      "desc": "ブラウザのユーザーエージェント文字列情報",
       "user_agent_string": "ユーザーエージェント文字列",
       "use_my_ua": "自分のユーザーエージェントを使用",
       "browser": "ブラウザ",
@@ -1229,8 +1229,8 @@
       "architecture": "アーキテクチャ"
     },
     "password-generator": {
-      "name": "",
-      "desc": "",
+      "name": "パスワード生成器",
+      "desc": "セキュリティ強度設定可能な安全なパスワード生成",
       "strength": {
         "weak": "弱い",
         "medium": "中程度",
@@ -1242,16 +1242,16 @@
       "deselect-all": "すべて選択解除"
     },
     "rsa-generator": {
-      "name": "",
-      "desc": "",
+      "name": "RSA生成器",
+      "desc": "暗号化用RSA鍵を生成",
       "key_size": "鍵サイズ",
       "generating": "生成中...",
       "public_key": "公開鍵",
       "private_key": "秘密鍵"
     },
     "unit-converter": {
-      "name": "",
-      "desc": "",
+      "name": "単位変換器",
+      "desc": "様々なシステム間で単位を変換",
       "from": "元の単位",
       "to": "変換後の単位",
       "conversion_table": "変換表",

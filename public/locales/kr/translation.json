@@ -19,12 +19,12 @@
   },
   "tool": {
     "json-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "JSON 포맷터",
+      "desc": "JSON 데이터를 포맷하고 예쁘게 출력합니다"
     },
     "code-diff": {
-      "name": "",
-      "desc": "",
+      "name": "코드 비교",
+      "desc": "두 코드 조각 간의 차이점을 비교하고 분석하는 도구",
       "split": "분할",
       "unified": "통합",
       "ignore_whitespace": "공백 무시",
@@ -37,8 +37,8 @@
       "no_diffs": "차이점을 찾을 수 없거나 입력이 비어 있습니다."
     },
     "code-beautifier": {
-      "name": "",
-      "desc": "",
+      "name": "코드 포맷터",
+      "desc": "구문 강조가 적용된 코드를 포맷하고 정리하는 도구",
       "paste_code_here": "// 여기에 코드를 붙여넣으세요",
       "unsupported_language": "지원되지 않는 언어",
       "formatting_not_supported": "브라우저에서 이 언어의 형식화가 현재 지원되지 않습니다.",
@@ -64,12 +64,12 @@
       "preview": "미리보기"
     },
     "sql-formatter": {
-      "name": "",
-      "desc": ""
+      "name": "SQL 포맷터",
+      "desc": "다양한 데이터베이스 방언을 지원하는 온라인 SQL 쿼리 포맷터"
     },
     "latex-editor": {
-      "name": "",
-      "desc": "",
+      "name": "LaTeX 편집기",
+      "desc": "실시간 미리보기와 다양한 형식으로 내보내기가 가능한 온라인 LaTeX 수식 편집기",
       "render_error": "LaTeX 렌더링 오류. 문법을 확인하세요.",
       "empty_placeholder": "미리보기를 보려면 LaTeX를 입력하세요...",
       "export_error": "내보내기 실패. 다시 시도해주세요.",
@@ -102,8 +102,8 @@
       "square_root": "제곱근"
     },
     "base-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "진법 계산기",
+      "desc": "다양한 진법(2진수, 8진수, 10진수, 16진수)을 지원하는 기본 수학 연산과 상세한 계산 단계",
       "binary_addition": "이진수 덧셈",
       "carries": "받아올림",
       "binary_subtraction": "이진수 뺄셈",
@@ -127,8 +127,8 @@
       "division_by_zero": "0으로 나누기"
     },
     "bigint-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "큰 수 계산기",
+      "desc": "덧셈, 뺄셈, 곱셈, 나눗셈, 거듭제곱, 모듈로 연산, 최대공약수 및 최소공배수를 포함한 임의 정밀도 연산을 지원하는 계산기",
       "enter_value_a": "값 A를 입력해주세요",
       "enter_value_b": "값 B를 입력해주세요",
       "invalid_inputs": "입력은 유효한 정수여야 합니다",
@@ -143,20 +143,20 @@
       "lcm": "최소공배수"
     },
     "bitwise-calculator": {
-      "name": "",
-      "desc": "",
+      "name": "비트 연산 계산기",
+      "desc": "32비트 시각화와 함께 비트 연산(AND, OR, XOR, NOT, 왼쪽/오른쪽 시프트 등)을 지원하는 계산기",
       "operand_a": "피연산자 A",
       "shift_amount": "시프트 양",
       "operand_b": "피연산자 B",
       "visualization": "비트 시각화 (32비트)"
     },
     "base-converter": {
-      "name": "",
-      "desc": ""
+      "name": "진법 변환기",
+      "desc": "진법(2진수, 8진수, 10진수, 16진수) 간 변환 및 사용자 정의 진법 변환"
     },
     "encoding-converter": {
-      "name": "",
-      "desc": "",
+      "name": "인코딩 변환기",
+      "desc": "Base64, URL 인코딩, 16진수, 2진수 등 다양한 인코딩 형식을 지원하는 인코딩 및 디코딩 도구(브라우저에서 로컬로 처리)",
       "encodings": {
         "base64": "Base64",
         "base64_desc": "표준 Base64 인코딩",
@@ -197,8 +197,8 @@
       "info_text": "지원되는 \"인코딩\": Base64 (표준 및 URL 안전), URL 인코딩, 16진수, 이진. 모든 변환은 브라우저 내에서 로컬로 수행됩니다. 텍스트를 입력하거나 붙여넣거나 파일을 드래그 앤 드롭하거나 업로드할 수 있습니다."
     },
     "config-converter": {
-      "name": "",
-      "desc": "",
+      "name": "구성 파일 변환기",
+      "desc": "JSON, YAML, TOML, XML, INI 등 다양한 구성 파일 형식 간의 상호 변환을 지원하는 변환기",
       "parse_error": "파싱 오류",
       "parsed_content_empty": "파싱된 내용이 비어 있거나 유효하지 않습니다.",
       "toml_error": "TOML 생성 \"오류\": {{error}}. 데이터에 null이나 혼합 유형 배열이 포함되어 있지 않은지 확인하세요.",
@@ -217,8 +217,8 @@
       "result_placeholder": "결과가 여기에 나타납니다..."
     },
     "curl-converter": {
-      "name": "",
-      "desc": "",
+      "name": "cURL 변환기",
+      "desc": "cURL 명령어를 다양한 프로그래밍 언어로 변환",
       "invalid_curl": "유효하지 않은 cURL 명령어",
       "curl_command": "Curl 명령어",
       "output_code": "출력 코드",
@@ -228,8 +228,8 @@
       "generated_code_placeholder": "// 생성된 코드가 여기에 나타납니다"
     },
     "uuid-generator": {
-      "name": "",
-      "desc": "",
+      "name": "UUID 생성기",
+      "desc": "다양한 버전의 UUID를 생성하고 네임스페이스 기반 생성을 지원",
       "invalid_namespace": "유효하지 않은 네임스페이스 UUID",
       "version": "버전",
       "v1_label": "v1 (시간 기반)",
@@ -258,8 +258,8 @@
       "ready_to_generate": "생성 준비 완료."
     },
     "cron-generator": {
-      "name": "",
-      "desc": "",
+      "name": "Cron 생성기",
+      "desc": "Cron 표현식을 생성하고 설명",
       "invalid_cron": "유효하지 않은 Cron 표현식",
       "every_minute": "매 분",
       "every_hour": "매 시간",
@@ -271,8 +271,8 @@
       "every_month_1st": "매월 1일"
     },
     "hash-generator": {
-      "name": "",
-      "desc": "",
+      "name": "해시 생성기",
+      "desc": "다양한 알고리즘에 대한 해시를 생성",
       "copy_all": "모두 복사",
       "error_reading_file": "파일 읽기 오류",
       "text_input": "텍스트 입력",
@@ -287,8 +287,8 @@
       "enter_text_or_file": "해시를 생성하려면 텍스트를 입력하거나 파일을 업로드하세요."
     },
     "jwt-decoder": {
-      "name": "",
-      "desc": "",
+      "name": "JWT 디코더",
+      "desc": "JWT 토큰을 디코딩하고 검증",
       "invalid_token": "유효하지 않은 토큰",
       "token_label": "JWT 토큰",
       "placeholder": "여기에 JWT 토큰을 붙여넣으세요...",
@@ -296,8 +296,8 @@
       "valid": "유효"
     },
     "regex-tester": {
-      "name": "",
-      "desc": "",
+      "name": "정규식 테스터",
+      "desc": "정규식을 테스트하고 검증",
       "match": "일치",
       "index": "인덱스",
       "regex_input": "정규표현식",
@@ -315,8 +315,8 @@
       "click_append": "클릭하여 추가"
     },
     "browser-info": {
-      "name": "",
-      "desc": "",
+      "name": "브라우저 정보",
+      "desc": "브라우저 및 운영체제 정보를 표시",
       "unknown": "알 수 없음",
       "system_browser": "시스템 및 브라우저",
       "browser": "브라우저",
@@ -364,8 +364,8 @@
       "copy_report": "보고서 복사"
     },
     "archive-extractor": {
-      "name": "",
-      "desc": "",
+      "name": "압축 파일 추출기",
+      "desc": "다양한 압축 파일 형식에서 파일을 추출",
       "unknown_error": "알 수 없는 오류",
       "invalid_zip_error": "유효하지 않거나 손상된 ZIP 파일입니다. 유효한 .zip 압축파일인지 확인하세요 (RAR 및 7z는 지원되지 않음).",
       "read_error": "\"압축파일\" 읽기 실패: {{error}}",
@@ -392,8 +392,8 @@
       "unlock": "잠금 해제"
     },
     "pdf-tools": {
-      "name": "",
-      "desc": "",
+      "name": "PDF 도구",
+      "desc": "PDF 파일 작업을 위한 도구 모음",
       "errors": {
         "merge_min_files": "병합하려면 최소 2개의 PDF 파일을 선택해주세요.",
         "merge_failed": "PDF 병합 실패. 파일이 비밀번호로 보호되었거나 손상되었는지 확인해주세요.",
@@ -421,8 +421,8 @@
       "save_pdf": "PDF 저장"
     },
     "video-audio-converter": {
-      "name": "",
-      "description": "",
+      "name": "비디오 및 오디오 변환기",
+      "description": "다양한 형식 간 비디오 및 오디오 파일 변환",
       "conversion-success": "변환이 성공적으로 완료되었습니다!",
       "conversion-error": "변환 중 오류 발생",
       "change-file": "파일 변경",
@@ -468,8 +468,8 @@
       "note-content": "파일은 브라우저 내에서 로컬로 처리됩니다. 어떤 데이터도 서버로 전송되지 않습니다."
     },
     "ffmpeg": {
-      "name": "",
-      "description": "",
+      "name": "FFmpeg",
+      "description": "멀티미디어 파일 작업을 위한 강력한 명령줄 도구",
       "categories": {
         "format_conversion": "형식 변환",
         "video_processing": "비디오 처리",
@@ -644,8 +644,8 @@
       "output_files": "출력 파일"
     },
     "screen-test": {
-      "name": "",
-      "desc": "",
+      "name": "화면 테스트",
+      "desc": "모니터 화면의 다양한 색상 및 패턴 테스트",
       "black": "검정",
       "check_bright_spots": "밝은/흰색 픽셀 확인",
       "white": "흰색",
@@ -723,8 +723,8 @@
       "test_patterns": "테스트 패턴"
     },
     "camera-test": {
-      "name": "",
-      "desc": "",
+      "name": "카메라 테스트",
+      "desc": "웹캠을 테스트하고 비디오 스트림을 표시",
       "access_error": "카메라에 접근할 수 없습니다. 권한을 확인해주세요.",
       "click_start": "테스트를 시작하려면 '카메라 시작'을 클릭하세요",
       "permission_hint": "브라우저 설정에서 카메라 접근을 허용해주세요.",
@@ -738,8 +738,8 @@
       "discard": "폐기"
     },
     "mic-test": {
-      "name": "",
-      "desc": "",
+      "name": "마이크 테스트",
+      "desc": "마이크를 테스트하고 볼륨 레벨을 표시",
       "access_error": "마이크에 접근할 수 없습니다. 권한을 확인해주세요.",
       "visualizer": "오디오 비주얼라이저",
       "volume": "볼륨",
@@ -756,8 +756,8 @@
       "start_record": "녹음 시작"
     },
     "mouse-test": {
-      "name": "",
-      "desc": "",
+      "name": "마우스 테스트",
+      "desc": "마우스 버튼과 휠을 테스트",
       "coordinates": "좌표",
       "polling_rate": "폴링 속도",
       "buttons_pressed": "버튼",
@@ -774,8 +774,8 @@
       "draw_hint": "클릭하고 드래그하여 그리기"
     },
     "keyboard-test": {
-      "name": "",
-      "desc": "",
+      "name": "키보드 테스트",
+      "desc": "키보드의 모든 키를 테스트",
       "last_key": "마지막으로 누른 키",
       "lock_hint": "기본 동작 방지 전환 (브라우저 바로 가기 잠금)",
       "reset": "테스트 재설정",
@@ -784,8 +784,8 @@
       "instruction": "키보드의 키를 눌러 테스트하세요. 녹색은 해당 키가 테스트되었음을 나타냅니다."
     },
     "gamepad-test": {
-      "name": "",
-      "desc": "",
+      "name": "게임패드 테스트",
+      "desc": "게임 컨트롤러를 테스트하고 버튼 상태를 표시",
       "no_gamepad": "게임패드가 감지되지 않음",
       "connect_hint": "USB 또는 블루투스를 통해 게임패드를 연결하고 아무 버튼이나 눌러 활성화하세요.",
       "press_button_hint": "연결되었지만 표시되지 않으면 컨트롤러의 버튼을 눌러보세요.",
@@ -798,8 +798,8 @@
       "circularity_hint": "축을 완전한 원으로 회전하여 원형을 테스트하세요. 이상적인 값은 0% 오류(완벽한 원)입니다."
     },
     "touch-test": {
-      "name": "",
-      "desc": "",
+      "name": "터치 스크린 테스트",
+      "desc": "터치 스크린 및 멀티터치 제스처를 테스트",
       "toggle_info": "정보 패널 전환",
       "exit_fullscreen": "전체 화면 종료",
       "enter_fullscreen": "전체 화면 진입",
@@ -811,8 +811,8 @@
       "no_events": "아직 이벤트 없음"
     },
     "sensor-test": {
-      "name": "",
-      "desc": "",
+      "name": "센서 테스트",
+      "desc": "장치 센서 데이터를 표시",
       "title": "장치 센서 테스트",
       "permission_denied": "권한 거부됨",
       "permission_hint": "이 기능을 사용하려면 브라우저 설정에서 장치 센서 접근을 활성화해주세요.",
@@ -842,8 +842,8 @@
       "hint": "\"수신 시작\"을 클릭하여 장치 센서 테스트를 시작하세요. 장치를 움직여 방향 및 가속도 데이터를 확인하세요."
     },
     "speaker-test": {
-      "name": "",
-      "desc": "",
+      "name": "스피커 테스트",
+      "desc": "스피커를 테스트하고 테스트 소리를 재생",
       "stereo_test": "스테레오 스피커 테스트",
       "stereo_desc": "왼쪽, 오른쪽 또는 양쪽 채널을 테스트하려면 아래 버튼을 클릭하세요.",
       "left": "왼쪽 채널",
@@ -855,8 +855,8 @@
       "waveform": "파형"
     },
     "dns-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "DNS 조회",
+      "desc": "도메인에 대한 DNS 레코드 조회",
       "error": {
         "empty_domain": "도메인 이름을 입력해주세요",
         "query_failed": "DNS 조회 실패. 도메인 이름을 확인해주세요.",
@@ -876,8 +876,8 @@
       "info_text": "이 도구는 Google DNS, Cloudflare 및 AliDNS 등 여러 \"제공업체\"의 DNS-over-HTTPS(DoH)를 사용하여 DNS 레코드를 조회합니다. 모든 조회는 HTTPS를 통해 안전하게 수행됩니다. 일반적인 레코드 \"유형\": A(IPv4), AAAA(IPv6), MX(메일), TXT(텍스트), CNAME(별칭), NS(네임 서버)."
     },
     "certificate-search": {
-      "name": "",
-      "desc": "",
+      "name": "인증서 검색",
+      "desc": "도메인의 SSL/TLS 인증서를 검색하고 검증",
       "enter_domain": "도메인 이름을 입력해주세요",
       "error": "인증서 가져오기 실패. 다시 시도해주세요.",
       "domain": "도메인",
@@ -894,8 +894,8 @@
       "no_results": "이 도메인에 대한 인증서를 찾을 수 없음"
     },
     "ip-lookup": {
-      "name": "",
-      "desc": "",
+      "name": "IP 조회",
+      "desc": "IP 주소에 대한 정보를 가져옴",
       "error": "IP 정보 가져오기 실패. 다시 시도해주세요.",
       "ip_address": "IP 주소",
       "my_ip": "내 IP",
@@ -922,8 +922,8 @@
       "raw_data": "원시 데이터"
     },
     "http-status": {
-      "name": "",
-      "desc": "",
+      "name": "HTTP 상태 코드",
+      "desc": "HTTP 상태 코드 및 그 의미 참조",
       "ui": {
         "search_placeholder": "코드(404), 상태(Not Found) 또는 설명으로 검색...",
         "all_codes": "모든 코드",
@@ -932,8 +932,8 @@
       }
     },
     "dns-records-info": {
-      "name": "",
-      "desc": "",
+      "name": "DNS 레코드 정보",
+      "desc": "다양한 유형의 DNS 레코드에 대한 상세 정보",
       "search_placeholder": "레코드 유형 검색...",
       "no_records_found": "일치하는 레코드 유형을 찾을 수 없음",
       "title": "DNS 레코드 유형",
@@ -942,8 +942,8 @@
       "useCase": "사용 사례"
     },
     "word-counter": {
-      "name": "",
-      "desc": "",
+      "name": "단어 수 계산기",
+      "desc": "텍스트의 단어, 문자 및 기타 통계를 계산",
       "words": "단어",
       "characters": "문자",
       "lines": "줄",
@@ -951,8 +951,8 @@
       "placeholder": "분석할 텍스트를 입력하거나 붙여넣으세요..."
     },
     "pomodoro": {
-      "name": "",
-      "desc": "",
+      "name": "포모도로 타이머",
+      "desc": "포모도로 시간 관리 기술을 위한 타이머",
       "work": "작업",
       "break": "휴식",
       "pause": "일시정지",
@@ -960,8 +960,8 @@
       "reset": "재설정"
     },
     "qr-barcode": {
-      "name": "",
-      "desc": "",
+      "name": "QR 및 바코드",
+      "desc": "QR 코드 및 바코드를 생성하고 스캔",
       "scanner": {
         "select_image": "이미지 선택",
         "copy_text": "텍스트 복사",
@@ -1003,8 +1003,8 @@
       }
     },
     "paint": {
-      "name": "",
-      "desc": "",
+      "name": "그리기",
+      "desc": "그리기를 위한 간단한 그래픽 편집기",
       "canvas": {
         "save_image": "이미지 저장",
         "reset_counter": "카운터 재설정",
@@ -1032,8 +1032,8 @@
       }
     },
     "color-converter": {
-      "name": "",
-      "desc": "",
+      "name": "색상 변환기",
+      "desc": "다양한 형식 간 색상 변환",
       "hex_color": "HEX 색상",
       "copy_hex": "HEX 복사",
       "rgb": "RGB",
@@ -1051,8 +1051,8 @@
       "common_colors": "일반 색상"
     },
     "editor": {
-      "name": "",
-      "desc": "",
+      "name": "이미지 편집기",
+      "desc": "다양한 필터와 설정으로 이미지 편집",
       "adjust": {
         "effects": "효과",
         "title": "조정",
@@ -1075,7 +1075,7 @@
       "export": "내보내기"
     },
     "converter": {
-      "name": "",
+      "name": "이미지 변환기",
       "desc": "이미지를 PNG, JPEG 또는 WEBP 형식으로 변환합니다.",
       "resize": {
         "width": "너비",
@@ -1101,7 +1101,7 @@
       }
     },
     "ico-converter": {
-      "name": "",
+      "name": "ICO 변환기",
       "desc": "웹사이트 파비콘용 다중 크기 ICO 파일을 만듭니다.",
       "upload_image": "이미지 업로드",
       "convert_to_ico": "ICO로 변환",
@@ -1110,15 +1110,15 @@
       "download_ico": ".ICO 파일 다운로드"
     },
     "ico-viewer": {
-      "name": "",
-      "desc": "",
+      "name": "ICO 뷰어",
+      "desc": "ICO 파일에서 아이콘을 보고 추출",
       "save": "저장",
       "view_ico": "ICO 파일 보기",
       "icons_found": "발견된 아이콘"
     },
     "metadata": {
       "name": "메타데이터 뷰어",
-      "desc": "",
+      "desc": "이미지 EXIF 및 기타 메타데이터 보기",
       "no_gps_data": "이 이미지에서 GPS 데이터를 찾을 수 없음",
       "view_metadata": "이미지 메타데이터 보기",
       "camera": "카메라",
@@ -1136,12 +1136,12 @@
       "gps": "GPS"
     },
     "case-converter": {
-      "name": "",
-      "desc": ""
+      "name": "대소문자 변환기",
+      "desc": "다양한 대소문자 형식 간 텍스트 변환"
     },
     "csv-json": {
-      "name": "",
-      "desc": "",
+      "name": "CSV 및 JSON",
+      "desc": "CSV 및 JSON 형식 간 변환",
       "error": {
         "conversion_failed": "변환 실패"
       },
@@ -1159,8 +1159,8 @@
       }
     },
     "lorem-ipsum": {
-      "name": "",
-      "desc": "",
+      "name": "Lorem Ipsum",
+      "desc": "Lorem Ipsum 텍스트 채우기 생성",
       "count": "개수",
       "type": "유형",
       "paragraphs": "단락",
@@ -1168,8 +1168,8 @@
       "words": "단어"
     },
     "text-escaper": {
-      "name": "",
-      "desc": "",
+      "name": "텍스트 이스케이프",
+      "desc": "텍스트의 특수 문자를 이스케이프하고 디코딩",
       "error_invalid_input": "오류: 선택한 작업에 대한 잘못된 입력",
       "escape": "이스케이프",
       "unescape": "언이스케이프",
@@ -1184,8 +1184,8 @@
       }
     },
     "ip-subnet": {
-      "name": "",
-      "desc": "",
+      "name": "IP 서브넷",
+      "desc": "IP 서브넷 및 서브넷 마스크 계산기",
       "ip_address": "IP 주소",
       "subnet_mask": "서브넷 마스크 (CIDR)",
       "calculate": "계산",
@@ -1199,8 +1199,8 @@
       "total_hosts": "총 호스트 수"
     },
     "unix-timestamp": {
-      "name": "",
-      "desc": "",
+      "name": "Unix 타임스탬프",
+      "desc": "Unix 타임스탬프 변환기",
       "current_timestamp": "현재 Unix 타임스탬프",
       "resume": "재개",
       "pause": "일시정지",
@@ -1210,8 +1210,8 @@
       "enter_date": "날짜 및 시간"
     },
     "user-agent": {
-      "name": "",
-      "desc": "",
+      "name": "User Agent",
+      "desc": "브라우저 User Agent 문자열 정보",
       "user_agent_string": "사용자 에이전트 문자열",
       "use_my_ua": "내 사용자 에이전트 사용",
       "browser": "브라우저",
@@ -1229,8 +1229,8 @@
       "architecture": "아키텍처"
     },
     "password-generator": {
-      "name": "",
-      "desc": "",
+      "name": "비밀번호 생성기",
+      "desc": "보안 강도 설정이 가능한 안전한 비밀번호 생성",
       "strength": {
         "weak": "약함",
         "medium": "중간",
@@ -1242,16 +1242,16 @@
       "deselect-all": "모두 선택 해제"
     },
     "rsa-generator": {
-      "name": "",
-      "desc": "",
+      "name": "RSA 생성기",
+      "desc": "암호화용 RSA 키 생성",
       "key_size": "키 크기",
       "generating": "생성 중...",
       "public_key": "공개 키",
       "private_key": "개인 키"
     },
     "unit-converter": {
-      "name": "",
-      "desc": "",
+      "name": "단위 변환기",
+      "desc": "다양한 시스템 간 단위 변환",
       "from": "변환 전",
       "to": "변환 후",
       "conversion_table": "변환 표",
