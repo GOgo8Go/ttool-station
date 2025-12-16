@@ -4,7 +4,7 @@ main:
     
       stages:
         - name: Build Current Project
-          image: node:25
+          image: node:24
           script: node -v && npm install && npm run generate:sitemap && npm run build
 
         - name: Deploy to EdgeOne Pages
