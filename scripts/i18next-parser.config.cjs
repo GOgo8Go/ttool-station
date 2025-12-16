@@ -2,7 +2,7 @@ module.exports = {
   locales: ['en', 'zh', 'jp', 'kr', 'ru'],
   defaultNamespace: 'translation',
   output: 'public/locales/$LOCALE/$NAMESPACE.json',
-  input: ['../src/**/*.{ts,tsx}'],
+  input: ['../src/**/*.{ts,tsx}', '../src/.iNeedTheseTranslation.tsx'],
   options: {
     defaultValue: null,
     removeUnusedKeys: false,

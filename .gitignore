@@ -29,4 +29,5 @@ public/sitemap.xml
 # Tencent Cloud EdgeOne
 .edgeone
 .tef_dist/*
-  
+
+.iNeedTheseTranslation.tsx
