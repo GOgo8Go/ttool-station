@@ -7,8 +7,8 @@ import {
   Upload, Play, Download, Loader2, FileVideo, FileAudio, 
   Settings, AlertCircle, CheckCircle, XCircle 
 } from 'lucide-react';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { loadFFmpeg } from '../../utils/ffmpegLoader';
 
 const VideoAudioConverter: React.FC = () => {
   const { t } = useTranslation();
@@ -44,39 +44,21 @@ const VideoAudioConverter: React.FC = () => {
   }, [outputFormat, sourceFile]);
 
   // Load FFmpeg core
-  const loadFFmpeg = async () => {
+  const initializeFFmpegCore = async () => {
     if (!ffmpegRef.current) {
-      ffmpegRef.current = new FFmpeg();
-      
-      ffmpegRef.current.on('log', ({ message }: { message: string }) => {
-        console.log('FFmpeg log:', message);
-      });
-      
-      ffmpegRef.current.on('progress', ({ progress }: { progress: number }) => {
-        setConversionProgress(Math.round(progress * 100));
-      });
-      
       try {
-        console.log('Loading FFmpeg from built assets');
-        // 在构建版本中使用正确的路径
-        await ffmpegRef.current.load({
-          coreURL: '/assets/ffmpeg-N6ahAfcc.js',
-          wasmURL: '/assets/ffmpeg-core-Cbz6om2n.wasm'
+        ffmpegRef.current = await loadFFmpeg();
+        
+        ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+          console.log('FFmpeg log:', message);
         });
-        console.log('FFmpeg loaded successfully');
-      } catch (err) {
-        console.error('Failed to load FFmpeg:', err);
-        // 如果构建版本路径失败，则尝试开发环境路径
-        try {
-          await ffmpegRef.current.load({
-            coreURL: '/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.js',
-            wasmURL: '/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm'
-          });
-          console.log('FFmpeg loaded with dev path');
-        } catch (err2) {
-          console.error('Failed to load FFmpeg with dev path:', err2);
-          throw new Error('Failed to load FFmpeg core from both build and dev paths.');
-        }
+        
+        ffmpegRef.current.on('progress', ({ progress }: { progress: number }) => {
+          setConversionProgress(Math.round(progress * 100));
+        });
+      } catch (error) {
+        console.error('Failed to load FFmpeg:', error);
+        throw error;
       }
     }
   };
@@ -125,7 +107,7 @@ const VideoAudioConverter: React.FC = () => {
     
     try {
       // Ensure FFmpeg is loaded
-      await loadFFmpeg();
+      await initializeFFmpegCore();
       
       if (!ffmpegRef.current) {
         throw new Error('Failed to initialize FFmpeg');
@@ -345,7 +327,7 @@ const VideoAudioConverter: React.FC = () => {
                 {videoFormats.map(format => (
                   <Button
                     key={format}
-                    variant={outputFormat === format ? 'default' : 'outline'}
+                    variant={outputFormat === format ? 'primary' : 'outline'}
                     onClick={() => setOutputFormat(format)}
                     className={`text-xs py-2 h-auto transition-all ${
                       outputFormat === format 
@@ -368,7 +350,7 @@ const VideoAudioConverter: React.FC = () => {
               {audioFormats.map(format => (
                 <Button
                   key={format}
-                  variant={outputFormat === format ? 'default' : 'outline'}
+                  variant={outputFormat === format ? 'primary' : 'outline'}
                   onClick={() => setOutputFormat(format)}
                   className={`text-xs py-2 h-auto transition-all ${
                     outputFormat === format 

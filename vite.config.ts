@@ -27,13 +27,13 @@ export default defineConfig({
           'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
           'utils-vendor': ['uuid', 'crypto-js', 'js-yaml', 'ini', 'smol-toml', 'prismjs'],
           'pdf-vendor': ['pdf-lib', 'pdfjs-dist'],
-          'ffmpeg-vendor': ['@ffmpeg/ffmpeg', '@ffmpeg/util', '@ffmpeg/core'],
+          'ffmpeg-vendor': ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
         }
       }
     }
   },
   optimizeDeps: {
     // include: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
-    exclude: ['@ffmpeg/core', '@ffmpeg/ffmpeg', '@ffmpeg/util']
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
   }
 });

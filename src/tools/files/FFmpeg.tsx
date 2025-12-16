@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { loadFFmpeg } from '../../utils/ffmpegLoader';
 import { 
   Play, Download, Loader2, FileVideo, FileAudio, 
   AlertCircle, ChevronDown, ChevronRight, Folder, FileIcon, 
@@ -23,6 +23,8 @@ const FFmpegTool: React.FC = () => {
   const { t } = useTranslation();
   const [command, setCommand] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [executionProgress, setExecutionProgress] = useState<number>(0);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState<boolean>(false);
   const [rootNode, setRootNode] = useState<FileNode | null>(null);
@@ -570,30 +572,27 @@ const FFmpegTool: React.FC = () => {
   };
 
   // Load FFmpeg
-  const loadFFmpeg = async () => {
+  const initializeFFmpegCore = async () => {
     if (!ffmpegRef.current) {
-      ffmpegRef.current = new FFmpeg();
-      
-      ffmpegRef.current.on('log', ({ message }: { message: string }) => {
-        setLogs(prev => [...prev, message]);
-      });
-      
       try {
-        // Try loading from built assets first
-        await ffmpegRef.current.load({
-          coreURL: '/assets/ffmpeg-N6ahAfcc.js',
-          wasmURL: '/assets/ffmpeg-core-Cbz6om2n.wasm'
+        setIsDownloading(true);
+        ffmpegRef.current = await loadFFmpeg();
+        setIsDownloading(false);
+        
+        ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+          setLogs(prev => [...prev, message]);
         });
-      } catch (err) {
-        // Fallback to dev paths
-        try {
-          await ffmpegRef.current.load({
-            coreURL: '/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.js',
-            wasmURL: '/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm'
-          });
-        } catch (err2) {
-          throw new Error('Failed to load FFmpeg core');
-        }
+        
+        // Listen to progress events
+        ffmpegRef.current.on('progress', ({ progress, time }: { progress: number; time: number }) => {
+          const percentage = Math.round(progress * 100);
+          setExecutionProgress(percentage);
+          setLogs(prev => [...prev, `Progress: ${percentage}% (transcoded time: ${time / 1000000} s)`]);
+        });
+      } catch (error) {
+        setIsDownloading(false);
+        console.error('Failed to load FFmpeg:', error);
+        throw error;
       }
     }
   };
@@ -606,12 +605,13 @@ const FFmpegTool: React.FC = () => {
     }
 
     setIsRunning(true);
+    setExecutionProgress(0);
     setLogs([]);
     setOutputFiles([]);
     setShowLogs(true);
 
     try {
-      await loadFFmpeg();
+      await initializeFFmpegCore();
       
       // Write input files to MEMFS
       const writtenFiles: string[] = [];
@@ -1277,7 +1277,11 @@ const FFmpegTool: React.FC = () => {
           {isRunning ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t('tool.ffmpeg.executing')}
+              {isDownloading ? (
+                t('tool.ffmpeg.downloading')
+              ) : (
+                `${t('tool.ffmpeg.executing')} ${executionProgress > 0 ? `(${executionProgress}%)` : ''}`
+              )}
             </>
           ) : (
             <>
@@ -1392,7 +1396,7 @@ const FFmpegTool: React.FC = () => {
           </div>
           
           {showLogs && (
-            <Card className="p-3 max-h-60 overflow-y-auto font-mono text-sm" ref={logContainerRef}>
+            <div ref={logContainerRef} className="p-3 max-h-60 overflow-y-auto font-mono text-sm bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
               {logs.length > 0 ? (
                 <>
                   {logs.map((log, index) => (
@@ -1409,7 +1413,7 @@ const FFmpegTool: React.FC = () => {
                   {t('tool.ffmpeg.logs_empty')}
                 </p>
               )}
-            </Card>
+            </div>
           )}
         </div>
 
@@ -1427,7 +1431,18 @@ const FFmpegTool: React.FC = () => {
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => {
                       // Create a Blob from the Uint8Array data
-                      const blob = new Blob([file.data], { type: 'application/octet-stream' });
+                      let buffer: ArrayBuffer;
+                      
+                      // 检查是否存在 SharedArrayBuffer 并且正确处理数据
+                      if (typeof SharedArrayBuffer !== 'undefined' && file.data.buffer instanceof SharedArrayBuffer) {
+                        // 将 SharedArrayBuffer 转换为普通 ArrayBuffer
+                        buffer = new Uint8Array(file.data).slice().buffer;
+                      } else {
+                        // 直接使用数据的 buffer 或创建新的副本
+                        buffer = file.data.buffer.slice(file.data.byteOffset, file.data.byteOffset + file.data.byteLength) as ArrayBuffer;
+                      }
+                      
+                      const blob = new Blob([buffer], { type: 'application/octet-stream' });
                       // Create a temporary URL and open it in a new tab
                       const url = URL.createObjectURL(blob);
                       window.open(url, '_blank');
