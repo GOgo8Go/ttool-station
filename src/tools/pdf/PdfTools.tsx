@@ -6,9 +6,7 @@ import {
   Upload, FileText, Trash2, ArrowUp, ArrowDown, Merge, 
   Split, RotateCw, Download, CheckCircle, Loader2, X, MousePointerClick
 } from 'lucide-react';
-// @ts-ignore
 import { PDFDocument, degrees } from 'pdf-lib';
-// @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist';
 import { useTranslation } from 'react-i18next';
 
@@ -71,9 +69,9 @@ const PdfTools: React.FC = () => {
 
   const handleMergeFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles: PdfFile[] = Array.from(e.target.files).map(f => ({
+      const newFiles: PdfFile[] = Array.from(e.target.files as FileList).map(f => ({
         id: Math.random().toString(36).substr(2, 9),
-        file: f,
+        file: f as File,
         name: f.name,
         size: f.size
       }));
@@ -243,7 +241,13 @@ const PdfTools: React.FC = () => {
   // ----------------------------------------------------------------
 
   const downloadPdf = (bytes: Uint8Array, filename: string) => {
-    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    // 确保我们传递的是 ArrayBuffer 而不是 SharedArrayBuffer
+    const arrayBuffer = buffer instanceof ArrayBuffer ? buffer : new ArrayBuffer(buffer.byteLength);
+    if (!(buffer instanceof ArrayBuffer)) {
+      new Uint8Array(arrayBuffer).set(new Uint8Array(buffer));
+    }
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -498,3 +502,9 @@ const PdfTools: React.FC = () => {
 };
 
 export default PdfTools;
+
+
+
+
+
+
