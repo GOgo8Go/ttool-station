@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate:sitemap": "node scripts/generate-sitemap.js"
+    "generate:sitemap": "node scripts/generate-sitemap.js",
+    "generate:translation": "npx i18next 'src/**/*.{ts,tsx}' --config scripts/i18next-parser.config.cjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
