@@ -13,6 +13,7 @@ interface SegmentedControlProps<T> {
   size?: 'sm' | 'md';
   className?: string;
   variant?: 'pill' | 'grid'; // 'pill' for tabs, 'grid' for simple grid buttons
+  fitWidth?: boolean; // 新增属性，控制是否根据内容宽度自适应
 }
 
 export const SegmentedControl = <T extends string | number>({
@@ -22,6 +23,7 @@ export const SegmentedControl = <T extends string | number>({
   size = 'md',
   className = '',
   variant = 'pill',
+  fitWidth = false, // 默认不启用
 }: SegmentedControlProps<T>) => {
   if (variant === 'grid') {
     return (
@@ -50,16 +52,21 @@ export const SegmentedControl = <T extends string | number>({
   // Default 'pill' variant
   const sizeStyles = size === 'sm' ? 'p-0.5 text-xs' : 'p-1 text-sm';
   const itemStyles = size === 'sm' ? 'px-2 py-0.5' : 'px-4 py-1.5';
+  
+  // 根据fitWidth属性决定容器的样式
+  const containerStyles = fitWidth 
+    ? 'inline-flex bg-gray-100 dark:bg-gray-800 rounded-lg' 
+    : 'flex bg-gray-100 dark:bg-gray-800 rounded-lg';
 
   return (
-    <div className={`flex bg-gray-100 dark:bg-gray-800 rounded-lg ${sizeStyles} ${className}`}>
+    <div className={`${containerStyles} ${sizeStyles} ${className}`}>
       {options.map((option) => (
         <button
           key={String(option.value)}
           onClick={() => !option.disabled && onChange(option.value)}
           disabled={option.disabled}
           className={`
-            flex-1 rounded-md font-medium transition-all flex items-center justify-center gap-2
+            ${fitWidth ? 'flex-initial' : 'flex-1'} rounded-md font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap
             ${value === option.value
               ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-white shadow-sm'
               : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'

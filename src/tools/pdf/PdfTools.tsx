@@ -273,6 +273,7 @@ const PdfTools: React.FC = () => {
       {/* Header / Mode Switcher */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <SegmentedControl
+          className='w-64'
           value={mode}
           onChange={(v) => {
             setMode(v as 'merge' | 'edit');

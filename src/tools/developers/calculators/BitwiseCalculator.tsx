@@ -128,10 +128,10 @@ const BitwiseCalculator: React.FC = () => {
     }
 
     return (
-      <div className="flex items-center gap-4 overflow-x-auto pb-2">
+      <div className="flex items-center gap-4">
         <div className="w-8 text-xs font-bold text-gray-500 text-right flex-shrink-0">{label}</div>
-        <div className="flex flex-1 min-w-max">{bits}</div>
-        <div className="w-24 text-xs font-mono text-right text-gray-600 dark:text-gray-400 flex-shrink-0 hidden md:block">
+        <div className="flex flex-1">{bits}</div>
+        <div className="text-xs font-mono text-right text-gray-600 dark:text-gray-400 flex-shrink-0 hidden md:block min-w-[100px]">
           {formatOutput(num, format)}
         </div>
       </div>
@@ -155,6 +155,7 @@ const BitwiseCalculator: React.FC = () => {
               setInputA(formatOutput(nA, fmt));
               setInputB(formatOutput(nB, fmt));
             }}
+            fitWidth
             options={[
               { value: 'dec', label: t('common.decimal') },
               { value: 'hex', label: t('common.hexadecimal') },
@@ -162,26 +163,15 @@ const BitwiseCalculator: React.FC = () => {
             ]}
           />
 
-          <div className="flex-1 overflow-x-auto pb-1 hide-scrollbar">
-            <div className="flex gap-2 min-w-max">
-              {OPS.map(o => (
-                <button
-                  key={o.value}
-                  onClick={() => setOp(o.value)}
-                  className={`
-                      px-3 py-2 rounded-lg text-sm font-bold font-mono transition-all border
-                      ${op === o.value
-                      ? 'bg-primary-500 text-white border-primary-500 shadow-md'
-                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
-                    }
-                    `}
-                  title={t(`tool.bitwise-calculator.desc_${o.key}`)}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <SegmentedControl<Operation>
+            value={op}
+            onChange={(newOp) => setOp(newOp)}
+            fitWidth
+            options={OPS.map(o => ({
+              value: o.value,
+              label: o.label,
+            }))}
+          />
         </div>
 
         {/* Inputs */}
@@ -228,30 +218,32 @@ const BitwiseCalculator: React.FC = () => {
           <h3 className="text-sm font-bold uppercase">{t('tool.bitwise-calculator.visualization')}</h3>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 pb-4">
-          {/* Row A */}
-          {renderBitRow(valA, 'A')}
+        <div className="flex-1 overflow-x-auto custom-scrollbar pb-4">
+          <div className="space-y-6 min-w-max">
+            {/* Row A */}
+            {renderBitRow(valA, 'A')}
 
-          {/* Row B (Hidden for unary NOT) */}
-          {op !== '~' && (
-            <div className="relative">
-              {renderBitRow(valB, 'B')}
-              {/* Operator Overlay */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 -ml-8 text-gray-300 font-mono text-xl font-bold hidden md:block">
-                {op}
+            {/* Row B (Hidden for unary NOT) */}
+            {op !== '~' && (
+              <div className="relative">
+                {renderBitRow(valB, 'B')}
+                {/* Operator Overlay */}
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 -ml-8 text-gray-300 font-mono text-xl font-bold hidden md:block">
+                  {op}
+                </div>
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="h-px bg-gray-200 dark:bg-gray-700 w-full my-2 relative">
+              <div className="absolute right-0 -top-3 text-gray-400">
+                <ArrowDown size={16} />
               </div>
             </div>
-          )}
 
-          {/* Divider */}
-          <div className="h-px bg-gray-200 dark:bg-gray-700 w-full my-2 relative">
-            <div className="absolute right-0 -top-3 text-gray-400">
-              <ArrowDown size={16} />
-            </div>
+            {/* Result */}
+            {renderBitRow(result, '=', true)}
           </div>
-
-          {/* Result */}
-          {renderBitRow(result, '=', true)}
         </div>
 
         {/* Result Summary Footer */}

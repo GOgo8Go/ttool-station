@@ -199,6 +199,13 @@ export const toolRegistry: ToolCategory[] = [
         component: () => import('./files/ArchiveExtractor'),
       },
       {
+        id: 'pdf-tools',
+        name: 'tool.pdf-tools.name',
+        description: 'tool.pdf-tools.desc',
+        icon: FileArchive,
+        component: () => import('./pdf/PdfTools'),
+      },
+      {
         id: 'video-audio-converter',
         name: 'tool.video-audio-converter.name',
         description: 'tool.video-audio-converter.description',
