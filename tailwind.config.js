@@ -1,12 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./App.tsx",
-    "./index.tsx",
-    "./components/**/*.{ts,tsx}",
-    "./pages/**/*.{ts,tsx}",
-    "./tools/**/*.{ts,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/index.html",
+    // "./index.html",
+    // "./App.tsx",
+    // "./index.tsx",
+    // "./components/**/*.{ts,tsx}",
+    // "./pages/**/*.{ts,tsx}",
+    // "./tools/**/*.{ts,tsx}",
   ],
   darkMode: 'class',
   theme: {

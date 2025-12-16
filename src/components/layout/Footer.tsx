@@ -11,7 +11,7 @@ interface ImportMeta {
 }
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import packageJson from '../../package.json';
+import packageJson from '@/../package.json';
 
 export const Footer: React.FC = () => {
     const { t } = useTranslation();
