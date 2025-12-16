@@ -25,8 +25,12 @@ const VideoAudioConverter: React.FC = () => {
     quality: 23,
     useQuality: false,
     preset: 'medium',
-    useWebCodecs: false // 添加WebCodecs API支持选项
+    useWebCodecs: false,
+    useMultithreading: false
   });
+  
+  const [showMultithreadingWarning, setShowMultithreadingWarning] = useState(false);
+  const [crossOriginIsolationState, setCrossOriginIsolationState] = useState<'unknown' | 'supported' | 'unsupported'>('unknown');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef<any>(null);
@@ -47,7 +51,15 @@ const VideoAudioConverter: React.FC = () => {
   const initializeFFmpegCore = async () => {
     if (!ffmpegRef.current) {
       try {
-        ffmpegRef.current = await loadFFmpeg();
+        // Check if multithreading is supported
+        if (codecSettings.useMultithreading && typeof SharedArrayBuffer === 'undefined') {
+          setShowMultithreadingWarning(true);
+          // Fall back to single-threaded version
+          ffmpegRef.current = await loadFFmpeg(false);
+        } else {
+          setShowMultithreadingWarning(false);
+          ffmpegRef.current = await loadFFmpeg(codecSettings.useMultithreading);
+        }
         
         ffmpegRef.current.on('log', ({ message }: { message: string }) => {
           console.log('FFmpeg log:', message);
@@ -58,7 +70,25 @@ const VideoAudioConverter: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to load FFmpeg:', error);
-        throw error;
+        // If multithreading fails, try falling back to single-threaded version
+        if (codecSettings.useMultithreading) {
+          try {
+            setShowMultithreadingWarning(true);
+            ffmpegRef.current = await loadFFmpeg(false);
+            ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+              console.log('FFmpeg log:', message);
+            });
+            
+            ffmpegRef.current.on('progress', ({ progress }: { progress: number }) => {
+              setConversionProgress(Math.round(progress * 100));
+            });
+          } catch (fallbackError) {
+            console.error('Failed to load FFmpeg fallback:', fallbackError);
+            throw fallbackError;
+          }
+        } else {
+          throw error;
+        }
       }
     }
   };
@@ -268,6 +298,16 @@ const VideoAudioConverter: React.FC = () => {
   const videoFormats = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', 'wmv'];
   const audioFormats = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma'];
 
+  // Check cross-origin isolation state on component mount
+  useEffect(() => {
+    if (typeof crossOriginIsolated !== 'undefined') {
+      setCrossOriginIsolationState(crossOriginIsolated ? 'supported' : 'unsupported');
+    } else {
+      // Older browsers don't have crossOriginIsolated property
+      setCrossOriginIsolationState('unsupported');
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* File Upload */}
@@ -382,12 +422,12 @@ const VideoAudioConverter: React.FC = () => {
               <select
                 value={codecSettings.videoCodec}
                 onChange={(e) => setCodecSettings({...codecSettings, videoCodec: e.target.value})}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded bg-background text-foreground border-input dark:bg-gray-700 dark:text-white dark:border-gray-600"
               >
-                <option value="libx264">H.264 (MP4)</option>
-                <option value="libx265">H.265 (HEVC)</option>
-                <option value="vp9">VP9 (WebM)</option>
-                <option value="libvpx">VP8 (WebM)</option>
+                <option value="libx264" className="dark:bg-gray-700 dark:text-white">H.264 (MP4)</option>
+                <option value="libx265" className="dark:bg-gray-700 dark:text-white">H.265 (HEVC)</option>
+                <option value="vp9" className="dark:bg-gray-700 dark:text-white">VP9 (WebM)</option>
+                <option value="libvpx" className="dark:bg-gray-700 dark:text-white">VP8 (WebM)</option>
               </select>
             </div>
             
@@ -432,17 +472,17 @@ const VideoAudioConverter: React.FC = () => {
                 <select
                   value={codecSettings.preset || 'medium'}
                   onChange={(e) => setCodecSettings({...codecSettings, preset: e.target.value})}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-background text-foreground border-input dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 >
-                  <option value="ultrafast">{t('tool.video-audio-converter.ultrafast')}</option>
-                  <option value="superfast">{t('tool.video-audio-converter.superfast')}</option>
-                  <option value="veryfast">{t('tool.video-audio-converter.veryfast')}</option>
-                  <option value="faster">{t('tool.video-audio-converter.faster')}</option>
-                  <option value="fast">{t('tool.video-audio-converter.fast')}</option>
-                  <option value="medium">{t('tool.video-audio-converter.medium')}</option>
-                  <option value="slow">{t('tool.video-audio-converter.slow')}</option>
-                  <option value="slower">{t('tool.video-audio-converter.slower')}</option>
-                  <option value="veryslow">{t('tool.video-audio-converter.veryslow')}</option>
+                  <option value="ultrafast" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.ultrafast')}</option>
+                  <option value="superfast" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.superfast')}</option>
+                  <option value="veryfast" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.veryfast')}</option>
+                  <option value="faster" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.faster')}</option>
+                  <option value="fast" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.fast')}</option>
+                  <option value="medium" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.medium')}</option>
+                  <option value="slow" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.slow')}</option>
+                  <option value="slower" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.slower')}</option>
+                  <option value="veryslow" className="dark:bg-gray-700 dark:text-white">{t('tool.video-audio-converter.veryslow')}</option>
                 </select>
                 <p className="text-xs text-muted-foreground mt-1">
                   {t('tool.video-audio-converter.performance-description')}
@@ -468,6 +508,28 @@ const VideoAudioConverter: React.FC = () => {
                 {t('tool.video-audio-converter.webcodecs-description')}
               </p>
               
+              {/* 多线程选项 */}
+              <div className="pt-2 flex items-center">
+                <input
+                  type="checkbox"
+                  id="multithreading"
+                  checked={codecSettings.useMultithreading}
+                  onChange={(e) => setCodecSettings({...codecSettings, useMultithreading: e.target.checked})}
+                  className="mr-2"
+                  disabled={crossOriginIsolationState === 'unsupported'}
+                />
+                <label htmlFor="multithreading" className="text-sm font-medium">
+                  {t('tool.video-audio-converter.enable-multithreading')}
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('tool.video-audio-converter.multithreading-description')}
+              </p>
+              {crossOriginIsolationState === 'unsupported' && (
+                <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                  {t('tool.video-audio-converter.multithreading-not-supported')}
+                </p>
+              )}
             </div>
             
           </div>
@@ -493,7 +555,7 @@ const VideoAudioConverter: React.FC = () => {
                 type="text"
                 value={getRecommendedAudioCodec(outputFormat)}
                 readOnly
-                className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-800"
+                className="w-full p-2 border rounded bg-background text-foreground border-input dark:bg-gray-700 dark:text-white dark:border-gray-600"
               />
             </div>
             
@@ -539,6 +601,13 @@ const VideoAudioConverter: React.FC = () => {
         <div className="mt-4 p-3 bg-destructive/20 text-destructive rounded flex items-start">
           <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
           <span>{errorMessage}</span>
+        </div>
+      )}
+      
+      {showMultithreadingWarning && (
+        <div className="mt-4 p-3 bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 rounded flex items-start">
+          <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+          <span>{t('tool.video-audio-converter.multithreading-not-supported-warning')}</span>
         </div>
       )}
       
