@@ -23,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# generate:sitemap
 public/sitemap.xml
+
 # Tencent Cloud EdgeOne
-.env
-.edgeone/*
-!.edgeone/project.json
+.edgeone
 .tef_dist/*
   

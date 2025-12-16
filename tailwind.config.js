@@ -3,12 +3,6 @@ export default {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     "./src/index.html",
-    // "./index.html",
-    // "./App.tsx",
-    // "./index.tsx",
-    // "./components/**/*.{ts,tsx}",
-    // "./pages/**/*.{ts,tsx}",
-    // "./tools/**/*.{ts,tsx}",
   ],
   darkMode: 'class',
   theme: {
