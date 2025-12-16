@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const BASE_URL = 'https://www.zinc233.top';
 
 // 临时创建一个JS版本的工具注册表以便Node.js可以读取
-const registryTsPath = path.join(__dirname, '..', 'tools', 'registry.tsx');
+const registryTsPath = path.join(__dirname, '..', 'src', 'tools', 'registry.tsx');
 const tempRegistryJsPath = path.join(__dirname, 'temp-registry.js');
 
 // 使用正则表达式提取工具信息
