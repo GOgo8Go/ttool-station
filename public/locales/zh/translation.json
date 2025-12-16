@@ -1240,7 +1240,7 @@
       "select-all": "全选",
       "deselect-all": "取消全选"
     },
-    "rsa-keygen": {
+    "rsa-generator": {
       "name": "RSA密钥生成器",
       "desc": "生成RSA公钥和私钥对，用于加密和数字签名",
       "key_size": "密钥长度",
