@@ -88,7 +88,7 @@ const MetadataViewer: React.FC = () => {
 
     } catch (err: any) {
       console.error(err);
-      setError(t('tool.metadata.view_metadata') + '. ' + (err.message || t('common.error') + ': ' + t('tool.editor.adjust.effects')));
+      setError(t('tool.metadata.view_metadata') + '. ' + (err.message || t('common.error.general') + ': ' + t('tool.editor.adjust.effects')));
     } finally {
       setLoading(false);
     }
@@ -147,7 +147,7 @@ const MetadataViewer: React.FC = () => {
             <div>
               <div className="text-xs text-gray-500 uppercase font-semibold">{t('tool.metadata.camera')}</div>
               <div className="font-medium text-gray-900 dark:text-white truncate max-w-[150px]" title={cameraModel}>
-                {cameraModel || t('common.error')}
+                {cameraModel || t('common.error.general')}
               </div>
               <div className="text-xs text-gray-400">{cameraMake}</div>
             </div>
@@ -160,7 +160,7 @@ const MetadataViewer: React.FC = () => {
             <div>
               <div className="text-xs text-gray-500 uppercase font-semibold">{t('tool.metadata.lens')}</div>
               <div className="font-medium text-gray-900 dark:text-white truncate max-w-[150px]" title={lens}>
-                {lens || t('common.error')}
+                {lens || t('common.error.general')}
               </div>
               <div className="text-xs text-gray-400">{focalLength ? `${focalLength} mm` : '-'}</div>
             </div>
@@ -175,7 +175,7 @@ const MetadataViewer: React.FC = () => {
               <div className="font-medium text-gray-900 dark:text-white text-sm">
                  {fNumber ? `f/${fNumber}` : ''} {exposure ? `${exposure}s` : ''} {iso ? `ISO${iso}` : ''}
               </div>
-              <div className="text-xs text-gray-400">{!fNumber && !exposure && !iso ? t('common.error') : t('tool.editor.adjust.light_color')}</div>
+              <div className="text-xs text-gray-400">{!fNumber && !exposure && !iso ? t('common.error.general') : t('tool.editor.adjust.light_color')}</div>
             </div>
           </Card>
 
@@ -186,7 +186,7 @@ const MetadataViewer: React.FC = () => {
             <div>
               <div className="text-xs text-gray-500 uppercase font-semibold">{t('tool.metadata.date_taken')}</div>
               <div className="font-medium text-gray-900 dark:text-white text-sm">
-                {date ? new Date(date).toLocaleDateString() : t('common.error')}
+                {date ? new Date(date).toLocaleDateString() : t('common.error.general')}
               </div>
               <div className="text-xs text-gray-400">{date ? new Date(date).toLocaleTimeString() : '-'}</div>
             </div>

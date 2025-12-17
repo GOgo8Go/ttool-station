@@ -141,7 +141,7 @@ const IcoViewer: React.FC = () => {
 
     } catch (err: any) {
       console.error(err);
-      setError(err.message || t('common.error') + ': ' + t('tool.editor.adjust.effects'));
+      setError(err.message || t('common.error.general') + ': ' + t('tool.editor.adjust.effects'));
     }
   };
 
@@ -187,7 +187,7 @@ const IcoViewer: React.FC = () => {
       setTimeout(() => setCopiedIndex(null), 1500);
     } catch (e) {
       console.error(e);
-      alert(t('common.error') + ': ' + t('tool.qr-barcode.scanner.copy_text'));
+      alert(t('common.error.general') + ': ' + t('tool.qr-barcode.scanner.copy_text'));
     }
   };
 

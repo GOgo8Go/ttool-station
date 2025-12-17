@@ -1316,6 +1316,7 @@
     "green": "Green",
     "blue": "Blue",
     "error": {
+      "general": "Error",
       "invalid_ip": "Invalid IP Address",
       "invalid_subnet": "Invalid Subnet Mask",
       "invalid_timestamp": "Invalid Timestamp",

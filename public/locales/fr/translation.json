@@ -1312,6 +1312,7 @@
     "green": "Vert",
     "blue": "Bleu",
     "error": {
+      "general": "Erreur",
       "invalid_ip": "Adresse IP invalide",
       "invalid_subnet": "Masque de sous-réseau invalide",
       "invalid_timestamp": "Timestamp invalide",

@@ -115,7 +115,7 @@ const ImageConverter: React.FC = () => {
         scale: 1
       }));
     };
-    img.onerror = () => setError(t('common.error') + ': ' + t('tool.converter.failed_to_load_dimensions'));
+    img.onerror = () => setError(t('common.error.general') + ': ' + t('tool.converter.failed_to_load_dimensions'));
     img.src = url;
 
     setFile(selectedFile);
@@ -164,7 +164,7 @@ const ImageConverter: React.FC = () => {
       
       await new Promise((resolve, reject) => { 
         img.onload = () => resolve(true); 
-        img.onerror = () => reject(new Error(t('common.error') + ': ' + t('tool.converter.failed_to_load_original')));
+        img.onerror = () => reject(new Error(t('common.error.general') + ': ' + t('tool.converter.failed_to_load_original')));
         img.src = originalUrl;
       });
 
@@ -212,7 +212,7 @@ const ImageConverter: React.FC = () => {
     } catch (err: any) {
       if (requestId === lastRequestId.current) {
         console.error('Processing failed:', err);
-        setError(err.message || t('common.error') + ': ' + t('tool.converter.unexpected_error'));
+        setError(err.message || t('common.error.general') + ': ' + t('tool.converter.unexpected_error'));
       }
     } finally {
       if (requestId === lastRequestId.current) setIsProcessing(false);

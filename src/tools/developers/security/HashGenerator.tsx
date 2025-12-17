@@ -241,7 +241,7 @@ const HashGenerator: React.FC = () => {
               />
               {t('tool.hash-generator.uppercase')}
             </label>
-            <Button size="sm" variant="ghost" onClick={() => copyToClipboard(Object.entries(results).map(([k, v]) => `${k}: ${formatHash(v)}`).join('\n'), 'all')}>
+            <Button size="sm" variant="ghost" onClick={() => copyToClipboard(Object.entries(results).map(([k, v]: [string, string]) => `${k}: ${formatHash(v)}`).join('\n'), 'all')}>
               {copiedKey === 'all' ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Copy className="w-4 h-4 mr-1" />}
               {t('tool.hash-generator.copy_all')}
             </Button>

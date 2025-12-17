@@ -1312,6 +1312,7 @@
     "green": "绿色",
     "blue": "蓝色",
     "error": {
+      "general": "错误",
       "invalid_ip": "无效的IP地址",
       "invalid_subnet": "无效的子网掩码",
       "invalid_timestamp": "无效的时间戳",

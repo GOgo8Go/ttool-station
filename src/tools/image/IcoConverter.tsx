@@ -27,7 +27,7 @@ const IcoConverter: React.FC = () => {
 
   const handleFileSelect = (selectedFile: File) => {
     if (!selectedFile.type.startsWith('image/')) {
-      setError(t('common.error') + ': ' + t('tool.converter.desc'));
+      setError(t('common.error.general') + ': ' + t('tool.converter.desc'));
       return;
     }
 
@@ -84,7 +84,7 @@ const IcoConverter: React.FC = () => {
         canvas.width = size;
         canvas.height = size;
         const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error(t('common.error') + ': ' + t('tool.paint.canvas.save_image'));
+        if (!ctx) throw new Error(t('common.error.general') + ': ' + t('tool.paint.canvas.save_image'));
         
         // High quality resizing
         ctx.imageSmoothingEnabled = true;
@@ -95,7 +95,7 @@ const IcoConverter: React.FC = () => {
         if (!blob) throw new Error(t('tool.ico-converter.upload_image') + ` ${size}x${size} ` + t('tool.editor.transform.geometry'));
         
         const buffer = await blob.arrayBuffer();
-        pngBuffers.push(new Uint8Array(buffer));
+        pngBuffers.push(new Uint8Array(buffer) as Uint8Array);
       }
 
       // 2. Construct ICO file
@@ -105,14 +105,14 @@ const IcoConverter: React.FC = () => {
       const directorySize = dirEntrySize * selectedSizes.length;
       let currentOffset = headerSize + directorySize;
 
-      const parts: (ArrayBuffer | Uint8Array)[] = [];
+      const parts: BlobPart[] = [];
 
       // Write Header
       const header = new DataView(new ArrayBuffer(headerSize));
       header.setUint16(0, 0, true); // Reserved
       header.setUint16(2, 1, true); // Type (1 = ICO)
       header.setUint16(4, selectedSizes.length, true); // Count
-      parts.push(header.buffer);
+      parts.push(header.buffer as ArrayBuffer);
 
       // Write Directory Entries
       for (let i = 0; i < selectedSizes.length; i++) {
@@ -132,13 +132,13 @@ const IcoConverter: React.FC = () => {
         entry.setUint32(8, pngData.byteLength, true); // Size
         entry.setUint32(12, currentOffset, true); // Offset
 
-        parts.push(entry.buffer);
+        parts.push(entry.buffer as ArrayBuffer);
         currentOffset += pngData.byteLength;
       }
 
       // Write Image Data
       for (const pngData of pngBuffers) {
-        parts.push(pngData);
+        parts.push(pngData.buffer as ArrayBuffer);
       }
 
       const icoBlob = new Blob(parts, { type: 'image/x-icon' });
@@ -260,7 +260,7 @@ const IcoConverter: React.FC = () => {
               })}
             </div>
             {selectedSizes.length === 0 && (
-              <p className="text-xs text-red-500 mt-2">{t('tool.converter.resize.width')} {t('common.error')}.</p>
+              <p className="text-xs text-red-500 mt-2">{t('tool.converter.resize.width')} {t('common.error.general')}.</p>
             )}
           </div>
 

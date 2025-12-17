@@ -215,7 +215,7 @@ const QrBarCode: React.FC = () => {
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || t('common.error') + ': ' + t('tool.qr-barcode.scanner.no_code_found'));
+      setError(err.message || t('common.error.general') + ': ' + t('tool.qr-barcode.scanner.no_code_found'));
       setGeneratedUrl(null);
     }
   };

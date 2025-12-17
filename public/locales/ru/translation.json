@@ -1322,6 +1322,7 @@
     "green": "Зеленый",
     "blue": "Синий",
     "error": {
+      "general": "Ошибка",
       "invalid_ip": "Invalid IP Address",
       "invalid_subnet": "Invalid Subnet Mask",
       "invalid_timestamp": "Invalid Timestamp",

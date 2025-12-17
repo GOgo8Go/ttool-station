@@ -1313,6 +1313,7 @@
     "green": "緑",
     "blue": "青",
     "error": {
+      "general": "エラー",
       "invalid_ip": "Invalid IP Address",
       "invalid_subnet": "Invalid Subnet Mask",
       "invalid_timestamp": "Invalid Timestamp",
