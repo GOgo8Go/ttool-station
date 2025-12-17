@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { AlertCircle, Check, Copy, Info, X, Zap } from 'lucide-react';
 
-const FLAGS = [
+export const FLAGS = [
   { char: 'g', label: 'Global', desc: 'Don\'t return after first match' },
   { char: 'i', label: 'Insensitive', desc: 'Case insensitive match' },
   { char: 'm', label: 'Multiline', desc: '^ and $ match start/end of line' },
@@ -14,7 +13,7 @@ const FLAGS = [
   { char: 'y', label: 'Sticky', desc: 'Anchor to lastIndex of previous match' },
 ];
 
-const CHEATSHEET = [
+export const CHEATSHEET = [
   {
     category: 'Character Classes', items: [
       { code: '.', desc: 'Any character except newline' },
