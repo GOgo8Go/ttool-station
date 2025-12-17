@@ -14,7 +14,7 @@ interface MotionData {
     rotationRate: { alpha: number | null; beta: number | null; gamma: number | null } | null;
 }
 
-interface SensorStatus {
+export interface SensorStatus {
     deviceOrientation: boolean | null;
     deviceMotion: boolean | null;
     ambientLight: boolean | null;

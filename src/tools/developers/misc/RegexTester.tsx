@@ -206,7 +206,7 @@ const RegexTester: React.FC = () => {
                     : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50'
                   }
                 `}
-                title={t(`tool.regex-tester.flag_desc.${flag.label.toLowerCase().replace(' ', '_')}`)}
+                title={t(`tool.regex-tester.flags_desc.${flag.label.toLowerCase().replace(' ', '_')}`)}
               >
                 {t(`tool.regex-tester.flags.${flag.label.toLowerCase().replace(' ', '_')}`)} <span className="opacity-50 font-mono">({flag.char})</span>
               </button>

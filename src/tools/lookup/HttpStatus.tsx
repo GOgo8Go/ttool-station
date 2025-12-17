@@ -11,6 +11,14 @@ interface StatusCode {
    category: '1xx' | '2xx' | '3xx' | '4xx' | '5xx';
 }
 
+export const HTTP_STATUS = {
+   1: [0, 1, 2, 3],
+   2: [0, 1, 2, 3, 4, 5, 6],
+   3: [0, 1, 2, 3, 4, 5, 7, 8],
+   4: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 25, 26, 28, 29, 31, 51],
+   5: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
+}
+
 const HTTP_CODES: StatusCode[] = [
    // 1xx Informational
    { code: 100, title: 'Continue', description: 'The server has received the request headers and the client should proceed to send the request body.', category: '1xx' },

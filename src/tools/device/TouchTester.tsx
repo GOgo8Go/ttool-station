@@ -189,7 +189,7 @@ const TouchTest: React.FC = () => {
                 <div className="flex items-center space-x-2">
                     <div className="hidden md:flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-300 mr-2">
                         <Activity className="w-3 h-3 mr-2" />
-                        Max Touch Points: {maxTouchPoints}
+                        {t('tool.touch-test.max_touch_points')}: {maxTouchPoints}
                     </div>
 
                     <button
