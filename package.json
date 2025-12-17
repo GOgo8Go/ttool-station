@@ -12,8 +12,9 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "generate:sitemap": "node scripts/generate-sitemap.js",
-    "generate:translation": "npx i18next 'src/**/*.{ts,tsx}' --config scripts/i18next-parser.config.cjs"
-  },
+    "generate:translation": "npx i18next 'src/**/*.{ts,tsx}' --config scripts/i18next-parser.config.cjs",
+    "check-i18n": "npx tsx scripts/check-i18n-completeness.ts"
+ },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",

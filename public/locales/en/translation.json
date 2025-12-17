@@ -1006,8 +1006,8 @@
       }
     },
     "paint": {
-      "name": "",
-      "desc": "",
+      "name": "Paint",
+      "desc": "Simple graphic editor for drawing",
       "canvas": {
         "save_image": "Save Image",
         "reset_counter": "Reset Counter",
@@ -1054,8 +1054,8 @@
       "common_colors": "Common Colors"
     },
     "editor": {
-      "name": "",
-      "desc": "",
+      "name": "Image Editor",
+      "desc": "Edit images with various filters and settings",
       "adjust": {
         "effects": "Effects",
         "title": "Adjust",
@@ -1078,7 +1078,7 @@
       "export": "Export"
     },
     "converter": {
-      "name": "",
+      "name": "Image Converter",
       "desc": "Convert images to PNG, JPEG, or WEBP formats.",
       "resize": {
         "width": "Width",
@@ -1139,12 +1139,12 @@
       "gps": "GPS"
     },
     "case-converter": {
-      "name": "",
-      "desc": ""
+      "name": "Case Converter",
+      "desc": "Convert text between different cases"
     },
     "csv-json": {
-      "name": "",
-      "desc": "",
+      "name": "CSV & JSON",
+      "desc": "Convert between CSV and JSON formats",
       "error": {
         "conversion_failed": "Conversion failed"
       },
@@ -1162,8 +1162,8 @@
       }
     },
     "lorem-ipsum": {
-      "name": "",
-      "desc": "",
+      "name": "Lorem Ipsum",
+      "desc": "Generate random placeholder Lorem Ipsum text",
       "count": "Count",
       "type": "Type",
       "paragraphs": "Paragraphs",
@@ -1171,8 +1171,8 @@
       "words": "Words"
     },
     "text-escaper": {
-      "name": "",
-      "desc": "",
+      "name": "Text Escaper",
+      "desc": "Escape and decode special characters in text",
       "error_invalid_input": "Error: Invalid input for selected operation",
       "escape": "Escape",
       "unescape": "Unescape",
@@ -1253,8 +1253,8 @@
       "private_key": "Private Key"
     },
     "unit-converter": {
-      "name": "",
-      "desc": "",
+      "name": "Unit Converter",
+      "desc": "Convert units between different systems",
       "from": "From",
       "to": "To",
       "conversion_table": "Conversion Table",

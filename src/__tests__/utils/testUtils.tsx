@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import { vi } from 'vitest';
 import i18n from '@/tools/i18n';
+import React from 'react';
 
 // 自定义渲染函数，包含必要的 providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
