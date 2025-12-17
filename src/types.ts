@@ -16,4 +16,4 @@ export interface ToolCategory {
   tools: ToolMetadata[];
 }
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'system';

@@ -31,3 +31,6 @@ public/sitemap.xml
 .tef_dist/*
 
 .iNeedTheseTranslation.tsx
+
+# Test
+coverage/
