@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "Éditeur LaTeX",
       "desc": "Éditeur de formules LaTeX en ligne avec aperçu en temps réel et exportation vers plusieurs formats",
+      "template_quadratic_formula": "Formule quadratique",
+      "template_integral": "Intégrale",
+      "template_matrix": "Matrice",
+      "template_sum": "Somme",
+      "template_limit": "Limite",
+      "template_greek_letters": "Lettres grecques",
       "render_error": "Erreur de rendu LaTeX. Veuillez vérifier la syntaxe.",
       "empty_placeholder": "Saisir LaTeX pour voir l'aperçu...",
       "export_error": "Échec de l'exportation, veuillez réessayer.",

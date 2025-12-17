@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "Редактор LaTeX",
       "desc": "Онлайн редактор формул LaTeX с предварительным просмотром в реальном времени и экспортом в различные форматы",
+      "template_quadratic_formula": "Квадратичная формула",
+      "template_integral": "Интеграл",
+      "template_matrix": "Матрица",
+      "template_sum": "Сумма",
+      "template_limit": "Предел",
+      "template_greek_letters": "Греческие буквы",
       "render_error": "Ошибка рендеринга LaTeX. Пожалуйста, проверьте синтаксис.",
       "empty_placeholder": "Введите LaTeX для предварительного просмотра...",
       "export_error": "Экспорт не удался. Пожалуйста, попробуйте еще раз.",

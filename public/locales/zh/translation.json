@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "LaTeX编辑器",
       "desc": "在线LaTeX公式编辑器，支持实时预览和导出为多种格式",
+      "template_quadratic_formula": "二次公式",
+      "template_integral": "积分",
+      "template_matrix": "矩阵",
+      "template_sum": "求和",
+      "template_limit": "极限",
+      "template_greek_letters": "希腊字母",
       "render_error": "LaTeX 渲染错误。请检查语法。",
       "empty_placeholder": "输入 LaTeX 查看预览...",
       "export_error": "导出失败，请重试。",

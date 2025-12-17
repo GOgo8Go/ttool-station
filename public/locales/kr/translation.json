@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "LaTeX 편집기",
       "desc": "실시간 미리보기와 다양한 형식으로 내보내기가 가능한 온라인 LaTeX 수식 편집기",
+      "template_quadratic_formula": "이차식",
+      "template_integral": "적분",
+      "template_matrix": "행렬",
+      "template_sum": "합",
+      "template_limit": "극한",
+      "template_greek_letters": "그리스 문자",
       "render_error": "LaTeX 렌더링 오류. 문법을 확인하세요.",
       "empty_placeholder": "미리보기를 보려면 LaTeX를 입력하세요...",
       "export_error": "내보내기 실패. 다시 시도해주세요.",

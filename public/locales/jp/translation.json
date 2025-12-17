@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "LaTeXエディタ",
       "desc": "LaTeX数式の編集とプレビュー",
+      "template_quadratic_formula": "二次方程式",
+      "template_integral": "積分",
+      "template_matrix": "行列",
+      "template_sum": "総和",
+      "template_limit": "極限",
+      "template_greek_letters": "ギリシャ文字",
       "render_error": "LaTeXレンダリングエラー。構文を確認してください。",
       "empty_placeholder": "LaTeXを入力するとプレビューが表示されます...",
       "export_error": "エクスポート失敗。もう一度試してください。",

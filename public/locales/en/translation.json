@@ -70,6 +70,12 @@
     "latex-editor": {
       "name": "LaTeX Editor",
       "desc": "Online LaTeX formula editor with real-time preview and export to multiple formats",
+      "template_quadratic_formula": "Quadratic Formula",
+      "template_integral": "Integral",
+      "template_matrix": "Matrix",
+      "template_sum": "Sum",
+      "template_limit": "Limit",
+      "template_greek_letters": "Greek Letters",
       "render_error": "LaTeX rendering error. Please check your syntax.",
       "empty_placeholder": "Enter LaTeX to see preview...",
       "export_error": "Export failed. Please try again.",

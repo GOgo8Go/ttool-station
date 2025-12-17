@@ -13,39 +13,6 @@ import 'katex/dist/katex.min.css';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
-const EXAMPLE_TEMPLATES = [
-    {
-        nameKey: 'tool.latex-editor.template_quadratic_formula',
-        name: 'Quadratic Formula',
-        latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}'
-    },
-    {
-        nameKey: 'tool.latex-editor.template_integral',
-        name: 'Integral',
-        latex: '\\int_{a}^{b} f(x) \\, dx'
-    },
-    {
-        nameKey: 'tool.latex-editor.template_matrix',
-        name: 'Matrix',
-        latex: '\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}'
-    },
-    {
-        nameKey: 'tool.latex-editor.template_sum',
-        name: 'Sum',
-        latex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}'
-    },
-    {
-        nameKey: 'tool.latex-editor.template_limit',
-        name: 'Limit',
-        latex: '\\lim_{x \\to \\infty} \\frac{1}{x} = 0'
-    },
-    {
-        nameKey: 'tool.latex-editor.template_greek_letters',
-        name: 'Greek Letters',
-        latex: '\\alpha, \\beta, \\gamma, \\delta, \\epsilon, \\theta, \\lambda, \\mu, \\pi, \\sigma, \\phi, \\omega'
-    },
-];
-
 const LatexEditor: React.FC = () => {
     const { t } = useTranslation();
     const [latex, setLatex] = useState<string>('');
@@ -59,6 +26,40 @@ const LatexEditor: React.FC = () => {
     const [showExportMenu, setShowExportMenu] = useState(false);
     const renderRef = useRef<HTMLDivElement>(null);
     const exportMenuRef = useRef<HTMLDivElement>(null);
+
+    // Example templates
+    const EXAMPLE_TEMPLATES = [
+        {
+            nameT: t('tool.latex-editor.template_quadratic_formula'),
+            name: 'Quadratic Formula',
+            latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}'
+        },
+        {
+            nameT: t('tool.latex-editor.template_integral'),
+            name: 'Integral',
+            latex: '\\int_{a}^{b} f(x) \\, dx'
+        },
+        {
+            nameT: t('tool.latex-editor.template_matrix'),
+            name: 'Matrix',
+            latex: '\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}'
+        },
+        {
+            nameT: t('tool.latex-editor.template_sum'),
+            name: 'Sum',
+            latex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}'
+        },
+        {
+            nameT: t('tool.latex-editor.template_limit'),
+            name: 'Limit',
+            latex: '\\lim_{x \\to \\infty} \\frac{1}{x} = 0'
+        },
+        {
+            nameT: t('tool.latex-editor.template_greek_letters'),
+            name: 'Greek Letters',
+            latex: '\\alpha, \\beta, \\gamma, \\delta, \\epsilon, \\theta, \\lambda, \\mu, \\pi, \\sigma, \\phi, \\omega'
+        },
+    ];
 
     // Debounce latex input to avoid heavy rendering on every keystroke
     useEffect(() => {
@@ -403,7 +404,7 @@ const LatexEditor: React.FC = () => {
                             onClick={() => loadTemplate(template.latex)}
                             className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 hover:border-blue-400 transition-all"
                         >
-                            {t(template.nameKey)}
+                            {t(template.nameT)}
                         </button>
                     ))}
                 </div>
