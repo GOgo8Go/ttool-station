@@ -488,9 +488,9 @@ const ImageEditor: React.FC = () => {
 
   if (!file || !imageUrl) {
     return (
-      <div className="h-[calc(100vh-16rem)] flex flex-col items-center justify-center">
+      <div className="h-full flex flex-col">
         <div 
-          className="w-full max-w-xl flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-xl cursor-pointer border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer min-h-[400px] border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800"
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
@@ -498,7 +498,7 @@ const ImageEditor: React.FC = () => {
              if (e.dataTransfer.files?.[0]) handleFileSelect(e.dataTransfer.files[0]);
           }}
         >
-          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-6">
+          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-6 group-hover:scale-110 transition-transform">
             <Upload className="w-10 h-10 text-primary-600 dark:text-primary-400" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('common.open_image')}</h3>
