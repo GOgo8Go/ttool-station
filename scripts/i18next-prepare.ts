@@ -56,7 +56,7 @@ const dnsRecordsInfo =
 const qrBarCode = new Set([QR_LINE_STYLES, QR_DOT_STYLES, QR_CENTER_STYLES]);
 const passwordGenerator = ['uppercase', 'lowercase', 'numbers', 'symbols'].map(v => `tool.password-generator.${v}`);
 
-const unitConverter = UNIT_CATEGORIES.flatMap(([cat, { units }]) => [
+const unitConverter = Object.entries(UNIT_CATEGORIES).flatMap(([cat, { units }]) => [
   `tool.unit-converter.categories.${cat}`, 
   ...Object.keys(units).map(v => `tool.unit-converter.units.${v}`)
 ]);
@@ -69,7 +69,8 @@ const iNeedTheseTranslationKeys = [
   ...httpStatus,
   ...dnsRecordsInfo,
   ...qrBarCode,
-  ...passwordGenerator
+  ...passwordGenerator,
+  ...unitConverter,
 ];
 
 
