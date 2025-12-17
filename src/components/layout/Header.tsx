@@ -29,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title, isWideMode, 
   const languages = [
     { code: 'zh', name: '中文', flag: '🇨🇳' },
     { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
     { code: 'jp', name: '日本語', flag: '🇯🇵' },
     { code: 'kr', name: '한국어', flag: '🇰🇷' },
     { code: 'ru', name: 'Русский', flag: '🇷🇺' }
