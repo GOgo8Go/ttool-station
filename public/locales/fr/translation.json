@@ -303,6 +303,34 @@
     "regex-tester": {
       "name": "Testeur d'expressions régulières",
       "desc": "Tester en ligne les expressions régulières, avec aperçu des résultats de correspondance et fonction de remplacement",
+      "flags": {
+        "global": "Global",
+        "insensitive": "Insensible à la casse",
+        "multiline": "Multiligne",
+        "single_line": "Ligne unique",
+        "unicode": "Unicode",
+        "sticky": "Collant"
+      },
+      "flag_desc": {
+        "global": "Trouve toutes les correspondances au lieu de s'arrêter après la première",
+        "insensitive": "Ignore la casse lors de la correspondance",
+        "multiline": "Traite ^ et $ comme le début et la fin de chaque ligne plutôt que de toute la chaîne",
+        "single_line": "Permet à . de correspondre au caractère de nouvelle ligne",
+        "unicode": "Active le support Unicode",
+        "sticky": "Ne fait correspondre qu'à partir de la position indiquée par lastIndex"
+      },
+      "categories": {
+        "character_classes": "Classes de caractères",
+        "anchors": "Ancres",
+        "quantifiers": "Quantificateurs",
+        "groups": "Groupes"
+      },
+      "categories_desc": {
+        "character_classes": "Correspond aux ensembles de caractères d'un type spécifique",
+        "anchors": "Correspond à des positions spécifiques dans le texte",
+        "quantifiers": "Spécifie combien de caractères ou d'expressions doivent correspondre",
+        "groups": "Combine plusieurs jetons en une seule unité"
+      },
       "match": "Correspondance",
       "index": "Index",
       "regex_input": "Expression régulière",

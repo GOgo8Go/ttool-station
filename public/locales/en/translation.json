@@ -304,6 +304,34 @@
     "regex-tester": {
       "name": "Regex Tester",
       "desc": "Online tester for regular expressions",
+      "flags": {
+        "global": "Global",
+        "insensitive": "Case Insensitive",
+        "multiline": "Multiline",
+        "single_line": "Single Line",
+        "unicode": "Unicode",
+        "sticky": "Sticky"
+      },
+      "flag_desc": {
+        "global": "Find all matches instead of stopping after the first match",
+        "insensitive": "Ignore case when matching",
+        "multiline": "Treat ^ and $ as start/end of each line rather than the entire string",
+        "single_line": "Allow . to match newline characters",
+        "unicode": "Enable Unicode support",
+        "sticky": "Match only at the position indicated by lastIndex"
+      },
+      "categories": {
+        "character_classes": "Character Classes",
+        "anchors": "Anchors",
+        "quantifiers": "Quantifiers",
+        "groups": "Groups"
+      },
+      "categories_desc": {
+        "character_classes": "Match sets of characters of a specific type",
+        "anchors": "Match specific positions in the text",
+        "quantifiers": "Specify how many characters or expressions should match",
+        "groups": "Combine multiple tokens into a single unit"
+      },
       "match": "Match",
       "index": "Index",
       "regex_input": "Regular Expression",

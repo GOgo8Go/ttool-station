@@ -303,6 +303,34 @@
     "regex-tester": {
       "name": "正则表达式测试器",
       "desc": "在线测试正则表达式，提供匹配结果预览和替换功能",
+      "flags": {
+        "global": "全局匹配",
+        "insensitive": "忽略大小写",
+        "multiline": "多行模式",
+        "single_line": "单行模式",
+        "unicode": "Unicode匹配",
+        "sticky": "粘性匹配"
+      },
+      "flag_desc": {
+        "global": "查找所有匹配项而非在第一个匹配项后停止",
+        "insensitive": "匹配时忽略大小写差异",
+        "multiline": "将 ^ 和 $ 视为行的开头和结尾而不是整个字符串的开头和结尾",
+        "single_line": "将 . 匹配包括换行符在内的任何字符",
+        "unicode": "启用 Unicode 支持",
+        "sticky": "仅在 lastIndex 属性指示的位置开始匹配"
+      },
+      "categories": {
+        "character_classes": "字符类",
+        "anchors": "锚点",
+        "quantifiers": "量词",
+        "groups": "分组"
+      },
+      "categories_desc": {
+        "character_classes": "匹配特定类型的字符集合",
+        "anchors": "匹配文本中的特定位置",
+        "quantifiers": "指定应匹配多少个字符或表达式",
+        "groups": "将多个标记组合在一起作为一个单元"
+      },
       "match": "匹配",
       "index": "索引",
       "regex_input": "正则表达式",

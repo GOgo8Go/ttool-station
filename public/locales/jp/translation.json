@@ -304,6 +304,34 @@
     "regex-tester": {
       "name": "正規表現テスター",
       "desc": "正規表現をテストし、検証",
+      "flags": {
+        "global": "グローバル",
+        "insensitive": "大文字小文字を区別しない",
+        "multiline": "複数行",
+        "single_line": "単一行",
+        "unicode": "ユニコード",
+        "sticky": "スティッキー"
+      },
+      "flag_desc": {
+        "global": "最初の一致後に停止せず、すべての一致を見つける",
+        "insensitive": "一致時に大文字小文字を無視する",
+        "multiline": "^ と $ を文字列全体の開始と終了ではなく、各行の開始と終了として扱う",
+        "single_line": ". が改行文字を含むすべての文字に一致できるようにする",
+        "unicode": "ユニコードサポートを有効にする",
+        "sticky": "lastIndex プロパティが指す位置からのみ一致させる"
+      },
+      "categories": {
+        "character_classes": "文字クラス",
+        "anchors": "アンカー",
+        "quantifiers": "量指定子",
+        "groups": "グループ"
+      },
+      "categories_desc": {
+        "character_classes": "特定のタイプの文字セットに一致する",
+        "anchors": "テキスト内の特定の位置に一致する",
+        "quantifiers": "一致すべき文字または式の数を指定する",
+        "groups": "複数のトークンを1つの単位として結合する"
+      },
       "match": "一致",
       "index": "インデックス",
       "regex_input": "正規表現",

@@ -304,6 +304,34 @@
     "regex-tester": {
       "name": "정규식 테스터",
       "desc": "정규식을 테스트하고 검증",
+      "flags": {
+        "global": "전역",
+        "insensitive": "대소문자 구분 안 함",
+        "multiline": "멀티라인",
+        "single_line": "싱글라인",
+        "unicode": "유니코드",
+        "sticky": "스티키"
+      },
+      "flag_desc": {
+        "global": "첫 번째 매칭 후 멈추지 않고 모든 매칭 찾기",
+        "insensitive": "매칭 시 대소문자 무시",
+        "multiline": "^와 $를 전체 문자열이 아닌 각 줄의 시작과 끝으로 처리",
+        "single_line": ".이 줄바꿈 문자를 포함한 모든 문자와 매칭되도록 허용",
+        "unicode": "유니코드 지원 활성화",
+        "sticky": "lastIndex 속성이 가리키는 위치에서만 매칭"
+      },
+      "categories": {
+        "character_classes": "문자 클래스",
+        "anchors": "앵커",
+        "quantifiers": "수량자",
+        "groups": "그룹"
+      },
+      "categories_desc": {
+        "character_classes": "특정 유형의 문자 집합과 매칭",
+        "anchors": "텍스트 내 특정 위치와 매칭",
+        "quantifiers": "매칭되어야 할 문자나 표현식의 수 지정",
+        "groups": "여러 토큰을 하나의 단위로 결합"
+      },
       "match": "일치",
       "index": "인덱스",
       "regex_input": "정규표현식",
