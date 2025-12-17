@@ -331,6 +331,33 @@
         "quantifiers": "Spécifie combien de caractères ou d'expressions doivent correspondre",
         "groups": "Combine plusieurs jetons en une seule unité"
       },
+      "categories_example": {
+        "character_classes": {
+          "1": "Tout caractère sauf le saut de ligne",
+          "2": "Mot, chiffre, espace blanc",
+          "3": "N'importe lequel parmi a, b ou c",
+          "4": "Ni a, ni b, ni c",
+          "5": "Caractère de a à z"
+        },
+        "anchors": {
+          "1": "Début de la chaîne/ligne",
+          "2": "Fin de la chaîne/ligne",
+          "3": "Limite de mot"
+        },
+        "quantifiers": {
+          "1": "0 ou plus",
+          "2": "1 ou plus",
+          "3": "0 ou 1",
+          "4": "Exactement 2",
+          "5": "2 ou plus",
+          "6": "Entre 2 et 5"
+        },
+        "groups": {
+          "1": "Groupe de capture",
+          "2": "Groupe non capturant",
+          "3": "Référence arrière au groupe #1"
+        }
+      },
       "match": "Correspondance",
       "index": "Index",
       "regex_input": "Expression régulière",

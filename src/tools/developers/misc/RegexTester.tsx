@@ -5,46 +5,46 @@ import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 import { AlertCircle, Check, Copy, Info, X, Zap } from 'lucide-react';
 
 export const FLAGS = [
-  { char: 'g', label: 'Global', desc: 'Don\'t return after first match' },
-  { char: 'i', label: 'Insensitive', desc: 'Case insensitive match' },
-  { char: 'm', label: 'Multiline', desc: '^ and $ match start/end of line' },
-  { char: 's', label: 'Single line', desc: 'Dot (.) matches newline' },
-  { char: 'u', label: 'Unicode', desc: 'Enable unicode support' },
-  { char: 'y', label: 'Sticky', desc: 'Anchor to lastIndex of previous match' },
+  { char: 'g', label: 'Global' },
+  { char: 'i', label: 'Insensitive' },
+  { char: 'm', label: 'Multiline' },
+  { char: 's', label: 'Single line' },
+  { char: 'u', label: 'Unicode' },
+  { char: 'y', label: 'Sticky' },
 ];
 
 export const CHEATSHEET = [
   {
     category: 'Character Classes', items: [
-      { code: '.', desc: 'Any character except newline' },
-      { code: '\\w \\d \\s', desc: 'Word, digit, whitespace' },
-      { code: '[abc]', desc: 'Any of a, b, or c' },
-      { code: '[^abc]', desc: 'Not a, b, or c' },
-      { code: '[a-z]', desc: 'Char from a to z' },
+      { no: 1, code: '.' },
+      { no: 2, code: '\\w \\d \\s' },
+      { no: 3, code: '[abc]' },
+      { no: 4, code: '[^abc]' },
+      { no: 5, code: '[a-z]' },
     ]
   },
   {
     category: 'Anchors', items: [
-      { code: '^abc', desc: 'Start of string/line' },
-      { code: 'abc$', desc: 'End of string/line' },
-      { code: '\\b', desc: 'Word boundary' },
+      { no: 1, code: '^abc' },
+      { no: 2, code: 'abc$' },
+      { no: 3, code: '\\b' },
     ]
   },
   {
     category: 'Quantifiers', items: [
-      { code: 'a*', desc: '0 or more' },
-      { code: 'a+', desc: '1 or more' },
-      { code: 'a?', desc: '0 or 1' },
-      { code: 'a{2}', desc: 'Exactly 2' },
-      { code: 'a{2,}', desc: '2 or more' },
-      { code: 'a{2,5}', desc: 'Between 2 and 5' },
+      { no: 1, code: 'a*' },
+      { no: 2, code: 'a+' },
+      { no: 3, code: 'a?' },
+      { no: 4, code: 'a{2}' },
+      { no: 5, code: 'a{2,}' },
+      { no: 6, code: 'a{2,5}' },
     ]
   },
   {
     category: 'Groups', items: [
-      { code: '(...)', desc: 'Capture group' },
-      { code: '(?:...)', desc: 'Non-capturing group' },
-      { code: '\\1', desc: 'Backreference to group #1' },
+      { no: 1, code: '(...)' },
+      { no: 2, code: '(?:...)' },
+      { no: 3, code: '\\1' },
     ]
   },
 ];
@@ -170,10 +170,10 @@ const RegexTester: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-16rem)] -m-6 bg-gray-50 dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col lg:flex-row -m-6 bg-gray-50 dark:bg-gray-900">
 
       {/* Left: Editor Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full p-6 space-y-4 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 h-full p-6 space-y-4">
 
         {/* 1. Regex Input */}
         <Card className="flex flex-col gap-3 p-4 border-l-4 border-l-primary-500">
@@ -330,33 +330,41 @@ const RegexTester: React.FC = () => {
       </div>
 
       {/* Right: Sidebar / Cheatsheet */}
-      <div className="w-full lg:w-72 bg-white dark:bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 overflow-y-auto custom-scrollbar">
+      <div className="w-full lg:w-72 bg-white dark:bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800">
         <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800">
           <h3 className="font-semibold text-sm flex items-center gap-2">
             <Info size={16} /> {t('tool.regex-tester.cheatsheet')}
           </h3>
         </div>
-        <div className="p-4 space-y-6">
-          {CHEATSHEET.map((section) => (
-            <div key={section.category}>
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{t(`tool.regex-tester.categories.${section.category.toLowerCase().replace(/ /g, '_')}`)}</h4>
-              <div className="space-y-1">
-                {section.items.map((item) => (
-                  <button
-                    key={item.code}
-                    onClick={() => setPattern(p => p + item.code)}
-                    className="w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 group text-left"
-                    title={t('tool.regex-tester.click_append')}
-                  >
-                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-primary-600 dark:text-primary-400 border border-gray-200 dark:border-gray-700 group-hover:border-primary-300">
-                      {item.code}
-                    </code>
-                    <span className="text-xs text-gray-500">{item.desc}</span>
-                  </button>
-                ))}
+        <div className="p-4 space-y-6 pb-6">
+          {CHEATSHEET.map((section) => {
+            const label = section.category.toLowerCase().replace(/ /g, '_');
+            return (
+              <div key={section.category}>
+                <h4 
+                  className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
+                  title={t(`tool.regex-tester.categories_desc.${label}`)}
+                >
+                  {t(`tool.regex-tester.categories.${label}`)}
+                </h4>
+                <div className="space-y-1">
+                  {section.items.map((item) => (
+                    <button
+                      key={item.code}
+                      onClick={() => setPattern(p => p + item.code)}
+                      className="w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 group text-left"
+                      title={t('tool.regex-tester.click_append')}
+                    >
+                      <code className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-primary-600 dark:text-primary-400 border border-gray-200 dark:border-gray-700 group-hover:border-primary-300">
+                        {item.code}
+                      </code>
+                      <span className="text-xs text-gray-500">{t(`tool.regex-tester.categories_example.${label}.${item.no}`)}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 

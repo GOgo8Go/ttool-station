@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { Copy, ArrowRightLeft, Check, AlertCircle, FileText, Upload } from 'lucide-react';
+import { SegmentedControl } from '../../../components/ui/SegmentedControl';
 
 type EncodingType = 'base64' | 'base64url' | 'base32' | 'url' | 'hex' | 'binary' | 'ascii' | 'unicode' | 'octal' | 'html';
 type Direction = 'encode' | 'decode';
@@ -464,21 +465,15 @@ const EncodingConverter: React.FC = () => {
             {/* Toolbar */}
             <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                 {/* Encoding Type Selection */}
-                <div className="flex flex-wrap gap-2">
-                    {ENCODINGS.map((enc) => (
-                        <button
-                            key={enc.value}
-                            onClick={() => setEncoding(enc.value)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${encoding === enc.value
-                                ? 'bg-primary-600 text-white border-primary-600'
-                                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                }`}
-                            title={enc.description}
-                        >
-                            {enc.label}
-                        </button>
-                    ))}
-                </div>
+                <SegmentedControl
+                    value={encoding}
+                    onChange={(value) => setEncoding(value as EncodingType)}
+                    options={ENCODINGS.map(enc => ({
+                        value: enc.value,
+                        label: enc.label,
+                        title: enc.description
+                    }))}
+                />
 
                 {/* Direction Toggle */}
                 <div className="flex items-center gap-4">

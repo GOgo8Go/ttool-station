@@ -30,6 +30,10 @@ function iNeedTheseTranslationForRegex() {
     const label = section.category.toLowerCase().replace(' ', '_');
     keys.push(`tool.regex-tester.categories.${label}`);
     keys.push(`tool.regex-tester.categories_desc.${label}`);
+    for (const item of section.items) {
+      const label2 = item.no;
+      keys.push(`tool.regex-tester.categories_example.${label}.${label2}`); 
+    }
   }
 
   return keys;

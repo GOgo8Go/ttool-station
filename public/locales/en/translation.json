@@ -332,6 +332,33 @@
         "quantifiers": "Specify how many characters or expressions should match",
         "groups": "Combine multiple tokens into a single unit"
       },
+      "categories_example": {
+        "character_classes": {
+          "1": "Any character except newline",
+          "2": "Word, digit, whitespace",
+          "3": "Any of a, b, or c",
+          "4": "Not a, b, or c",
+          "5": "Char from a to z"
+        },
+        "anchors": {
+          "1": "Start of string/line",
+          "2": "End of string/line",
+          "3": "Word boundary"
+        },
+        "quantifiers": {
+          "1": "0 or more",
+          "2": "1 or more",
+          "3": "0 or 1",
+          "4": "Exactly 2",
+          "5": "2 or more",
+          "6": "Between 2 and 5"
+        },
+        "groups": {
+          "1": "Capture group",
+          "2": "Non-capturing group",
+          "3": "Backreference to group #1"
+        }
+      },
       "match": "Match",
       "index": "Index",
       "regex_input": "Regular Expression",
