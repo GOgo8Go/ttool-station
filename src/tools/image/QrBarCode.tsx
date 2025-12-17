@@ -29,6 +29,9 @@ const CODE_TYPES: { value: CodeType; label: string }[] = [
   { value: 'ITF14', label: 'ITF-14' },
 ];
 
+export const QR_DOT_STYLES = ['square', 'dots', 'rounded', 'classy', 'classy-rounded', 'extra-rounded'];
+export const QR_LINE_STYLES = ['square', 'dot', 'extra-rounded'];
+export const QR_CENTER_STYLES = ['square', 'dot'];
 const QrBarCode: React.FC = () => {
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>('generate');
@@ -501,7 +504,7 @@ const QrBarCode: React.FC = () => {
                             value={dotsStyle}
                             onChange={(e) => setDotsStyle(e.target.value)}
                           >
-                            {['square', 'dots', 'rounded', 'classy', 'classy-rounded', 'extra-rounded'].map(s => (
+                            {QR_DOT_STYLES.map(s => (
                               <option key={s} value={s}>{t(`tool.qr-barcode.generator.styles.${s.replace('-', '_')}`)}</option>
                             ))}
                           </select>
@@ -514,7 +517,7 @@ const QrBarCode: React.FC = () => {
                             value={cornersSquareStyle}
                             onChange={(e) => setCornersSquareStyle(e.target.value)}
                           >
-                            {['square', 'dot', 'extra-rounded'].map(s => (
+                            {QR_LINE_STYLES.map(s => (
                               <option key={s} value={s}>{t(`tool.qr-barcode.generator.styles.${s.replace('-', '_')}`)}</option>
                             ))}
                           </select>
@@ -527,7 +530,7 @@ const QrBarCode: React.FC = () => {
                             value={cornersDotStyle}
                             onChange={(e) => setCornersDotStyle(e.target.value)}
                           >
-                            {['square', 'dot'].map(s => (
+                            {QR_CENTER_STYLES.map(s => (
                               <option key={s} value={s}>{t(`tool.qr-barcode.generator.styles.${s.replace('-', '_')}`)}</option>
                             ))}
                           </select>

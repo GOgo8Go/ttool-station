@@ -13,7 +13,7 @@ interface DnsRecordInfo {
 }
 
 // DNS记录类型信息数据
-const DNS_RECORDS_INFO: DnsRecordInfo[] = [
+export const DNS_RECORDS_INFO: DnsRecordInfo[] = [
   {
     type: 'A',
     icon: Globe,

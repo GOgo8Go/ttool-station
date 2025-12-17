@@ -1,21 +1,12 @@
-import { toolRegistry } from '../src/tools/registry';
-import { FLAGS, CHEATSHEET } from '../src/tools/developers/misc/RegexTester';
-import { HTTP_STATUS } from '@/tools/lookup/HttpStatus';
 import fs from 'fs';
+import { toolRegistry } from '@/tools/registry';
+import { FLAGS, CHEATSHEET } from '@/tools/developers/misc/RegexTester';
+import { HTTP_STATUS } from '@/tools/lookup/HttpStatus';
+import { DNS_RECORDS_INFO } from '@/tools/lookup/DnsRecordsInfo';
+import { QR_DOT_STYLES, QR_LINE_STYLES, QR_CENTER_STYLES } from '@/tools/image/QrBarCode';
+import { UNIT_CATEGORIES } from '@/tools/math/UnitConverter';
 
-// function iNeedTheseTranslationForRegistry() {
-//   let keys: string[] = [];
-//   for (const cate of toolRegistry.values()) {
-//     keys.push(cate.name)
-//     for (const tool of cate.tools) {
-//       keys.push(tool.name)
-//       keys.push(tool.description)
-//     }
-//   }
-//   return keys;
-// }
-
-const iNeedTheseTranslationForRegistry = toolRegistry.flatMap(cate => [
+const registry = toolRegistry.flatMap(cate => [
   cate.name,
   ...cate.tools.flatMap(tool => [
     tool.name,
@@ -23,27 +14,8 @@ const iNeedTheseTranslationForRegistry = toolRegistry.flatMap(cate => [
   ])
 ]);
 
-// function iNeedTheseTranslationForRegex() {
-//   let keys: string[] = [];
-//   for (const flag of FLAGS) {
-//     const label = flag.label.toLowerCase().replace(' ', '_');
-//     keys.push(`tool.regex-tester.flags.${label}`);
-//     keys.push(`tool.regex-tester.flags_desc.${label}`);
-//   }
-//   for (const section of CHEATSHEET) {
-//     const label = section.category.toLowerCase().replace(' ', '_');
-//     keys.push(`tool.regex-tester.categories.${label}`);
-//     keys.push(`tool.regex-tester.categories_desc.${label}`);
-//     for (const item of section.items) {
-//       const label2 = item.no;
-//       keys.push(`tool.regex-tester.categories_example.${label}.${label2}`); 
-//     }
-//   }
 
-//   return keys;
-// }
-
-const iNeedTheseTranslationForRegexTest = [
+const regexTest = [
   ...FLAGS.flatMap(flag => ['', '_desc'].map(p => {
     const label = flag.label.toLowerCase().replace(' ', '_');
     return `tool.regex-tester.flags${p}.${label}`;
@@ -62,13 +34,13 @@ const iNeedTheseTranslationForRegexTest = [
   })
 ];
 
-const iNeedTheseTranslationForSensorTest = [
+const sensorTest = [
     'deviceOrientation', 'deviceMotion', 'ambientLight', 'accelerometer', 'gyroscope', 'magnetometer', 'geolocation',
   ].map(v => `tool.sensor-test.sensors.${v}`)
 
-const iNeedTheseTranslationForSpeakerTest = ['sine', 'square', 'sawtooth', 'triangle'].map(v => `tool.speaker-test.wave_${v}`);
+const speakerTest = ['sine', 'square', 'sawtooth', 'triangle'].map(v => `tool.speaker-test.wave_${v}`);
 
-const iNeedTheseTranslationForHttpStatus = [
+const httpStatus = [
   ...Object.keys(HTTP_STATUS).map(v => `tool.http-status.category.${v}xx`),
   ...Object.entries(HTTP_STATUS).flatMap(([k, vs]) =>
     vs.flatMap(v => {
@@ -78,12 +50,26 @@ const iNeedTheseTranslationForHttpStatus = [
   )
 ];
 
+const dnsRecordsInfo = 
+  DNS_RECORDS_INFO.flatMap(( {descriptionKey, exampleKey, useCaseKey}) => [descriptionKey, exampleKey, useCaseKey]);
+
+const qrBarCode = new Set([QR_LINE_STYLES, QR_DOT_STYLES, QR_CENTER_STYLES]);
+const passwordGenerator = ['uppercase', 'lowercase', 'numbers', 'symbols'].map(v => `tool.password-generator.${v}`);
+
+const unitConverter = UNIT_CATEGORIES.flatMap(([cat, { units }]) => [
+  `tool.unit-converter.categories.${cat}`, 
+  ...Object.keys(units).map(v => `tool.unit-converter.units.${v}`)
+]);
+
 const iNeedTheseTranslationKeys = [
-  ...iNeedTheseTranslationForRegistry,
-  ...iNeedTheseTranslationForRegexTest,
-  ...iNeedTheseTranslationForSensorTest,
-  ...iNeedTheseTranslationForSpeakerTest,
-  ...iNeedTheseTranslationForHttpStatus,
+  ...registry,
+  ...regexTest,
+  ...sensorTest,
+  ...speakerTest,
+  ...httpStatus,
+  ...dnsRecordsInfo,
+  ...qrBarCode,
+  ...passwordGenerator
 ];
 
 
