@@ -39,7 +39,7 @@ function iNeedTheseTranslationForRegex() {
 
 let text = "import { useTranslation } from 'react-i18next';\nconst { t } = useTranslation();";
 for (const key of iNeedTheseTranslationKeys) {
-  text += `\nt(${key});`
+  text += `\nt('${key}');`
 }
 
 fs.writeFileSync('src/.iNeedTheseTranslation.tsx', text);
