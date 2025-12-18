@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { loadFFmpeg } from '../../utils/ffmpegLoader';
 import {
@@ -26,6 +27,7 @@ const FFmpegTool: React.FC = () => {
   const [command, setCommand] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isFfmpegLoading, setIsFfmpegLoading] = useState<boolean>(false);
   const [executionProgress, setExecutionProgress] = useState<number>(0);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState<boolean>(false);
@@ -37,20 +39,25 @@ const FFmpegTool: React.FC = () => {
   }
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<string>('.');
+  const [lastUploadedFile, setLastUploadedFile] = useState<string>('input.mp4');
   const [outputFiles, setOutputFiles] = useState<{name: string, data: Uint8Array}[]>([]);
-  const [showCommonFunctions, setShowCommonFunctions] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>('format_conversion');
   const [functionConfig, setFunctionConfig] = useState<Record<string, any>>({});
+  const [ffmpegVersion, setFfmpegVersion] = useState<'single' | 'multi'>('single');
+  const [commandType, setCommandType] = useState<'ffmpeg' | 'ffprobe'>('ffmpeg');
   
   const ffmpegRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const [dragOverNode, setDragOverNode] = useState<FileNode | null>(null);
 
   // Initialize FFmpeg and load file system
   useEffect(() => {
     const initFFmpeg = async () => {
+      setIsFfmpegLoading(true);
       try {
-        ffmpegRef.current = await loadFFmpeg();
+        const useMultithreading = ffmpegVersion === 'multi';
+        ffmpegRef.current = await loadFFmpeg(useMultithreading);
         
         // Set up event listeners
         ffmpegRef.current.on('log', ({ message }: { message: string }) => {
@@ -65,13 +72,64 @@ const FFmpegTool: React.FC = () => {
 
         // Load initial file system
         await loadFileSystem();
+        setLogs(prev => [...prev, 'FFmpeg loaded successfully']);
       } catch (error) {
         console.error('Failed to load FFmpeg:', error);
+        setLogs(prev => [...prev, `Error loading FFmpeg: ${(error as Error).message}`]);
+        throw error;
+      } finally {
+        setIsFfmpegLoading(false);
       }
     };
 
     initFFmpeg();
   }, []);
+
+  // Reload FFmpeg when version changes
+  useEffect(() => {
+    if (rootNode) {
+      // Clear existing FFmpeg instance
+      ffmpegRef.current = null;
+      // Set loading state
+      setIsFfmpegLoading(true);
+      // Reinitialize with new version
+      const initFFmpeg = async () => {
+        try {
+          const useMultithreading = ffmpegVersion === 'multi';
+          ffmpegRef.current = await loadFFmpeg(useMultithreading);
+          
+          // Set up event listeners
+          ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+            setLogs(prev => [...prev, message]);
+          });
+          
+          ffmpegRef.current.on('progress', ({ progress, time }: { progress: number; time: number }) => {
+            const percentage = Math.round(progress * 100);
+            setExecutionProgress(percentage);
+            setLogs(prev => [...prev, `Progress: ${percentage}% (transcoded time: ${time / 1000000} s)`]);
+          });
+
+          // Refresh file system with new FFmpeg instance
+          await refreshFileSystem();
+          setLogs(prev => [...prev, `FFmpeg ${ffmpegVersion === 'multi' ? 'multi-thread' : 'single-thread'} loaded successfully`]);
+        } catch (error) {
+          console.error('Failed to reload FFmpeg:', error);
+          setLogs(prev => [...prev, `Error loading FFmpeg: ${(error as Error).message}`]);
+        } finally {
+          setIsFfmpegLoading(false);
+        }
+      };
+
+      initFFmpeg();
+    }
+  }, [ffmpegVersion]);
+
+  // Update active category when switching between ffmpeg/ffprobe
+  useEffect(() => {
+    if (commandType === 'ffprobe') {
+      setActiveCategory('quick_commands');
+    }
+  }, [commandType]);
 
   // Load file system from FFmpeg WASM
   const loadFileSystem = async (path: string = '.') => {
@@ -85,6 +143,11 @@ const FFmpegTool: React.FC = () => {
 
       files.forEach((file: any) => {
         if (file.name === '.' || file.name === '..') return;
+        
+        // 隐藏根目录下的 dev 和 proc 目录
+        if (path === '.' && file.isDir && (file.name === 'dev' || file.name === 'proc')) {
+          return;
+        }
         
         const fullPath = path === '.' ? file.name : `${path}/${file.name}`;
         const newNode: FileNode = {
@@ -125,6 +188,11 @@ const FFmpegTool: React.FC = () => {
 
       files.forEach((file: any) => {
         if (file.name === '.' || file.name === '..') return;
+        
+        // 隐藏根目录下的 dev 和 proc 目录
+        if (node.path === '.' && file.isDir && (file.name === 'dev' || file.name === 'proc')) {
+          return;
+        }
         
         const fullPath = node.path === '.' ? file.name : `${node.path}/${file.name}`;
         const newNode: FileNode = {
@@ -213,6 +281,7 @@ const FFmpegTool: React.FC = () => {
 
   // 定义功能类别
   const categories = [
+    { id: 'quick_commands', name: t('tool.ffmpeg.categories.quick_commands') },
     { id: 'format_conversion', name: t('tool.ffmpeg.categories.format_conversion') },
     { id: 'video_processing', name: t('tool.ffmpeg.categories.video_processing') },
     { id: 'audio_processing', name: t('tool.ffmpeg.categories.audio_processing') },
@@ -225,50 +294,93 @@ const FFmpegTool: React.FC = () => {
 
   // 定义各功能类别下的子功能
   const functions = {
+    quick_commands: [
+      // FFmpeg Functions
+      { id: 'convert_video', name: t('tool.ffmpeg.functions.convert_video'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'convert_audio', name: t('tool.ffmpeg.functions.convert_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'convert_container', name: t('tool.ffmpeg.functions.convert_container'), icon: FileIcon, tool: 'ffmpeg' },
+      { id: 'resize', name: t('tool.ffmpeg.functions.resize'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'trim', name: t('tool.ffmpeg.functions.trim'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'crop', name: t('tool.ffmpeg.functions.crop'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'rotate', name: t('tool.ffmpeg.functions.rotate'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'watermark', name: t('tool.ffmpeg.functions.watermark'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'extract_audio', name: t('tool.ffmpeg.functions.extract_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'mix_audio', name: t('tool.ffmpeg.functions.mix_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'adjust_volume', name: t('tool.ffmpeg.functions.adjust_volume'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'brightness_contrast', name: t('tool.ffmpeg.functions.brightness_contrast'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'denoise', name: t('tool.ffmpeg.functions.denoise'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'deinterlace', name: t('tool.ffmpeg.functions.deinterlace'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'hls_segment', name: t('tool.ffmpeg.functions.hls_segment'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'dash_segment', name: t('tool.ffmpeg.functions.dash_segment'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'concat_videos', name: t('tool.ffmpeg.functions.concat_videos'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_speed', name: t('tool.ffmpeg.functions.video_speed'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_loop', name: t('tool.ffmpeg.functions.video_loop'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_stabilize', name: t('tool.ffmpeg.functions.video_stabilize'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_reverse', name: t('tool.ffmpeg.functions.video_reverse'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'fade_in_out', name: t('tool.ffmpeg.functions.fade_in_out'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'image_overlay', name: t('tool.ffmpeg.functions.image_overlay'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'picture_in_picture', name: t('tool.ffmpeg.functions.picture_in_picture'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'ken_burns_effect', name: t('tool.ffmpeg.functions.ken_burns_effect'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'add_subtitle', name: t('tool.ffmpeg.functions.add_subtitle'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'add_text', name: t('tool.ffmpeg.functions.add_text'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'draw_box', name: t('tool.ffmpeg.functions.draw_box'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'generate_video_from_image', name: t('tool.ffmpeg.functions.generate_video_from_image'), icon: FileVideo, tool: 'ffmpeg' },
+      // FFprobe Functions
+      { id: 'show_format', name: t('tool.ffmpeg.functions.ffprobe_show_format_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_streams', name: t('tool.ffmpeg.functions.ffprobe_show_streams_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_duration', name: t('tool.ffmpeg.functions.ffprobe_show_duration'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_resolution', name: t('tool.ffmpeg.functions.ffprobe_show_resolution'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_bitrate', name: t('tool.ffmpeg.functions.ffprobe_show_bitrate'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_fps', name: t('tool.ffmpeg.functions.ffprobe_show_FPS'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_codec', name: t('tool.ffmpeg.functions.ffprobe_show_codec_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_metadata', name: t('tool.ffmpeg.functions.ffprobe_show_metadata'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_chapters', name: t('tool.ffmpeg.functions.ffprobe_show_chapters'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_frame_count', name: t('tool.ffmpeg.functions.ffprobe_show_frame_count'), icon: FileIcon, tool: 'ffprobe' },
+    ],
     format_conversion: [
-      { id: 'convert_video', name: t('tool.ffmpeg.functions.convert_video'), icon: FileVideo },
-      { id: 'convert_audio', name: t('tool.ffmpeg.functions.convert_audio'), icon: FileAudio },
-      { id: 'convert_container', name: t('tool.ffmpeg.functions.convert_container'), icon: FileIcon },
+      { id: 'convert_video', name: t('tool.ffmpeg.functions.convert_video'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'convert_audio', name: t('tool.ffmpeg.functions.convert_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'convert_container', name: t('tool.ffmpeg.functions.convert_container'), icon: FileIcon, tool: 'ffmpeg' },
     ],
     video_processing: [
-      { id: 'resize', name: t('tool.ffmpeg.functions.resize'), icon: FileVideo },
-      { id: 'trim', name: t('tool.ffmpeg.functions.trim'), icon: FileVideo },
-      { id: 'crop', name: t('tool.ffmpeg.functions.crop'), icon: FileVideo },
-      { id: 'rotate', name: t('tool.ffmpeg.functions.rotate'), icon: FileVideo },
-      { id: 'watermark', name: t('tool.ffmpeg.functions.watermark'), icon: FileVideo },
+      { id: 'resize', name: t('tool.ffmpeg.functions.resize'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'trim', name: t('tool.ffmpeg.functions.trim'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'crop', name: t('tool.ffmpeg.functions.crop'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'rotate', name: t('tool.ffmpeg.functions.rotate'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'watermark', name: t('tool.ffmpeg.functions.watermark'), icon: FileVideo, tool: 'ffmpeg' },
     ],
     audio_processing: [
-      { id: 'extract_audio', name: t('tool.ffmpeg.functions.extract_audio'), icon: FileAudio },
-      { id: 'mix_audio', name: t('tool.ffmpeg.functions.mix_audio'), icon: FileAudio },
-      { id: 'adjust_volume', name: t('tool.ffmpeg.functions.adjust_volume'), icon: FileAudio },
+      { id: 'extract_audio', name: t('tool.ffmpeg.functions.extract_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'mix_audio', name: t('tool.ffmpeg.functions.mix_audio'), icon: FileAudio, tool: 'ffmpeg' },
+      { id: 'adjust_volume', name: t('tool.ffmpeg.functions.adjust_volume'), icon: FileAudio, tool: 'ffmpeg' },
     ],
     filters: [
-      { id: 'brightness_contrast', name: t('tool.ffmpeg.functions.brightness_contrast'), icon: FileVideo },
-      { id: 'denoise', name: t('tool.ffmpeg.functions.denoise'), icon: FileVideo },
-      { id: 'deinterlace', name: t('tool.ffmpeg.functions.deinterlace'), icon: FileVideo },
+      { id: 'brightness_contrast', name: t('tool.ffmpeg.functions.brightness_contrast'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'denoise', name: t('tool.ffmpeg.functions.denoise'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'deinterlace', name: t('tool.ffmpeg.functions.deinterlace'), icon: FileVideo, tool: 'ffmpeg' },
     ],
     streaming: [
-      { id: 'hls_segment', name: t('tool.ffmpeg.functions.hls_segment'), icon: FileVideo },
-      { id: 'dash_segment', name: t('tool.ffmpeg.functions.dash_segment'), icon: FileVideo },
+      { id: 'hls_segment', name: t('tool.ffmpeg.functions.hls_segment'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'dash_segment', name: t('tool.ffmpeg.functions.dash_segment'), icon: FileVideo, tool: 'ffmpeg' },
     ],
     advanced_video: [
-      { id: 'concat_videos', name: t('tool.ffmpeg.functions.concat_videos'), icon: FileVideo },
-      { id: 'video_speed', name: t('tool.ffmpeg.functions.video_speed'), icon: FileVideo },
-      { id: 'video_loop', name: t('tool.ffmpeg.functions.video_loop'), icon: FileVideo },
-      { id: 'video_stabilize', name: t('tool.ffmpeg.functions.video_stabilize'), icon: FileVideo },
-      { id: 'video_reverse', name: t('tool.ffmpeg.functions.video_reverse'), icon: FileVideo },
+      { id: 'concat_videos', name: t('tool.ffmpeg.functions.concat_videos'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_speed', name: t('tool.ffmpeg.functions.video_speed'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_loop', name: t('tool.ffmpeg.functions.video_loop'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_stabilize', name: t('tool.ffmpeg.functions.video_stabilize'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'video_reverse', name: t('tool.ffmpeg.functions.video_reverse'), icon: FileVideo, tool: 'ffmpeg' },
     ],
     effects: [
-      { id: 'fade_in_out', name: t('tool.ffmpeg.functions.fade_in_out'), icon: FileVideo },
-      { id: 'image_overlay', name: t('tool.ffmpeg.functions.image_overlay'), icon: FileVideo },
-      { id: 'picture_in_picture', name: t('tool.ffmpeg.functions.picture_in_picture'), icon: FileVideo },
-      { id: 'ken_burns_effect', name: t('tool.ffmpeg.functions.ken_burns_effect'), icon: FileVideo },
+      { id: 'fade_in_out', name: t('tool.ffmpeg.functions.fade_in_out'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'image_overlay', name: t('tool.ffmpeg.functions.image_overlay'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'picture_in_picture', name: t('tool.ffmpeg.functions.picture_in_picture'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'ken_burns_effect', name: t('tool.ffmpeg.functions.ken_burns_effect'), icon: FileVideo, tool: 'ffmpeg' },
     ],
     text_graphics: [
-      { id: 'add_subtitle', name: t('tool.ffmpeg.functions.add_subtitle'), icon: FileVideo },
-      { id: 'add_text', name: t('tool.ffmpeg.functions.add_text'), icon: FileVideo },
-      { id: 'draw_box', name: t('tool.ffmpeg.functions.draw_box'), icon: FileVideo },
-      { id: 'generate_video_from_image', name: t('tool.ffmpeg.functions.generate_video_from_image'), icon: FileVideo },
+      { id: 'add_subtitle', name: t('tool.ffmpeg.functions.add_subtitle'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'add_text', name: t('tool.ffmpeg.functions.add_text'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'draw_box', name: t('tool.ffmpeg.functions.draw_box'), icon: FileVideo, tool: 'ffmpeg' },
+      { id: 'generate_video_from_image', name: t('tool.ffmpeg.functions.generate_video_from_image'), icon: FileVideo, tool: 'ffmpeg' },
     ],
   };
 
@@ -594,6 +706,103 @@ const FFmpegTool: React.FC = () => {
         ] },
       ]
     },
+    // FFprobe functions
+    show_format: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'output_format', label: 'Output Format', type: 'select', options: [
+          { value: 'default', label: 'Default' },
+          { value: 'json', label: 'JSON' },
+          { value: 'xml', label: 'XML' },
+          { value: 'csv', label: 'CSV' },
+        ]},
+      ]
+    },
+    show_streams: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'stream_type', label: 'Stream Type', type: 'select', options: [
+          { value: 'all', label: 'All Streams' },
+          { value: 'video', label: 'Video Only' },
+          { value: 'audio', label: 'Audio Only' },
+          { value: 'subtitle', label: 'Subtitle Only' },
+        ]},
+        { id: 'output_format', label: 'Output Format', type: 'select', options: [
+          { value: 'default', label: 'Default' },
+          { value: 'json', label: 'JSON' },
+          { value: 'xml', label: 'XML' },
+          { value: 'csv', label: 'CSV' },
+        ]},
+      ]
+    },
+    show_duration: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'precision', label: 'Precision', type: 'select', options: [
+          { value: 'seconds', label: 'Seconds' },
+          { value: 'milliseconds', label: 'Milliseconds' },
+          { value: 'timecode', label: 'Timecode' },
+        ]},
+      ]
+    },
+    show_resolution: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'stream_index', label: 'Stream Index', type: 'number', placeholder: '0 (leave empty for first video stream)' },
+      ]
+    },
+    show_bitrate: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'bitrate_type', label: 'Bitrate Type', type: 'select', options: [
+          { value: 'overall', label: 'Overall' },
+          { value: 'video', label: 'Video Only' },
+          { value: 'audio', label: 'Audio Only' },
+        ]},
+      ]
+    },
+    show_fps: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'stream_index', label: 'Stream Index', type: 'number', placeholder: '0 (leave empty for first video stream)' },
+      ]
+    },
+    show_codec: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'stream_type', label: 'Stream Type', type: 'select', options: [
+          { value: 'all', label: 'All Streams' },
+          { value: 'video', label: 'Video Only' },
+          { value: 'audio', label: 'Audio Only' },
+          { value: 'subtitle', label: 'Subtitle Only' },
+        ]},
+      ]
+    },
+    show_metadata: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'metadata_type', label: 'Metadata Type', type: 'select', options: [
+          { value: 'all', label: 'All Metadata' },
+          { value: 'format', label: 'Format Metadata' },
+          { value: 'streams', label: 'Stream Metadata' },
+        ]},
+      ]
+    },
+    show_chapters: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'output_format', label: 'Output Format', type: 'select', options: [
+          { value: 'default', label: 'Default' },
+          { value: 'json', label: 'JSON' },
+        ]},
+      ]
+    },
+    show_frame_count: {
+      inputs: [
+        { id: 'input', label: t('tool.ffmpeg.inputs.input_file'), type: 'file', required: true },
+        { id: 'stream_index', label: 'Stream Index', type: 'number', placeholder: '0 (leave empty for first video stream)' },
+      ]
+    },
   };
 
   // Scroll to bottom of logs when new logs are added
@@ -648,6 +857,8 @@ const FFmpegTool: React.FC = () => {
          // Create a dummy File object for the virtual file
          const dummyFile = new File([], node.name);
          setSelectedFiles(prev => [...prev, { file: dummyFile, path: node.path }]);
+         // 更新最后上传的文件
+         setLastUploadedFile(node.name);
        }
     };
     
@@ -725,6 +936,10 @@ const FFmpegTool: React.FC = () => {
       
       // Refresh file system and expand the target folder
       await refreshFileSystem(targetPath);
+      // Update last uploaded file with the first uploaded file name
+      if (files.length > 0) {
+        setLastUploadedFile(files[0].name);
+      }
       setLogs(prev => [...prev, t('tool.ffmpeg.upload_completed')]);
     } catch (error) {
       setLogs(prev => [...prev, `Error uploading files: ${error.message}`]);
@@ -737,7 +952,7 @@ const FFmpegTool: React.FC = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files) {
-      addFiles(Array.from(e.dataTransfer.files));
+      uploadFiles(Array.from(e.dataTransfer.files) as File[], '.');
     }
   };
 
@@ -797,6 +1012,11 @@ const FFmpegTool: React.FC = () => {
  
     setRootNode(root);
     setExpandedPaths(new Set([''])); // Expand root by default
+    
+    // 更新最后上传的文件为第一个文件
+    if (allFiles.length > 0) {
+      setLastUploadedFile(allFiles[0].name);
+    }
   };
 
   // Remove a file from the tree
@@ -814,6 +1034,7 @@ const FFmpegTool: React.FC = () => {
   const FileTreeNode: React.FC<{ node: FileNode; depth: number }> = ({ node, depth }) => {
     if (!node) return null;
 
+    const [isHovered, setIsHovered] = useState(false);
     const isExpanded = expandedPaths.has(node.path);
     const isRoot = !node.parent && node.name === 'Root';
     const isSelected = selectedFiles.some(f => f.file.name === node.name);
@@ -835,9 +1056,45 @@ const FFmpegTool: React.FC = () => {
           className={`
             flex items-center gap-2 py-1.5 px-2 cursor-pointer transition-colors text-sm whitespace-nowrap rounded-md
             ${isSelected ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
+            ${dragOverNode?.path === node.path ? 'bg-blue-100 dark:bg-blue-900/30' : ''}
           `}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
           onClick={() => handleFileSelectFromTree(node)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (!dragOverNode || dragOverNode.path !== node.path) {
+              setDragOverNode(node);
+            }
+          }}
+          onDragLeave={(e) => {
+            // 检查是否真的离开了这个元素
+            const relatedTarget = e.relatedTarget as HTMLElement;
+            if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+              if (dragOverNode?.path === node.path) {
+                setDragOverNode(null);
+              }
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.dataTransfer.files && dragOverNode) {
+              let targetPath = '.';
+              if (dragOverNode.isDir) {
+                // 拖到文件夹上，放在该文件夹下
+                targetPath = dragOverNode.path;
+              } else {
+                // 拖到文件上，放在该文件对应的目录下
+                const parentPath = dragOverNode.path.lastIndexOf('/') > 0 ?
+                  dragOverNode.path.substring(0, dragOverNode.path.lastIndexOf('/')) : '.';
+                targetPath = parentPath;
+              }
+              uploadFiles(Array.from(e.dataTransfer.files) as File[], targetPath);
+              setDragOverNode(null);
+            }
+          }}
         >
           {node.isDir ? (
             <div className="p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10" onClick={(e) => { e.stopPropagation(); toggleExpand(node.path); }}>
@@ -851,7 +1108,7 @@ const FFmpegTool: React.FC = () => {
 
           <span className="truncate flex-1 text-left">{node.name}</span>
 
-          {node.isDir && (
+          {node.isDir && isHovered && (
             <div className="flex items-center gap-1">
               <Button
                 size="xs"
@@ -932,6 +1189,7 @@ const FFmpegTool: React.FC = () => {
                 }}
                 title={t('tool.ffmpeg.download_folder')}
                 className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+                disabled={isFfmpegLoading}
               >
                 <Download className="w-3 h-3" />
               </Button>
@@ -1063,7 +1321,7 @@ const FFmpegTool: React.FC = () => {
             </div>
           )}
 
-          {!node.isDir && (
+          {!node.isDir && isHovered && (
             <div className="flex items-center gap-1">
               <button
                 onClick={async (e) => {
@@ -1182,9 +1440,9 @@ const FFmpegTool: React.FC = () => {
   const initializeFFmpegCore = async () => {
     if (!ffmpegRef.current) {
       try {
-        setIsDownloading(true);
-        ffmpegRef.current = await loadFFmpeg();
-        setIsDownloading(false);
+        setIsFfmpegLoading(true);
+        const useMultithreading = ffmpegVersion === 'multi';
+        ffmpegRef.current = await loadFFmpeg(useMultithreading);
         
         ffmpegRef.current.on('log', ({ message }: { message: string }) => {
           setLogs(prev => [...prev, message]);
@@ -1197,9 +1455,11 @@ const FFmpegTool: React.FC = () => {
           setLogs(prev => [...prev, `Progress: ${percentage}% (transcoded time: ${time / 1000000} s)`]);
         });
       } catch (error) {
-        setIsDownloading(false);
+        setIsFfmpegLoading(false);
         console.error('Failed to load FFmpeg:', error);
         throw error;
+      } finally {
+        setIsFfmpegLoading(false);
       }
     }
   };
@@ -1218,6 +1478,11 @@ const FFmpegTool: React.FC = () => {
     setShowLogs(true);
 
     try {
+      // Wait for FFmpeg to be ready if it's loading
+      if (isFfmpegLoading) {
+        setLogs(['Waiting for FFmpeg to load...']);
+        return;
+      }
       await initializeFFmpegCore();
       
       // Write input files to MEMFS
@@ -1231,12 +1496,16 @@ const FFmpegTool: React.FC = () => {
 
       // Parse command
       // 更健壮的命令行参数解析，正确处理引号
-      const args = parseCommandLine(command);
+      const args = parseCommandLine(command, commandType);
       
-      setLogs(prev => [...prev, `${t('tool.ffmpeg.execute')} ffmpeg ${command}`]);
+      setLogs(prev => [...prev, `${t('tool.ffmpeg.execute')} ${commandType} ${command}`]);
       
-      // Run FFmpeg command
-      await ffmpegRef.current.exec(args);
+      // Run FFmpeg or FFprobe command based on commandType
+      if (commandType === 'ffprobe') {
+        await ffmpegRef.current.ffprobe(args);
+      } else {
+        await ffmpegRef.current.exec(args);
+      }
       
       // List output files
       const files: { name: string; isDir: boolean }[] = await ffmpegRef.current.listDir('.');
@@ -1265,16 +1534,18 @@ const FFmpegTool: React.FC = () => {
   };
 
   // 更健壮的命令行参数解析函数
-  const parseCommandLine = (command: string): string[] => {
+  const parseCommandLine = (command: string, commandType: 'ffmpeg' | 'ffprobe' = 'ffmpeg'): string[] => {
     const args: string[] = [];
     let currentArg = '';
     let inQuotes = false;
     let quoteChar = '';
     
-    // 移除开头的ffmpeg关键字（如果存在）
+    // 移除开头的ffmpeg或ffprobe关键字（如果存在）
     let cleanCommand = command.trim();
     if (cleanCommand.toLowerCase().startsWith('ffmpeg')) {
       cleanCommand = cleanCommand.substring(6).trim();
+    } else if (cleanCommand.toLowerCase().startsWith('ffprobe')) {
+      cleanCommand = cleanCommand.substring(7).trim();
     }
     
     for (let i = 0; i < cleanCommand.length; i++) {
@@ -1353,7 +1624,13 @@ const FFmpegTool: React.FC = () => {
     // 获取真实文件名，如果没有则使用默认值
     const getInputFileName = (inputKey: string, defaultName: string = 'input') => {
       const fileName = config[inputKey];
-      if (!fileName) return `${defaultName}.mp4`; // 默认值
+      if (!fileName) {
+        // 如果是 input 类型且有最后上传的文件，则使用最后上传的文件
+        if (defaultName === 'input' && lastUploadedFile !== 'input.mp4') {
+          return lastUploadedFile;
+        }
+        return `${defaultName}.mp4`; // 默认值
+      }
       return fileName;
     };
     
@@ -1652,6 +1929,106 @@ const FFmpegTool: React.FC = () => {
         cmd = `-loop 1 -i "${inputImage}" -c:v libx264 -t ${duration} -pix_fmt yuv420p -vf scale=${resolution} output.mp4`;
         break;
         
+      // FFprobe commands
+      case 'show_format':
+        const inputFormat = getInputFileName('input');
+        cmd = `-show_format "${inputFormat}"`;
+        if (config.output_format && config.output_format !== 'default') {
+          cmd = `-of ${config.output_format} -show_format "${inputFormat}"`;
+        }
+        break;
+        
+      case 'show_streams':
+        const inputStreams = getInputFileName('input');
+        cmd = `-show_streams "${inputStreams}"`;
+        if (config.stream_type && config.stream_type !== 'all') {
+          cmd = `-select_streams ${config.stream_type} -show_streams "${inputStreams}"`;
+        }
+        if (config.output_format && config.output_format !== 'default') {
+          cmd = config.stream_type && config.stream_type !== 'all' 
+            ? `-select_streams ${config.stream_type} -of ${config.output_format} -show_streams "${inputStreams}"`
+            : `-of ${config.output_format} -show_streams "${inputStreams}"`;
+        }
+        break;
+        
+      case 'show_duration':
+        const inputDuration = getInputFileName('input');
+        if (config.precision === 'milliseconds') {
+          cmd = `-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputDuration}"`;
+        } else if (config.precision === 'timecode') {
+          cmd = `-v error -show_entries format=time_base -of default=noprint_wrappers=1:nokey=1 "${inputDuration}"`;
+        } else {
+          cmd = `-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputDuration}"`;
+        }
+        break;
+        
+      case 'show_resolution':
+        const inputResolution = getInputFileName('input');
+        if (config.stream_index !== undefined && config.stream_index !== '') {
+          cmd = `-v error -select_streams v:${config.stream_index} -show_entries stream=width,height -of default=noprint_wrappers=1 "${inputResolution}"`;
+        } else {
+          cmd = `-v error -select_streams v -show_entries stream=width,height -of default=noprint_wrappers=1 "${inputResolution}"`;
+        }
+        break;
+        
+      case 'show_bitrate':
+        const inputBitrate = getInputFileName('input');
+        if (config.bitrate_type === 'video') {
+          cmd = `-v error -select_streams v -show_entries stream=bit_rate -of default=noprint_wrappers=1:nokey=1 "${inputBitrate}"`;
+        } else if (config.bitrate_type === 'audio') {
+          cmd = `-v error -select_streams a -show_entries stream=bit_rate -of default=noprint_wrappers=1:nokey=1 "${inputBitrate}"`;
+        } else {
+          cmd = `-v error -show_entries format=bit_rate -of default=noprint_wrappers=1:nokey=1 "${inputBitrate}"`;
+        }
+        break;
+        
+      case 'show_fps':
+        const inputFps = getInputFileName('input');
+        if (config.stream_index !== undefined && config.stream_index !== '') {
+          cmd = `-v error -select_streams v:${config.stream_index} -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "${inputFps}"`;
+        } else {
+          cmd = `-v error -select_streams v -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "${inputFps}"`;
+        }
+        break;
+        
+      case 'show_codec':
+        const inputCodec = getInputFileName('input');
+        if (config.stream_type && config.stream_type !== 'all') {
+          cmd = `-v error -select_streams ${config.stream_type} -show_entries stream=codec_name,codec_long_name -of default=noprint_wrappers=1 "${inputCodec}"`;
+        } else {
+          cmd = `-v error -show_entries stream=codec_name,codec_long_name -of default=noprint_wrappers=1 "${inputCodec}"`;
+        }
+        break;
+        
+      case 'show_metadata':
+        const inputMetadata = getInputFileName('input');
+        if (config.metadata_type === 'format') {
+          cmd = `-show_format -show_entries format_tags "${inputMetadata}"`;
+        } else if (config.metadata_type === 'streams') {
+          cmd = `-show_streams -show_entries stream_tags "${inputMetadata}"`;
+        } else {
+          cmd = `-show_format -show_streams "${inputMetadata}"`;
+        }
+        break;
+        
+      case 'show_chapters':
+        const inputChapters = getInputFileName('input');
+        if (config.output_format === 'json') {
+          cmd = `-of json -show_chapters "${inputChapters}"`;
+        } else {
+          cmd = `-show_chapters "${inputChapters}"`;
+        }
+        break;
+        
+      case 'show_frame_count':
+        const inputFrameCount = getInputFileName('input');
+        if (config.stream_index !== undefined && config.stream_index !== '') {
+          cmd = `-v error -select_streams v:${config.stream_index} -count_frames -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "${inputFrameCount}"`;
+        } else {
+          cmd = `-v error -select_streams v -count_frames -show_entries stream=nb_frames -of default=noprint_wrappers=1:nokey=1 "${inputFrameCount}"`;
+        }
+        break;
+        
       default:
         cmd = '';
     }
@@ -1798,48 +2175,213 @@ const FFmpegTool: React.FC = () => {
     <div className="space-y-6">
         {/* Command Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">
-            {t('tool.ffmpeg.command')}
-          </label>
-          <textarea
-            id="ffmpeg-command-input"
-            value={command}
-            onChange={(e) => setCommand(e.target.value)}
-            placeholder={t('tool.ffmpeg.command_placeholder')}
-            className="w-full p-3 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] resize-none"
-            disabled={isRunning}
-          />
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium">
+              {t('tool.ffmpeg.command')}
+            </label>
+            <div className="flex items-center gap-2">
+              <SegmentedControl
+                options={[
+                  { value: 'ffmpeg', label: 'FFmpeg', disabled: isFfmpegLoading || isRunning },
+                  { value: 'ffprobe', label: 'FFprobe', disabled: isFfmpegLoading || isRunning }
+                ]}
+                value={commandType}
+                onChange={(value) => setCommandType(value as 'ffmpeg' | 'ffprobe')}
+                size="sm"
+                fitWidth={true}
+              />
+              <SegmentedControl
+                options={[
+                  { value: 'single', label: t('tool.ffmpeg.single_thread'), disabled: isFfmpegLoading || isRunning },
+                  { value: 'multi', label: t('tool.ffmpeg.multi_thread'), disabled: isFfmpegLoading || isRunning }
+                ]}
+                value={ffmpegVersion}
+                onChange={setFfmpegVersion}
+                size="sm"
+                fitWidth={true}
+              />
+            </div>
+          </div>
+          <div className="relative">
+            <div className="flex">
+              <div className={`px-3 py-3 font-mono text-sm rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 ${commandType === 'ffmpeg' ? 'text-blue-500' : 'text-green-500'} min-w-[80px] text-center flex items-start justify-center pt-3`}>
+                {commandType}
+              </div>
+              <textarea
+                id="ffmpeg-command-input"
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                placeholder={commandType === 'ffmpeg' 
+                  ? '-i input.mp4 -vf scale=1280:720 output.mp4' 
+                  : '-v quiet -print_format json -show_format -show_streams input.mp4'
+                }
+                className="w-full p-3 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] resize-none"
+                disabled={isRunning || isFfmpegLoading}
+              />
+            </div>
+            {isFfmpegLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-50/80 dark:bg-gray-900/80 rounded-lg">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Common Functions Panel */}
-        <div className="mb-6">
-          <div 
-            className="flex items-center justify-between cursor-pointer mb-2 p-3 border rounded-lg bg-gray-50 dark:bg-gray-800"
-            onClick={() => setShowCommonFunctions(!showCommonFunctions)}
-          >
-            <h3 className="font-medium flex items-center gap-2">
-              {showCommonFunctions ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
-              {t('tool.ffmpeg.common_functions')}
-            </h3>
+        {/* File System and Common Functions Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* File System Tree - Left (1/3) */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium">{t('tool.ffmpeg.file_system')}</h3>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => refreshFileSystem()}
+                  disabled={isRunning || isFfmpegLoading}
+                  title={t('tool.ffmpeg.refresh')}
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRunning || isFfmpegLoading ? 'animate-spin' : ''}`} />
+                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      uploadFiles(Array.from(e.target.files), '.');
+                    }
+                  }}
+                  className="hidden"
+                  multiple
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isRunning || isFfmpegLoading}
+                  title={t('tool.ffmpeg.upload_files')}
+                >
+                  <Upload className="w-4 h-4" />
+                </Button>
+                {selectedFiles.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={downloadSelectedFiles}
+                    disabled={isRunning || isDownloading || isFfmpegLoading}
+                    title={t('tool.ffmpeg.download_selected', { count: selectedFiles.length })}
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <Card className="p-0 overflow-hidden h-full">
+              <div
+                className="text-center p-4 border-b border-gray-200 dark:border-gray-700"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files) {
+                    uploadFiles(Array.from(e.dataTransfer.files) as File[], '.');
+                  }
+                }}
+              >
+                {isFfmpegLoading ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      {t('tool.ffmpeg.loading_ffmpeg')}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {t('tool.ffmpeg.loading_description')}
+                    </p>
+                  </div>
+                ) : ffmpegRef.current && rootNode ? (
+                  <div className="max-h-[500px] overflow-y-auto">
+                    <FileTreeNode node={rootNode} depth={0} />
+                  </div>
+                ) : ffmpegRef.current && !rootNode ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <FileIcon className="w-12 h-12 text-gray-300 mb-3" />
+                    <p className="font-medium mb-1">{t('tool.ffmpeg.file_system_empty')}</p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('tool.ffmpeg.upload_to_start')}
+                    </p>
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                      {t('tool.ffmpeg.select_files')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <AlertCircle className="w-12 h-12 text-red-500 mb-3" />
+                    <p className="font-medium text-red-600 dark:text-red-400 mb-1">
+                      {t('tool.ffmpeg.load_failed')}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('tool.ffmpeg.load_failed_description')}
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        // Retry loading
+                        setIsFfmpegLoading(true);
+                        const initFFmpeg = async () => {
+                          try {
+                            const useMultithreading = ffmpegVersion === 'multi';
+                            ffmpegRef.current = await loadFFmpeg(useMultithreading);
+                            
+                            ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+                              setLogs(prev => [...prev, message]);
+                            });
+                            
+                            ffmpegRef.current.on('progress', ({ progress, time }: { progress: number; time: number }) => {
+                              const percentage = Math.round(progress * 100);
+                              setExecutionProgress(percentage);
+                              setLogs(prev => [...prev, `Progress: ${percentage}% (transcoded time: ${time / 1000000} s)`]);
+                            });
+
+                            await loadFileSystem();
+                            setLogs(prev => [...prev, 'FFmpeg loaded successfully']);
+                          } catch (error) {
+                            console.error('Failed to load FFmpeg:', error);
+                            setLogs(prev => [...prev, `Error loading FFmpeg: ${(error as Error).message}`]);
+                          } finally {
+                            setIsFfmpegLoading(false);
+                          }
+                        };
+                        initFFmpeg();
+                      }}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      {t('tool.ffmpeg.retry')}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
           </div>
-          
-          {showCommonFunctions && (
-            <Card className="p-0 overflow-hidden">
-              <div className="flex flex-col md:flex-row">
-                {/* 左侧导航栏 */}
-                <div className="md:w-36 border-r bg-gray-50 dark:bg-gray-800 p-2">
-                  <nav className="space-y-1">
+
+          {/* Common Functions Tabs - Right (2/3) */}
+          <div className="lg:col-span-2">
+            <h3 className="font-medium mb-3">{t('tool.ffmpeg.common_functions')}</h3>
+            <Card className="p-0 overflow-hidden h-full">
+              {/* TAB导航栏 - 只在FFmpeg模式下显示 */}
+              {commandType === 'ffmpeg' && (
+                <div className="border-b bg-gray-50 dark:bg-gray-800">
+                  <nav className="flex overflow-x-auto">
                     {categories.map(category => (
                       <button
                         key={category.id}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        className={`px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                           activeCategory === category.id
-                            ? 'bg-blue-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                         onClick={() => setActiveCategory(category.id)}
                       >
@@ -1848,154 +2390,196 @@ const FFmpegTool: React.FC = () => {
                     ))}
                   </nav>
                 </div>
+              )}
+              
+              {/* TAB内容区 */}
+              <div className="p-4 overflow-y-auto max-h-[500px]">
+                {(commandType === 'ffprobe' || activeCategory === 'quick_commands') && (
+                  <>
+                    {isFfmpegLoading ? (
+                      <div className="flex flex-col items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500 mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t('tool.ffmpeg.loading_ffmpeg')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(functions as any)[activeCategory]?.filter((func: any) => 
+                          !func.tool || func.tool === commandType
+                        ).map((func: any) => {
+                          const IconComponent = func.icon;
+                          return (
+                            <div
+                              key={func.id}
+                              className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
+                              onClick={() => {
+                                // 显示详细配置或直接应用命令
+                                applyCommand(func.id);
+                              }}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <IconComponent className={`w-5 h-5 ${commandType === 'ffprobe' ? 'text-green-500' : 'text-blue-500'}`} />
+                                <h4 className="font-medium text-sm">{func.name}</h4>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">
+                                {t('tool.ffmpeg.click_to_apply')}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
                 
-                {/* 右侧内容区 */}
-                <div className="flex-1 p-4 overflow-y-auto max-h-[500px]">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {(functions as any)[activeCategory]?.map((func: any) => {
-                      const IconComponent = func.icon;
-                      return (
-                        <div 
-                          key={func.id}
-                          className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
-                          onClick={() => {
-                            // 显示详细配置或直接应用命令
-                            applyCommand(func.id);
-                          }}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <IconComponent className="w-5 h-5 text-blue-500" />
-                            <h4 className="font-medium text-sm">{func.name}</h4>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            {t('tool.ffmpeg.click_to_apply')}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* 功能配置表单 */}
-                  <div className="mt-6 pt-4 border-t">
+                {/* 功能配置表单 - 不在quick_commands TAB中显示 */}
+                {activeCategory !== 'quick_commands' && (
+                  <div className="mt-4">
                     <h3 className="font-medium mb-3">
-                      {((functions as any)[activeCategory] || []).length > 0 
-                        ? t('tool.ffmpeg.function_settings') 
+                      {((functions as any)[activeCategory] || []).length > 0
+                        ? t('tool.ffmpeg.function_settings')
                         : t('tool.ffmpeg.no_functions')}
                     </h3>
                     
-                    {((functions as any)[activeCategory] || []).map((func: any) => (
-                      <div key={func.id} className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium text-sm">{func.name}</h4>
-                          <Button 
-                            size="sm" 
-                            onClick={() => applyCommand(func.id)}
-                          >
-                            {t('tool.ffmpeg.apply')}
-                          </Button>
-                        </div>
-                        
-                        {functionDetails[func.id] && functionDetails[func.id].inputs && (
-                          <div className="space-y-3">
-                            {functionDetails[func.id].inputs.map((input: any) => (
-                              <div key={input.id}>
-                                <label className="block text-xs font-medium mb-1">
-                                  {input.label}
-                                  {input.required && <span className="text-red-500">*</span>}
-                                </label>
-                                
-                                {input.type === 'select' ? (
-                                  <select
-                                    className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                                    value={functionConfig[func.id]?.[input.id] || ''}
-                                    onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
-                                  >
-                                    <option value="">{t('tool.ffmpeg.select_option')}</option>
-                                    {input.options.map((option: any) => (
-                                      <option key={option.value} value={option.value}>
-                                        {option.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                ) : input.type === 'range' ? (
-                                  <div className="space-y-1">
-                                    <input
-                                      type="range"
-                                      min={input.min}
-                                      max={input.max}
-                                      step={input.step}
-                                      className="w-full"
-                                      value={functionConfig[func.id]?.[input.id] || input.min}
-                                      onChange={(e) => updateFunctionConfig(func.id, input.id, parseInt(e.target.value))}
-                                    />
-                                    <div className="text-xs text-gray-500 text-center">
-                                      {functionConfig[func.id]?.[input.id] || input.min} {input.unit || ''}
-                                    </div>
-                                  </div>
-                                ) : input.type === 'file' ? (
-                                  <div className="space-y-2">
-                                    <div className="relative">
-                                      <input
-                                        type="text"
-                                        className="w-full p-2 border rounded text-sm pr-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                                        placeholder={input.placeholder || t('tool.ffmpeg.file_placeholder')}
-                                        value={functionConfig[func.id]?.[input.id] || ''}
-                                        onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
-                                      />
-                                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                        <FileIcon className="w-4 h-4 text-gray-400" />
-                                      </div>
-                                    </div>
-                                    {selectedFiles.length > 0 && (
-                                      <div className="relative">
-                                        <select
-                                          className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                                          onChange={(e) => {
-                                            if (e.target.value) {
-                                              updateFunctionConfig(func.id, input.id, e.target.value);
-                                            }
-                                          }}
-                                          value=""
-                                        >
-                                          <option value="">{t('tool.ffmpeg.select_uploaded_file')}</option>
-                                          {selectedFiles.map((file) => (
-                                            <option key={file.file.name} value={file.path}>
-                                              {file.file.name}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </div>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <input
-                                    type={input.type}
-                                    className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
-                                    placeholder={input.placeholder}
-                                    value={functionConfig[func.id]?.[input.id] || ''}
-                                    onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
-                                  />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                    {isFfmpegLoading ? (
+                      <div className="flex flex-col items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500 mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t('tool.ffmpeg.loading_ffmpeg')}
+                        </p>
                       </div>
-                    ))}
+                    ) : (
+                      ((functions as any)[activeCategory] || []).filter((func: any) => 
+                        !func.tool || func.tool === commandType
+                      ).map((func: any) => (
+                        <div key={func.id} className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-medium text-sm">{func.name}</h4>
+                            <Button
+                              size="sm"
+                              onClick={() => applyCommand(func.id)}
+                              disabled={isFfmpegLoading}
+                            >
+                              {t('tool.ffmpeg.apply')}
+                            </Button>
+                          </div>
+                          
+                          {functionDetails[func.id] && functionDetails[func.id].inputs && (
+                            <div className="space-y-3">
+                              {functionDetails[func.id].inputs.map((input: any) => (
+                                <div key={input.id}>
+                                  <label className="block text-xs font-medium mb-1">
+                                    {input.label}
+                                    {input.required && <span className="text-red-500">*</span>}
+                                  </label>
+                                  
+                                  {input.type === 'select' ? (
+                                    <select
+                                      className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                                      value={functionConfig[func.id]?.[input.id] || ''}
+                                      onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
+                                      disabled={isFfmpegLoading}
+                                    >
+                                      <option value="">{t('tool.ffmpeg.select_option')}</option>
+                                      {input.options.map((option: any) => (
+                                        <option key={option.value} value={option.value}>
+                                          {option.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  ) : input.type === 'range' ? (
+                                    <div className="space-y-1">
+                                      <input
+                                        type="range"
+                                        min={input.min}
+                                        max={input.max}
+                                        step={input.step}
+                                        className="w-full"
+                                        value={functionConfig[func.id]?.[input.id] || input.min}
+                                        onChange={(e) => updateFunctionConfig(func.id, input.id, parseInt(e.target.value))}
+                                        disabled={isFfmpegLoading}
+                                      />
+                                      <div className="text-xs text-gray-500 text-center">
+                                        {functionConfig[func.id]?.[input.id] || input.min} {input.unit || ''}
+                                      </div>
+                                    </div>
+                                  ) : input.type === 'file' ? (
+                                    <div className="space-y-2">
+                                      <div className="relative">
+                                        <input
+                                          type="text"
+                                          className="w-full p-2 border rounded text-sm pr-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                                          placeholder={input.placeholder || t('tool.ffmpeg.file_placeholder')}
+                                          value={functionConfig[func.id]?.[input.id] || ''}
+                                          onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
+                                          disabled={isFfmpegLoading}
+                                        />
+                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                          <FileIcon className="w-4 h-4 text-gray-400" />
+                                        </div>
+                                      </div>
+                                      {selectedFiles.length > 0 && (
+                                        <div className="relative">
+                                          <select
+                                            className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                                            onChange={(e) => {
+                                              if (e.target.value) {
+                                                updateFunctionConfig(func.id, input.id, e.target.value);
+                                              }
+                                            }}
+                                            value=""
+                                            disabled={isFfmpegLoading}
+                                          >
+                                            <option value="">{t('tool.ffmpeg.select_uploaded_file')}</option>
+                                            {selectedFiles.map((file) => (
+                                              <option key={file.file.name} value={file.path}>
+                                                {file.file.name}
+                                              </option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type={input.type}
+                                      className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                                      placeholder={input.placeholder}
+                                      value={functionConfig[func.id]?.[input.id] || ''}
+                                      onChange={(e) => updateFunctionConfig(func.id, input.id, e.target.value)}
+                                      disabled={isFfmpegLoading}
+                                    />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
-                </div>
+                )}
               </div>
             </Card>
-          )}
+          </div>
+        </div>
+
+        <div className="mb-6"> 
         </div>
 
         {/* Execute Button */}
         <Button
           onClick={executeCommand}
-          disabled={isRunning || !command.trim()}
+          disabled={isRunning || !command.trim() || isFfmpegLoading}
           className="w-full py-6 mb-6"
         >
-          {isRunning ? (
+          {isFfmpegLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('tool.ffmpeg.loading_ffmpeg')}
+            </>
+          ) : isRunning ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {isDownloading ? (
@@ -2011,84 +2595,6 @@ const FFmpegTool: React.FC = () => {
             </>
           )}
         </Button>
-
-        {/* File System Tree */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium">{t('tool.ffmpeg.file_system')}</h3>
-            <div className="flex items-center gap-2">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => refreshFileSystem()}
-                disabled={isRunning}
-              >
-                <RefreshCw className={`w-4 h-4 mr-1 ${isRunning ? 'animate-spin' : ''}`} />
-                {t('tool.ffmpeg.refresh')}
-              </Button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={(e) => {
-                  if (e.target.files) {
-                    uploadFiles(Array.from(e.target.files), '.');
-                  }
-                }}
-                className="hidden"
-                multiple
-              />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isRunning}
-              >
-                <Upload className="w-4 h-4 mr-1" />
-                {t('tool.ffmpeg.upload_files')}
-              </Button>
-              {selectedFiles.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={downloadSelectedFiles}
-                  disabled={isRunning || isDownloading}
-                >
-                  <Download className="w-4 h-4 mr-1" />
-                  {t('tool.ffmpeg.download_selected', { count: selectedFiles.length })}
-                </Button>
-              )}
-            </div>
-          </div>
-          
-          <Card className="p-0 overflow-hidden" onDragOver={(e) => e.preventDefault()}>
-            <div 
-              className={`text-center ${!rootNode ? 'p-4 border-b border-gray-200 dark:border-gray-700' : ''}`}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files) {
-                  uploadFiles(Array.from(e.dataTransfer.files));
-                }
-              }}
-            >
-              {!rootNode ? (
-                <>
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="font-medium mb-1">{t('tool.ffmpeg.drag_drop_files')}</p>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {t('tool.ffmpeg.or_click_upload')}
-                  </p>
-                  <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-                    {t('tool.ffmpeg.select_files')}
-                  </Button>
-                </>
-              ) : (
-                <div className="max-h-80 overflow-y-auto">
-                  <FileTreeNode node={rootNode} depth={0} />
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
 
 
         {/* Logs */}

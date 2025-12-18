@@ -705,7 +705,16 @@
       "no_files_added": "No files added yet",
       "execution_logs": "Execution Logs",
       "logs_empty": "Execution logs will appear here",
-      "output_files": "Output Files"
+      "output_files": "Output Files",
+      "loading_ffmpeg": "Loading FFmpeg...",
+      "loading_description": "Loading FFmpeg core files from multiple sources, please wait...",
+      "file_system_empty": "File System Empty",
+      "upload_to_start": "Upload files to start using FFmpeg",
+      "load_failed": "FFmpeg Loading Failed",
+      "load_failed_description": "Could not load FFmpeg core from any source. Please check your network connection or try again.",
+      "retry": "Retry",
+      "single_thread": "Single Thread",
+      "multi_thread": "Multi Thread"
     },
     "screen-test": {
       "name": "Screen Test",

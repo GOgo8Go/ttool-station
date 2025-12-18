@@ -701,7 +701,16 @@
       "no_files_added": "尚未添加文件",
       "execution_logs": "执行日志",
       "logs_empty": "执行日志将显示在这里",
-      "output_files": "输出文件"
+      "output_files": "输出文件",
+      "loading_ffmpeg": "加载FFmpeg中...",
+      "loading_description": "正在从多个源加载FFmpeg核心文件，请稍候...",
+      "file_system_empty": "文件系统为空",
+      "upload_to_start": "上传文件以开始使用FFmpeg",
+      "load_failed": "FFmpeg加载失败",
+      "load_failed_description": "无法从任何源加载FFmpeg核心。请检查网络连接或重试。",
+      "retry": "重试",
+      "single_thread": "单线程",
+      "multi_thread": "多线程"
     },
     "screen-test": {
       "name": "屏幕测试",
