@@ -15,7 +15,7 @@
     "generate:translation-prepare": "npx tsx scripts/i18next-prepare.ts",
     "generate:translation": "npx i18next --config scripts/i18next-parser.config.cjs",
     "check-i18n": "npx tsx scripts/check-i18n-completeness.ts"
- },
+  },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
@@ -37,6 +37,7 @@
     "ini": "^6.0.0",
     "js-yaml": "^4.1.1",
     "jsbarcode": "^3.12.1",
+    "jszip": "^3.10.1",
     "jwt-decode": "^4.0.0",
     "katex": "^0.16.27",
     "lucide-react": "^0.561.0",

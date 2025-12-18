@@ -4,11 +4,13 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { loadFFmpeg } from '../../utils/ffmpegLoader';
-import { 
-  Play, Download, Loader2, FileVideo, FileAudio, 
-  AlertCircle, ChevronDown, ChevronRight, Folder, FileIcon, 
-  Upload, Trash2, Terminal as TerminalIcon
+import {
+  Play, Download, Loader2, FileVideo, FileAudio,
+  AlertCircle, ChevronDown, ChevronRight, Folder, FileIcon,
+  Upload, Trash2, Terminal as TerminalIcon, RefreshCw,
+  Plus, FolderPlus, FolderMinus, Eye, Edit3
 } from 'lucide-react';
+import JSZip from 'jszip';
 
 interface FileNode {
   name: string;
@@ -29,7 +31,12 @@ const FFmpegTool: React.FC = () => {
   const [showLogs, setShowLogs] = useState<boolean>(false);
   const [rootNode, setRootNode] = useState<FileNode | null>(null);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  interface SelectedFile {
+    file: File;
+    path: string;
+  }
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<string>('.');
   const [outputFiles, setOutputFiles] = useState<{name: string, data: Uint8Array}[]>([]);
   const [showCommonFunctions, setShowCommonFunctions] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>('format_conversion');
@@ -38,6 +45,171 @@ const FFmpegTool: React.FC = () => {
   const ffmpegRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize FFmpeg and load file system
+  useEffect(() => {
+    const initFFmpeg = async () => {
+      try {
+        ffmpegRef.current = await loadFFmpeg();
+        
+        // Set up event listeners
+        ffmpegRef.current.on('log', ({ message }: { message: string }) => {
+          setLogs(prev => [...prev, message]);
+        });
+        
+        ffmpegRef.current.on('progress', ({ progress, time }: { progress: number; time: number }) => {
+          const percentage = Math.round(progress * 100);
+          setExecutionProgress(percentage);
+          setLogs(prev => [...prev, `Progress: ${percentage}% (transcoded time: ${time / 1000000} s)`]);
+        });
+
+        // Load initial file system
+        await loadFileSystem();
+      } catch (error) {
+        console.error('Failed to load FFmpeg:', error);
+      }
+    };
+
+    initFFmpeg();
+  }, []);
+
+  // Load file system from FFmpeg WASM
+  const loadFileSystem = async (path: string = '.') => {
+    if (!ffmpegRef.current) return;
+
+    try {
+      const files = await ffmpegRef.current.listDir(path);
+      const root: FileNode = { name: path === '.' ? 'Root' : path.split('/').pop() || 'Root', path: path, isDir: true, children: [] };
+      const nodeMap = new Map<string, FileNode>();
+      nodeMap.set(path, root);
+
+      files.forEach((file: any) => {
+        if (file.name === '.' || file.name === '..') return;
+        
+        const fullPath = path === '.' ? file.name : `${path}/${file.name}`;
+        const newNode: FileNode = {
+          name: file.name,
+          path: fullPath,
+          isDir: file.isDir,
+          children: [],
+          parent: root
+        };
+        nodeMap.set(fullPath, newNode);
+        root.children.push(newNode);
+      });
+
+      // Sort: folders first, then files
+      root.children.sort((a, b) => {
+        if (a.isDir && !b.isDir) return -1;
+        if (!a.isDir && b.isDir) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      setRootNode(root);
+      setExpandedPaths(new Set([path])); // Expand current path by default
+    } catch (error) {
+      console.error('Failed to load file system:', error);
+      // Create empty root node if no files exist
+      setRootNode({ name: path === '.' ? 'Root' : path.split('/').pop() || 'Root', path: path, isDir: true, children: [] });
+      setExpandedPaths(new Set([path]));
+    }
+  };
+
+  // Load subdirectory files
+  const loadSubdirectory = async (node: FileNode) => {
+    if (!ffmpegRef.current || !node.isDir) return;
+
+    try {
+      const files = await ffmpegRef.current.listDir(node.path);
+      const updatedNode: FileNode = { ...node, children: [] };
+
+      files.forEach((file: any) => {
+        if (file.name === '.' || file.name === '..') return;
+        
+        const fullPath = node.path === '.' ? file.name : `${node.path}/${file.name}`;
+        const newNode: FileNode = {
+          name: file.name,
+          path: fullPath,
+          isDir: file.isDir,
+          children: [],
+          parent: updatedNode
+        };
+        updatedNode.children.push(newNode);
+      });
+
+      // Sort: folders first, then files
+      updatedNode.children.sort((a, b) => {
+        if (a.isDir && !b.isDir) return -1;
+        if (!a.isDir && b.isDir) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      // Update the tree structure
+      const updateNodeInTree = (currentNode: FileNode): FileNode => {
+        if (currentNode.path === node.path) {
+          return updatedNode;
+        }
+        
+        if (currentNode.children && currentNode.children.length > 0) {
+          return {
+            ...currentNode,
+            children: currentNode.children.map(updateNodeInTree)
+          };
+        }
+        
+        return currentNode;
+      };
+
+      if (rootNode) {
+        const updatedRoot = updateNodeInTree(rootNode);
+        setRootNode(updatedRoot);
+      }
+    } catch (error) {
+      console.error('Failed to load subdirectory:', error);
+    }
+  };
+
+  // Refresh file system
+  const refreshFileSystem = async (expandPath: string | null = null) => {
+    // Save current expanded paths
+    const currentExpandedPaths = new Set(expandedPaths);
+    
+    await loadFileSystem();
+    
+    // If we have a path to expand, add it and all its parent directories
+    if (expandPath && expandPath !== '.') {
+      let path = '';
+      const parts = expandPath.split('/');
+      
+      // Add root level
+      currentExpandedPaths.add('.');
+      
+      // Add each parent directory
+      for (const part of parts) {
+        path = path ? `${path}/${part}` : part;
+        currentExpandedPaths.add(path);
+      }
+    }
+    
+    // Restore expanded paths and reload children for previously expanded directories
+    setExpandedPaths(currentExpandedPaths);
+    
+    // Reload children for all previously expanded directories
+    if (rootNode) {
+      const reloadExpandedNodes = async (node: FileNode) => {
+        if (currentExpandedPaths.has(node.path) && node.isDir) {
+          await loadSubdirectory(node);
+          
+          // Recursively check children
+          for (const child of node.children) {
+            await reloadExpandedNodes(child);
+          }
+        }
+      };
+      
+      await reloadExpandedNodes(rootNode);
+    }
+  };
 
   // 定义功能类别
   const categories = [
@@ -432,11 +604,133 @@ const FFmpegTool: React.FC = () => {
   }, [logs]);
 
   // Toggle folder expansion in file tree
-  const toggleExpand = (path: string) => {
+  const toggleExpand = async (path: string) => {
     const newSet = new Set(expandedPaths);
-    if (newSet.has(path)) newSet.delete(path);
-    else newSet.add(path);
+    if (newSet.has(path)) {
+      newSet.delete(path);
+    } else {
+      newSet.add(path);
+      // Load subdirectory when expanding
+      if (rootNode) {
+        const findNode = (node: FileNode): FileNode | null => {
+          if (node.path === path) return node;
+          for (const child of node.children) {
+            const found = findNode(child);
+            if (found) return found;
+          }
+          return null;
+        };
+        
+        const node = findNode(rootNode);
+        if (node && node.isDir) {
+          await loadSubdirectory(node);
+        }
+      }
+    }
     setExpandedPaths(newSet);
+  };
+
+  // Handle file selection from tree
+   const handleFileSelectFromTree = (node: FileNode) => {
+       if (node.isDir) {
+         toggleExpand(node.path);
+         return;
+       }
+  
+       // Check if file is already selected
+       const isSelected = selectedFiles.some(f => f.file.name === node.name);
+       
+       if (isSelected) {
+         // Remove from selected files if already selected (toggle off)
+         setSelectedFiles(prev => prev.filter(f => f.file.name !== node.name));
+       } else {
+         // Add to selected files if not already there
+         // Create a dummy File object for the virtual file
+         const dummyFile = new File([], node.name);
+         setSelectedFiles(prev => [...prev, { file: dummyFile, path: node.path }]);
+       }
+    };
+    
+    // Download selected files as a ZIP archive
+    const downloadSelectedFiles = async () => {
+      if (selectedFiles.length === 0) return;
+      
+      setIsDownloading(true);
+      try {
+        const zip = new JSZip();
+        
+        for (const selectedFile of selectedFiles) {
+          try {
+            // For files that exist in the FFmpeg filesystem
+            if (ffmpegRef.current) {
+              try {
+                const data = await ffmpegRef.current.readFile(selectedFile.path);
+                zip.file(selectedFile.file.name, data);
+              } catch (error) {
+                // If file doesn't exist in FFmpeg filesystem, try to get it from the browser
+                console.warn(`Could not read file from FFmpeg: ${selectedFile.path}`, error);
+                // For files that were just added but not yet written to FFmpeg filesystem
+                if (selectedFile.file instanceof File) {
+                  const arrayBuffer = await selectedFile.file.arrayBuffer();
+                  zip.file(selectedFile.file.name, arrayBuffer);
+                }
+              }
+            } else {
+              // If FFmpeg is not loaded yet, try to get file from browser
+              if (selectedFile.file instanceof File) {
+                const arrayBuffer = await selectedFile.file.arrayBuffer();
+                zip.file(selectedFile.file.name, arrayBuffer);
+              }
+            }
+          } catch (error) {
+            setLogs(prev => [...prev, `Error adding file to ZIP: ${selectedFile.file.name}`, `Error: ${(error as Error).message}`]);
+          }
+        }
+        
+        const zipContent = await zip.generateAsync({ type: 'blob' });
+        
+        const url = URL.createObjectURL(zipContent);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `selected_files_${new Date().getTime()}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        setLogs(prev => [...prev, t('tool.ffmpeg.selected_files_downloaded', { count: selectedFiles.length })]);
+      } catch (error) {
+        setLogs(prev => [...prev, `Error creating ZIP: ${(error as Error).message}`]);
+      } finally {
+        setIsDownloading(false);
+      }
+    };
+
+  // Remove selected file
+  const removeSelectedFile = (fileName: string) => {
+    setSelectedFiles(prev => prev.filter(f => f.file.name !== fileName));
+  };
+
+  // Upload new files
+  const uploadFiles = async (files: File[], targetPath: string = '.') => {
+    if (!ffmpegRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      for (const file of files) {
+        const targetFilePath = targetPath === '.' ? file.name : `${targetPath}/${file.name}`;
+        setLogs(prev => [...prev, t('tool.ffmpeg.writing_file', { fileName: targetFilePath })]);
+        await ffmpegRef.current.writeFile(targetFilePath, await fetchFile(file));
+      }
+      
+      // Refresh file system and expand the target folder
+      await refreshFileSystem(targetPath);
+      setLogs(prev => [...prev, t('tool.ffmpeg.upload_completed')]);
+    } catch (error) {
+      setLogs(prev => [...prev, `Error uploading files: ${error.message}`]);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // Handle file drop
@@ -450,28 +744,30 @@ const FFmpegTool: React.FC = () => {
   // Handle file selection via input
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      addFiles(Array.from(e.target.files));
+      uploadFiles(Array.from(e.target.files), selectedFolder);
     }
   };
 
   // Add files to the file tree
   const addFiles = (files: File[]) => {
-    setSelectedFiles(prev => [...prev, ...files]);
+    const newSelectedFiles = files.map(file => ({ file, path: file.name }));
+    setSelectedFiles(prev => [...prev, ...newSelectedFiles]);
     
     // Build tree structure
     const root: FileNode = { name: 'Root', path: '', isDir: true, children: [] };
     const nodeMap = new Map<string, FileNode>();
     nodeMap.set('', root);
-
-    [...selectedFiles, ...files].forEach(file => {
+ 
+    const allFiles = [...selectedFiles.map(sf => sf.file), ...files];
+    allFiles.forEach(file => {
       const pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
       let currentPath = '';
       let parent = root;
-
+ 
       pathParts.forEach((part, index) => {
         const isLast = index === pathParts.length - 1;
         currentPath = currentPath ? `${currentPath}/${part}` : part;
-
+ 
         if (!nodeMap.has(currentPath)) {
           const newNode: FileNode = {
             name: part,
@@ -487,7 +783,7 @@ const FFmpegTool: React.FC = () => {
         parent = nodeMap.get(currentPath)!;
       });
     });
-
+ 
     // Sort: folders first, then files
     const sortNode = (node: FileNode) => {
       node.children.sort((a, b) => {
@@ -498,18 +794,19 @@ const FFmpegTool: React.FC = () => {
       node.children.forEach(sortNode);
     };
     sortNode(root);
-
+ 
     setRootNode(root);
     setExpandedPaths(new Set([''])); // Expand root by default
   };
 
   // Remove a file from the tree
   const removeFile = (filePath: string) => {
-    const fileToRemove = selectedFiles.find(f => f.name === filePath.split('/').pop());
+    const fileName = filePath.split('/').pop();
+    const fileToRemove = selectedFiles.find(f => f.file.name === fileName);
     if (fileToRemove) {
       const newFiles = selectedFiles.filter(f => f !== fileToRemove);
       setSelectedFiles(newFiles);
-      addFiles([]); // Rebuild tree
+      addFiles([]); // Rebuild tree with remaining files
     }
   };
 
@@ -519,6 +816,7 @@ const FFmpegTool: React.FC = () => {
 
     const isExpanded = expandedPaths.has(node.path);
     const isRoot = !node.parent && node.name === 'Root';
+    const isSelected = selectedFiles.some(f => f.file.name === node.name);
 
     // Don't render root container itself, just children
     if (isRoot) {
@@ -534,9 +832,12 @@ const FFmpegTool: React.FC = () => {
     return (
       <div className="select-none">
         <div
-          className="flex items-center gap-2 py-1.5 px-2 cursor-pointer transition-colors text-sm whitespace-nowrap rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+          className={`
+            flex items-center gap-2 py-1.5 px-2 cursor-pointer transition-colors text-sm whitespace-nowrap rounded-md
+            ${isSelected ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
+          `}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-          onClick={() => node.isDir && toggleExpand(node.path)}
+          onClick={() => handleFileSelectFromTree(node)}
         >
           {node.isDir ? (
             <div className="p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10" onClick={(e) => { e.stopPropagation(); toggleExpand(node.path); }}>
@@ -548,15 +849,321 @@ const FFmpegTool: React.FC = () => {
 
           {node.isDir ? <Folder className="w-4 h-4 text-yellow-500" /> : <FileIcon className="w-4 h-4 text-gray-400" />}
 
-          <span className="truncate flex-1">{node.name}</span>
+          <span className="truncate flex-1 text-left">{node.name}</span>
+
+          {node.isDir && (
+            <div className="flex items-center gap-1">
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  // Download folder as archive
+                  if (ffmpegRef.current) {
+                    try {
+                      // Get all files in the folder and subfolders
+                      const getAllFiles = async (dirPath: string): Promise<{path: string, name: string}[]> => {
+                        const items: { name: string; isDir: boolean }[] = await ffmpegRef.current.listDir(dirPath);
+                        let files: {path: string, name: string}[] = [];
+                        
+                        for (const item of items) {
+                          if (item.name === '.' || item.name === '..') continue;
+                          
+                          const fullPath = dirPath === '.' ? item.name : `${dirPath}/${item.name}`;
+                          if (item.isDir) {
+                            // Recursively get files from subdirectory
+                            const subFiles = await getAllFiles(fullPath);
+                            files = files.concat(subFiles);
+                          } else {
+                            // Add file to the list
+                            files.push({ path: fullPath, name: item.name });
+                          }
+                        }
+                        
+                        return files;
+                      };
+                      
+                      // Get all files in the folder
+                      const allFiles = await getAllFiles(node.path);
+                      
+                      if (allFiles.length === 0) {
+                        setLogs(prev => [...prev, `Folder ${node.name} is empty`]);
+                        return;
+                      }
+                      
+                      // Create a new JSZip instance
+                      const zip = new JSZip();
+                      
+                      // Add each file to the zip with its relative path
+                      for (const file of allFiles) {
+                        try {
+                          const fileData = await ffmpegRef.current.readFile(file.path);
+                          
+                          // Calculate the relative path for the file in the zip
+                          const relativePath = file.path.startsWith(node.path + '/') ?
+                            file.path.substring(node.path.length + 1) :
+                            file.path;
+                          
+                          // Add file data to zip with the relative path
+                          zip.file(relativePath, fileData);
+                        } catch (fileError) {
+                          setLogs(prev => [...prev, `Error reading file ${file.path}: ${(fileError as Error).message}`]);
+                        }
+                      }
+                      
+                      // Generate the zip file
+                      const zipContent = await zip.generateAsync({ type: 'blob' });
+                      
+                      // Create a download link for the zip file
+                      const url = URL.createObjectURL(zipContent);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${node.name}.zip`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      
+                      setLogs(prev => [...prev, `Downloaded ${node.name}.zip containing ${allFiles.length} files`]);
+                    } catch (error) {
+                      setLogs(prev => [...prev, `Error downloading folder: ${(error as Error).message}`]);
+                    }
+                  }
+                }}
+                title={t('tool.ffmpeg.download_folder')}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <Download className="w-3 h-3" />
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Rename folder
+                  const newName = prompt(t('tool.ffmpeg.rename_folder_prompt'), node.name);
+                  if (newName) {
+                    const validation = validateFileName(newName);
+                    if (!validation.isValid) {
+                      alert(validation.errorMessage);
+                      return;
+                    }
+                    
+                    if (ffmpegRef.current) {
+                      // Determine the parent directory
+                      const parentPath = node.path.lastIndexOf('/') > 0 ?
+                        node.path.substring(0, node.path.lastIndexOf('/')) : '.';
+                      
+                      // Full paths for old and new
+                      const oldPath = node.path;
+                      const newPath = parentPath === '.' ? newName : `${parentPath}/${newName}`;
+                      
+                      ffmpegRef.current.rename(oldPath, newPath)
+                        .then(async () => {
+                          // Refresh the file system to reflect the change
+                          await refreshFileSystem(parentPath);
+                          setLogs(prev => [...prev, `Renamed folder: ${node.name} -> ${newName}`]);
+                        })
+                        .catch((error: any) => {
+                          setLogs(prev => [...prev, `Error renaming folder: ${error.message}`]);
+                        });
+                    }
+                  }
+                }}
+                title={t('tool.ffmpeg.rename_folder')}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <Edit3 className="w-3 h-3" />
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Set the current folder as the target for upload
+                  const targetFolder = node.path;
+                  setSelectedFolder(targetFolder);
+                  
+                  // Create a custom event handler for single use
+                  const handleChange = (event: Event) => {
+                    const target = event.target as HTMLInputElement;
+                    if (target.files) {
+                      uploadFiles(Array.from(target.files), targetFolder);
+                    }
+                    // Reset the input value and remove event listener
+                    target.value = '';
+                  };
+                  
+                  // Remove any existing event listeners and add the new one
+                  fileInputRef.current!.onchange = handleChange;
+                  
+                  // Trigger file input
+                  fileInputRef.current?.click();
+                }}
+                title={t('tool.ffmpeg.upload_files')}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <Upload className="w-3 h-3" />
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Create new folder
+                  const folderName = prompt(t('tool.ffmpeg.enter_folder_name'));
+                  if (folderName) {
+                    // Create folder in virtual file system
+                    if (ffmpegRef.current) {
+                      const newFolderPath = node.path === '.' ? folderName : `${node.path}/${folderName}`;
+                      ffmpegRef.current.createDir(newFolderPath)
+                        .then(async () => {
+                          // Refresh the current folder to show the new folder
+                          await loadSubdirectory(node);
+                          setLogs(prev => [...prev, `Created folder: ${newFolderPath}`]);
+                        })
+                        .catch((error: any) => {
+                          setLogs(prev => [...prev, `Error creating folder: ${error.message}`]);
+                        });
+                    }
+                  }
+                }}
+                title={t('tool.ffmpeg.create_folder')}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <FolderPlus className="w-3 h-3" />
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Delete folder
+                  if (ffmpegRef.current) {
+                    ffmpegRef.current.deleteDir(node.path)
+                      .then(async () => {
+                        // Refresh the parent folder
+                        if (node.parent) {
+                          await loadSubdirectory(node.parent);
+                        } else {
+                          await refreshFileSystem();
+                        }
+                        setLogs(prev => [...prev, `Deleted folder: ${node.name}`]);
+                      })
+                      .catch((error: any) => {
+                        setLogs(prev => [...prev, `Error deleting folder: ${error.message}`]);
+                      });
+                  }
+                }}
+                title={t('tool.ffmpeg.delete_folder')}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <FolderMinus className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
 
           {!node.isDir && (
-            <button 
-              onClick={(e) => { e.stopPropagation(); removeFile(node.path); }}
-              className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-500/10"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  // Preview file in browser
+                  if (ffmpegRef.current) {
+                    try {
+                      const data = await ffmpegRef.current.readFile(node.path);
+                      const blob = new Blob([data], { type: getMimeType(node.name) });
+                      const url = URL.createObjectURL(blob);
+                      window.open(url, '_blank');
+                    } catch (error) {
+                      setLogs(prev => [...prev, `Error previewing file: ${error.message}`]);
+                    }
+                  }
+                }}
+                className="text-gray-400 hover:text-blue-500 p-1 rounded-full hover:bg-blue-500/10"
+                title={t('tool.ffmpeg.preview_file')}
+              >
+                <Eye className="w-3 h-3" />
+              </button>
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  // Download file
+                  if (ffmpegRef.current) {
+                    try {
+                      const data = await ffmpegRef.current.readFile(node.path);
+                      
+                      let buffer: ArrayBuffer;
+                      if (typeof SharedArrayBuffer !== 'undefined' && data.buffer instanceof SharedArrayBuffer) {
+                        buffer = new Uint8Array(data).slice().buffer;
+                      } else {
+                        buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
+                      }
+                      
+                      const blob = new Blob([buffer], { type: getMimeType(node.name) });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = node.name;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    } catch (error) {
+                      setLogs(prev => [...prev, `Error downloading file: ${error.message}`]);
+                    }
+                  }
+                }}
+                className="text-gray-400 hover:text-green-500 p-1 rounded-full hover:bg-green-500/10"
+                title={t('tool.ffmpeg.download_file')}
+              >
+                <Download className="w-3 h-3" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Rename file
+                  const newName = prompt(t('tool.ffmpeg.rename_file_prompt'), node.name);
+                  if (newName) {
+                    const validation = validateFileName(newName);
+                    if (!validation.isValid) {
+                      alert(validation.errorMessage);
+                      return;
+                    }
+                    
+                    if (ffmpegRef.current) {
+                      // Determine the parent directory
+                      const parentPath = node.path.lastIndexOf('/') > 0 ?
+                        node.path.substring(0, node.path.lastIndexOf('/')) : '.';
+                      
+                      // Full paths for old and new
+                      const oldPath = node.path;
+                      const newPath = parentPath === '.' ? newName : `${parentPath}/${newName}`;
+                      
+                      ffmpegRef.current.rename(oldPath, newPath)
+                        .then(async () => {
+                          // Refresh the file system to reflect the change
+                          await refreshFileSystem(parentPath);
+                          setLogs(prev => [...prev, `Renamed file: ${node.name} -> ${newName}`]);
+                        })
+                        .catch((error: any) => {
+                          setLogs(prev => [...prev, `Error renaming file: ${error.message}`]);
+                        });
+                    }
+                  }
+                }}
+                className="text-gray-400 hover:text-yellow-500 p-1 rounded-full hover:bg-yellow-500/10"
+                title={t('tool.ffmpeg.rename_file')}
+              >
+                <Edit3 className="w-3 h-3" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); removeSelectedFile(node.name); }}
+                className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-500/10"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
           )}
         </div>
 
@@ -615,10 +1222,10 @@ const FFmpegTool: React.FC = () => {
       
       // Write input files to MEMFS
       const writtenFiles: string[] = [];
-      for (const file of selectedFiles) {
-        const fileName = file.name;
+      for (const fileObj of selectedFiles) {
+        const fileName = fileObj.file.name;
         setLogs(prev => [...prev, t('tool.ffmpeg.writing_file', { fileName })]);
-        await ffmpegRef.current.writeFile(fileName, await fetchFile(file));
+        await ffmpegRef.current.writeFile(fileName, await fetchFile(fileObj.file));
         writtenFiles.push(fileName);
       }
 
@@ -1058,6 +1665,120 @@ const FFmpegTool: React.FC = () => {
     return fileName.split('.').pop()?.toLowerCase() || 'mp4';
   };
 
+  // 根据文件扩展名获取MIME类型
+  const getMimeType = (fileName: string) => {
+    const ext = getFileExtension(fileName).toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      // 视频
+      'mp4': 'video/mp4',
+      'avi': 'video/x-msvideo',
+      'mov': 'video/quicktime',
+      'wmv': 'video/x-ms-wmv',
+      'flv': 'video/x-flv',
+      'webm': 'video/webm',
+      'mkv': 'video/x-matroska',
+      'm4v': 'video/x-m4v',
+      '3gp': 'video/3gpp',
+      '3g2': 'video/3gpp2',
+      'm2ts': 'video/mp2t',
+      'mts': 'video/mp2t',
+      'ts': 'video/mp2t',
+      'f4v': 'video/mp4',
+      'mjpeg': 'video/x-mjpeg',
+      'mjpg': 'video/x-mjpeg',
+      'mpg': 'video/mpeg',
+      'mpeg': 'video/mpeg',
+      'vob': 'video/x-ms-vob',
+      
+      // 音频
+      'mp3': 'audio/mpeg',
+      'wav': 'audio/wav',
+      'flac': 'audio/flac',
+      'aac': 'audio/aac',
+      'm4a': 'audio/mp4',
+      'wma': 'audio/x-ms-wma',
+      'opus': 'audio/opus',
+      'ogg': 'audio/ogg',
+      'aiff': 'audio/aiff',
+      'aif': 'audio/aiff',
+      'au': 'audio/basic',
+      'snd': 'audio/basic',
+      'mid': 'audio/midi',
+      'midi': 'audio/midi',
+      'mp2': 'audio/mpeg',
+      'mpa': 'audio/mpeg',
+      'mpega': 'audio/mpeg',
+      'mpga': 'audio/mpeg',
+      'oga': 'audio/ogg',
+      'spx': 'audio/ogg',
+      'weba': 'audio/webm',
+      
+      // 图像
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'bmp': 'image/bmp',
+      'webp': 'image/webp',
+      'tiff': 'image/tiff',
+      'tif': 'image/tiff',
+      'svg': 'image/svg+xml',
+      'ico': 'image/x-icon',
+      'gif': 'image/gif',
+      'heic': 'image/heic',
+      'heif': 'image/heif',
+      
+      // 文档
+      'pdf': 'application/pdf',
+      'txt': 'text/plain',
+      'html': 'text/html',
+      'htm': 'text/html',
+      'xml': 'application/xml',
+      'json': 'application/json',
+      'csv': 'text/csv',
+      'rtf': 'application/rtf',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls': 'application/vnd.ms-excel',
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ppt': 'application/vnd.ms-powerpoint',
+      'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    };
+    
+    return mimeTypes[ext] || 'application/octet-stream';
+  };
+
+  // 验证文件名合法性
+  const validateFileName = (fileName: string): { isValid: boolean; errorMessage?: string } => {
+    if (!fileName || fileName.trim() === '') {
+      return { isValid: false, errorMessage: t('tool.ffmpeg.errors.filename_required') };
+    }
+
+    // 检查是否包含非法字符
+    const invalidChars = /[<>:"/\\|?*]/;
+    if (invalidChars.test(fileName)) {
+      return { isValid: false, errorMessage: t('tool.ffmpeg.errors.invalid_characters') };
+    }
+
+    // 检查是否以空格或点结尾
+    if (fileName.endsWith(' ') || fileName.endsWith('.')) {
+      return { isValid: false, errorMessage: t('tool.ffmpeg.errors.cannot_end_with_space_or_dot') };
+    }
+
+    // 检查长度
+    if (fileName.length > 255) {
+      return { isValid: false, errorMessage: t('tool.ffmpeg.errors.filename_too_long') };
+    }
+
+    // 检查是否为Windows保留名称
+    const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
+    if (reservedNames.test(nameWithoutExt)) {
+      return { isValid: false, errorMessage: t('tool.ffmpeg.errors.reserved_name') };
+    }
+
+    return { isValid: true };
+  };
+
   // 应用生成的命令到命令输入框
   const applyCommand = (functionId: string) => {
     const cmd = generateCommand(functionId);
@@ -1238,8 +1959,8 @@ const FFmpegTool: React.FC = () => {
                                         >
                                           <option value="">{t('tool.ffmpeg.select_uploaded_file')}</option>
                                           {selectedFiles.map((file) => (
-                                            <option key={file.name} value={file.name}>
-                                              {file.name}
+                                            <option key={file.file.name} value={file.path}>
+                                              {file.file.name}
                                             </option>
                                           ))}
                                         </select>
@@ -1291,92 +2012,84 @@ const FFmpegTool: React.FC = () => {
           )}
         </Button>
 
-        {/* Combined File Upload and File List Area */}
-        <div 
-          className={`mb-6 rounded-lg p-6 text-center ${(selectedFiles.length === 0) ? 'border-2 border-dashed hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer' : 'border'}`}
-          onDragOver={(e) => { 
-            if (selectedFiles.length === 0) e.preventDefault();
-          }}
-          onDrop={(e) => { 
-            if (selectedFiles.length === 0) handleDrop(e);
-          }}
-          onClick={(e) => { 
-            if (selectedFiles.length === 0) fileInputRef.current?.click();
-          }}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            className="hidden"
-            multiple
-          />
-          
-          {selectedFiles.length === 0 ? (
-            <>
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="font-medium mb-1">{t('tool.ffmpeg.drag_drop_files')}</p>
-              <p className="text-sm text-muted-foreground mb-3">
-                {t('tool.ffmpeg.or_click_select')}
-              </p>
-              <Button variant="outline">{t('tool.ffmpeg.select_files')}</Button>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-medium">{t('tool.ffmpeg.files')}</h3>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
+        {/* File System Tree */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium">{t('tool.ffmpeg.file_system')}</h3>
+            <div className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => refreshFileSystem()}
+                disabled={isRunning}
+              >
+                <RefreshCw className={`w-4 h-4 mr-1 ${isRunning ? 'animate-spin' : ''}`} />
+                {t('tool.ffmpeg.refresh')}
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    uploadFiles(Array.from(e.target.files), '.');
+                  }
+                }}
+                className="hidden"
+                multiple
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isRunning}
+              >
+                <Upload className="w-4 h-4 mr-1" />
+                {t('tool.ffmpeg.upload_files')}
+              </Button>
+              {selectedFiles.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={downloadSelectedFiles}
+                  disabled={isRunning || isDownloading}
                 >
-                  <Upload className="w-4 h-4 mr-1" />
-                  {t('tool.ffmpeg.upload_more')}
+                  <Download className="w-4 h-4 mr-1" />
+                  {t('tool.ffmpeg.download_selected', { count: selectedFiles.length })}
                 </Button>
-              </div>
-              
-              <Card className="p-3 max-h-60 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-                  {selectedFiles.map((file, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between p-2 border rounded-lg"
-                    >
-                      <div 
-                        className="flex items-center gap-2 cursor-pointer"
-                        onClick={() => {
-                          // Create a temporary URL and open it in a new tab
-                          const url = URL.createObjectURL(file);
-                          window.open(url, '_blank');
-                        }}
-                      >
-                        <FileIcon className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm truncate max-w-[120px]">{file.name}</span>
-                      </div>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFile(file.name);
-                        }}
-                        className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-500/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  {selectedFiles.length === 0 && (
-                    <p className="text-muted-foreground text-center py-4 col-span-2">
-                      {t('tool.ffmpeg.no_files_added')}
-                    </p>
-                  )}
+              )}
+            </div>
+          </div>
+          
+          <Card className="p-0 overflow-hidden" onDragOver={(e) => e.preventDefault()}>
+            <div 
+              className={`text-center ${!rootNode ? 'p-4 border-b border-gray-200 dark:border-gray-700' : ''}`}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files) {
+                  uploadFiles(Array.from(e.dataTransfer.files));
+                }
+              }}
+            >
+              {!rootNode ? (
+                <>
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="font-medium mb-1">{t('tool.ffmpeg.drag_drop_files')}</p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('tool.ffmpeg.or_click_upload')}
+                  </p>
+                  <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    {t('tool.ffmpeg.select_files')}
+                  </Button>
+                </>
+              ) : (
+                <div className="max-h-80 overflow-y-auto">
+                  <FileTreeNode node={rootNode} depth={0} />
                 </div>
-              </Card>
-            </>
-          )}
+              )}
+            </div>
+          </Card>
         </div>
+
 
         {/* Logs */}
         <div>
