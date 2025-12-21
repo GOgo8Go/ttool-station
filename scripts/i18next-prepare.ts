@@ -53,7 +53,7 @@ const httpStatus = [
 const dnsRecordsInfo = 
   DNS_RECORDS_INFO.flatMap(( {descriptionKey, exampleKey, useCaseKey}) => [descriptionKey, exampleKey, useCaseKey]);
 
-const qrBarCode = new Set([QR_LINE_STYLES, QR_DOT_STYLES, QR_CENTER_STYLES]);
+const qrBarCode = Array.from(new Set([...QR_LINE_STYLES, ...QR_DOT_STYLES, ...QR_CENTER_STYLES]), v => `tool.qr-barcode.generator.styles.${v}`);
 const passwordGenerator = ['uppercase', 'lowercase', 'numbers', 'symbols'].map(v => `tool.password-generator.${v}`);
 
 const unitConverter = Object.entries(UNIT_CATEGORIES).flatMap(([cat, { units }]) => [

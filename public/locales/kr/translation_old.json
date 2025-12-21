@@ -1,0 +1,24 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "여기에 파일을 드래그 앤 드롭",
+      "or_click_select": "또는 클릭하여 파일 선택",
+      "files": "파일",
+      "upload_more": "더 업로드하기",
+      "no_files_added": "아직 추가된 파일 없음"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "매우 둥근",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+  "square,dot": ""
+}

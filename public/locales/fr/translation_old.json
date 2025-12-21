@@ -1,0 +1,24 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "Glisser-déposer les fichiers ici",
+      "or_click_select": "Ou cliquer pour sélectionner des fichiers",
+      "files": "Fichiers",
+      "upload_more": "Télécharger plus",
+      "no_files_added": "Aucun fichier ajouté"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "Très arrondi",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "Carré, point, très arrondi",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "Carré, points, arrondi, élégant, élégant arrondi, très arrondi",
+  "square,dot": "Carré, point"
+}

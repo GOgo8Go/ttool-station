@@ -1,0 +1,30 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "Drag & drop files here",
+      "or_click_select": "Or click to select files",
+      "files": "Files",
+      "upload_more": "Upload More",
+      "no_files_added": "No files added yet"
+    },
+    "bluetooth-test": {
+      "device_info": "Device Information",
+      "id": "ID",
+      "class": "Device Class",
+      "uuids": "UUID List"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "Extra Rounded",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "Square, dot, extra-rounded",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "Square, dots, rounded, classy, classy-rounded, extra-rounded",
+  "square,dot": "Square, dot"
+}

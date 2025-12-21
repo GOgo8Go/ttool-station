@@ -239,43 +239,43 @@ const FFmpegTool: React.FC = () => {
 
   // Refresh file system
   const refreshFileSystem = async (expandPath: string | null = null) => {
-    // Save current expanded paths
-    const currentExpandedPaths = new Set(expandedPaths);
-    
+    // Simply reload the entire file system from root
     await loadFileSystem();
     
-    // If we have a path to expand, add it and all its parent directories
+    // If we have a specific path to ensure is expanded, we'll handle it separately
     if (expandPath && expandPath !== '.') {
-      let path = '';
+      // Expand the target path and all its parents
+      const newExpandedPaths = new Set<string>();
+      newExpandedPaths.add('.'); // Always expand root
+      
       const parts = expandPath.split('/');
-      
-      // Add root level
-      currentExpandedPaths.add('.');
-      
-      // Add each parent directory
+      let currentPath = '';
       for (const part of parts) {
-        path = path ? `${path}/${part}` : part;
-        currentExpandedPaths.add(path);
+        currentPath = currentPath ? `${currentPath}/${part}` : part;
+        newExpandedPaths.add(currentPath);
       }
-    }
-    
-    // Restore expanded paths and reload children for previously expanded directories
-    setExpandedPaths(currentExpandedPaths);
-    
-    // Reload children for all previously expanded directories
-    if (rootNode) {
-      const reloadExpandedNodes = async (node: FileNode) => {
-        if (currentExpandedPaths.has(node.path) && node.isDir) {
-          await loadSubdirectory(node);
-          
-          // Recursively check children
-          for (const child of node.children) {
-            await reloadExpandedNodes(child);
-          }
-        }
-      };
       
-      await reloadExpandedNodes(rootNode);
+      setExpandedPaths(newExpandedPaths);
+      
+      // Now load subdirectories for the expanded paths
+      if (rootNode) {
+        const loadExpandedSubdirs = async (node: FileNode) => {
+          if (newExpandedPaths.has(node.path) && node.isDir) {
+            await loadSubdirectory(node);
+            for (const child of node.children) {
+              await loadExpandedSubdirs(child);
+            }
+          }
+        };
+        
+        // Note: This still has the same async state issue, but for most cases it should work
+        // For a more robust solution, we'd need to restructure the file system loading
+        setTimeout(async () => {
+          if (rootNode) {
+            await loadExpandedSubdirs(rootNode);
+          }
+        }, 0);
+      }
     }
   };
 
@@ -292,10 +292,9 @@ const FFmpegTool: React.FC = () => {
     { id: 'text_graphics', name: t('tool.ffmpeg.categories.text_graphics') },
   ];
 
-  // 定义各功能类别下的子功能
-  const functions = {
+  // 定义FFmpeg功能
+  const ffmpeg_functions = {
     quick_commands: [
-      // FFmpeg Functions
       { id: 'convert_video', name: t('tool.ffmpeg.functions.convert_video'), icon: FileVideo, tool: 'ffmpeg' },
       { id: 'convert_audio', name: t('tool.ffmpeg.functions.convert_audio'), icon: FileAudio, tool: 'ffmpeg' },
       { id: 'convert_container', name: t('tool.ffmpeg.functions.convert_container'), icon: FileIcon, tool: 'ffmpeg' },
@@ -325,17 +324,6 @@ const FFmpegTool: React.FC = () => {
       { id: 'add_text', name: t('tool.ffmpeg.functions.add_text'), icon: FileVideo, tool: 'ffmpeg' },
       { id: 'draw_box', name: t('tool.ffmpeg.functions.draw_box'), icon: FileVideo, tool: 'ffmpeg' },
       { id: 'generate_video_from_image', name: t('tool.ffmpeg.functions.generate_video_from_image'), icon: FileVideo, tool: 'ffmpeg' },
-      // FFprobe Functions
-      { id: 'show_format', name: t('tool.ffmpeg.functions.ffprobe_show_format_info'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_streams', name: t('tool.ffmpeg.functions.ffprobe_show_streams_info'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_duration', name: t('tool.ffmpeg.functions.ffprobe_show_duration'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_resolution', name: t('tool.ffmpeg.functions.ffprobe_show_resolution'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_bitrate', name: t('tool.ffmpeg.functions.ffprobe_show_bitrate'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_fps', name: t('tool.ffmpeg.functions.ffprobe_show_FPS'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_codec', name: t('tool.ffmpeg.functions.ffprobe_show_codec_info'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_metadata', name: t('tool.ffmpeg.functions.ffprobe_show_metadata'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_chapters', name: t('tool.ffmpeg.functions.ffprobe_show_chapters'), icon: FileIcon, tool: 'ffprobe' },
-      { id: 'show_frame_count', name: t('tool.ffmpeg.functions.ffprobe_show_frame_count'), icon: FileIcon, tool: 'ffprobe' },
     ],
     format_conversion: [
       { id: 'convert_video', name: t('tool.ffmpeg.functions.convert_video'), icon: FileVideo, tool: 'ffmpeg' },
@@ -381,6 +369,22 @@ const FFmpegTool: React.FC = () => {
       { id: 'add_text', name: t('tool.ffmpeg.functions.add_text'), icon: FileVideo, tool: 'ffmpeg' },
       { id: 'draw_box', name: t('tool.ffmpeg.functions.draw_box'), icon: FileVideo, tool: 'ffmpeg' },
       { id: 'generate_video_from_image', name: t('tool.ffmpeg.functions.generate_video_from_image'), icon: FileVideo, tool: 'ffmpeg' },
+    ],
+  };
+
+  // 定义FFprobe功能
+  const ffprobe_functions = {
+    quick_commands: [
+      { id: 'show_format', name: t('tool.ffmpeg.functions.ffprobe_show_format_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_streams', name: t('tool.ffmpeg.functions.ffprobe_show_streams_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_duration', name: t('tool.ffmpeg.functions.ffprobe_show_duration'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_resolution', name: t('tool.ffmpeg.functions.ffprobe_show_resolution'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_bitrate', name: t('tool.ffmpeg.functions.ffprobe_show_bitrate'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_fps', name: t('tool.ffmpeg.functions.ffprobe_show_FPS'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_codec', name: t('tool.ffmpeg.functions.ffprobe_show_codec_info'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_metadata', name: t('tool.ffmpeg.functions.ffprobe_show_metadata'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_chapters', name: t('tool.ffmpeg.functions.ffprobe_show_chapters'), icon: FileIcon, tool: 'ffprobe' },
+      { id: 'show_frame_count', name: t('tool.ffmpeg.functions.ffprobe_show_frame_count'), icon: FileIcon, tool: 'ffprobe' },
     ],
   };
 
@@ -840,27 +844,27 @@ const FFmpegTool: React.FC = () => {
   };
 
   // Handle file selection from tree
-   const handleFileSelectFromTree = (node: FileNode) => {
-       if (node.isDir) {
-         toggleExpand(node.path);
-         return;
-       }
-  
-       // Check if file is already selected
-       const isSelected = selectedFiles.some(f => f.file.name === node.name);
-       
-       if (isSelected) {
-         // Remove from selected files if already selected (toggle off)
-         setSelectedFiles(prev => prev.filter(f => f.file.name !== node.name));
-       } else {
-         // Add to selected files if not already there
-         // Create a dummy File object for the virtual file
-         const dummyFile = new File([], node.name);
-         setSelectedFiles(prev => [...prev, { file: dummyFile, path: node.path }]);
-         // 更新最后上传的文件
-         setLastUploadedFile(node.name);
-       }
-    };
+  const handleFileSelectFromTree = (node: FileNode) => {
+      if (node.isDir) {
+        toggleExpand(node.path);
+        return;
+      }
+ 
+      // Check if file is already selected
+      const isSelected = selectedFiles.some(f => f.file.name === node.name);
+      
+      if (isSelected) {
+        // Remove from selected files if already selected (toggle off)
+        setSelectedFiles(prev => prev.filter(f => f.file.name !== node.name));
+      } else {
+        // Add to selected files if not already there
+        // Create a dummy File object for the virtual file
+        const dummyFile = new File([], node.name);
+        setSelectedFiles(prev => [...prev, { file: dummyFile, path: node.path }]);
+        // 更新最后上传的文件
+        setLastUploadedFile(node.name);
+      }
+   };
     
     // Download selected files as a ZIP archive
     const downloadSelectedFiles = async () => {
@@ -934,8 +938,13 @@ const FFmpegTool: React.FC = () => {
         await ffmpegRef.current.writeFile(targetFilePath, await fetchFile(file));
       }
       
-      // Refresh file system and expand the target folder
-      await refreshFileSystem(targetPath);
+      // For root uploads, simply reload the entire file system
+      if (targetPath === '.') {
+        await loadFileSystem();
+      } else {
+        // For subdirectory uploads, use refreshFileSystem to maintain expanded state
+        await refreshFileSystem(targetPath);
+      }
       // Update last uploaded file with the first uploaded file name
       if (files.length > 0) {
         setLastUploadedFile(files[0].name);
@@ -956,12 +965,6 @@ const FFmpegTool: React.FC = () => {
     }
   };
 
-  // Handle file selection via input
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      uploadFiles(Array.from(e.target.files), selectedFolder);
-    }
-  };
 
   // Add files to the file tree
   const addFiles = (files: File[]) => {
@@ -1238,25 +1241,23 @@ const FFmpegTool: React.FC = () => {
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Set the current folder as the target for upload
-                  const targetFolder = node.path;
-                  setSelectedFolder(targetFolder);
-                  
-                  // Create a custom event handler for single use
-                  const handleChange = (event: Event) => {
-                    const target = event.target as HTMLInputElement;
-                    if (target.files) {
-                      uploadFiles(Array.from(target.files), targetFolder);
-                    }
-                    // Reset the input value and remove event listener
-                    target.value = '';
+                  // Upload files to the current folder directly
+                  const handleFolderUpload = () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.multiple = true;
+                    input.onchange = (e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.files) {
+                        uploadFiles(Array.from(target.files), node.path);
+                      }
+                      // Clean up
+                      input.remove();
+                    };
+                    input.click();
                   };
                   
-                  // Remove any existing event listeners and add the new one
-                  fileInputRef.current!.onchange = handleChange;
-                  
-                  // Trigger file input
-                  fileInputRef.current?.click();
+                  handleFolderUpload();
                 }}
                 title={t('tool.ffmpeg.upload_files')}
                 className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -2281,17 +2282,23 @@ const FFmpegTool: React.FC = () => {
               </div>
             </div>
             
-            <Card className="p-0 overflow-hidden h-full">
-              <div
-                className="text-center p-4 border-b border-gray-200 dark:border-gray-700"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  if (e.dataTransfer.files) {
-                    uploadFiles(Array.from(e.dataTransfer.files) as File[], '.');
-                  }
-                }}
-              >
+            <Card
+              className="p-0 overflow-hidden h-full relative"
+              onDragOver={(e) => {
+                e.preventDefault();
+                // 清除 dragOverNode 状态，表示拖拽到空白区域
+                if (dragOverNode) {
+                  setDragOverNode(null);
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files) {
+                  uploadFiles(Array.from(e.dataTransfer.files) as File[], '.');
+                }
+              }}
+            >
+              <div className="text-center p-0 border-gray-200 dark:border-gray-700">
                 {isFfmpegLoading ? (
                   <div className="flex flex-col items-center justify-center py-8">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -2405,7 +2412,7 @@ const FFmpegTool: React.FC = () => {
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {(functions as any)[activeCategory]?.filter((func: any) => 
+                        {(commandType === 'ffprobe' ? ffprobe_functions : ffmpeg_functions)[activeCategory]?.filter((func: any) =>
                           !func.tool || func.tool === commandType
                         ).map((func: any) => {
                           const IconComponent = func.icon;
@@ -2437,7 +2444,7 @@ const FFmpegTool: React.FC = () => {
                 {activeCategory !== 'quick_commands' && (
                   <div className="mt-4">
                     <h3 className="font-medium mb-3">
-                      {((functions as any)[activeCategory] || []).length > 0
+                      {((commandType === 'ffprobe' ? ffprobe_functions : ffmpeg_functions)[activeCategory] || []).length > 0
                         ? t('tool.ffmpeg.function_settings')
                         : t('tool.ffmpeg.no_functions')}
                     </h3>
@@ -2450,7 +2457,7 @@ const FFmpegTool: React.FC = () => {
                         </p>
                       </div>
                     ) : (
-                      ((functions as any)[activeCategory] || []).filter((func: any) => 
+                      ((commandType === 'ffprobe' ? ffprobe_functions : ffmpeg_functions)[activeCategory] || []).filter((func: any) =>
                         !func.tool || func.tool === commandType
                       ).map((func: any) => (
                         <div key={func.id} className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">

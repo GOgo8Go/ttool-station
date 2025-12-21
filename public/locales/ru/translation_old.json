@@ -1,0 +1,24 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "Перетащите файлы сюда",
+      "or_click_select": "Или нажмите, чтобы выбрать файлы",
+      "files": "Файлы",
+      "upload_more": "Загрузить еще",
+      "no_files_added": "Файлы еще не добавлены"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "Очень округлый",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+  "square,dot": ""
+}

@@ -1,0 +1,24 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "ここにファイルをドラッグ&ドロップ",
+      "or_click_select": "またはクリックしてファイルを選択",
+      "files": "ファイル",
+      "upload_more": "さらにアップロード",
+      "no_files_added": "まだファイルが追加されていません"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "特別丸角",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "四角、点、超丸み",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "四角、点、丸み、上品、上品丸み、超丸み",
+  "square,dot": "四角、点"
+}

@@ -1,0 +1,30 @@
+{
+  "tool": {
+    "ffmpeg": {
+      "drag_drop_files": "拖拽文件到此处",
+      "or_click_select": "或点击选择文件",
+      "files": "文件",
+      "upload_more": "上传更多",
+      "no_files_added": "尚未添加文件"
+    },
+    "bluetooth-test": {
+      "device_info": "设备信息",
+      "id": "ID",
+      "class": "设备类",
+      "uuids": "UUID列表"
+    },
+    "qr-barcode": {
+      "generator": {
+        "styles": {
+          "extra_rounded": "超圆角",
+          "square,dot,extra-rounded": "",
+          "square,dots,rounded,classy,classy-rounded,extra-rounded": "",
+          "square,dot": ""
+        }
+      }
+    }
+  },
+  "square,dot,extra-rounded": "方形、点、超圆角",
+  "square,dots,rounded,classy,classy-rounded,extra-rounded": "方形、点、圆角、优雅、优雅圆角、超圆角",
+  "square,dot": "方形、点"
+}

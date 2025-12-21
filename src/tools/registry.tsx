@@ -1,11 +1,11 @@
-import { 
-  Code2, FileText, Timer, Calculator, Settings, Braces, ImageIcon, 
-  ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode, 
-  FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint, 
-  Zap, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma, 
-  SquareFunction, Mic, Headphones, Mouse, Keyboard, Gamepad2, Monitor, 
-  Key, Clock, Terminal, Database, Type, FileJson, AlignLeft, Shield, 
-  Network, Cpu, Link, MapPin, FileVideo, FileAudio 
+import {
+  Code2, FileText, Timer, Calculator, Settings, Braces, ImageIcon,
+  ArrowLeftRight, FileImage, Crop, Info, View, Brush, FileCode,
+  FileStack, FolderOpen, FileArchive, Globe, Camera, Regex, Fingerprint,
+  Zap, Palette, QrCode, Hash, GitCompare, Search, Binary, Sigma,
+  SquareFunction, Mic, Headphones, Mouse, Keyboard, Gamepad2, Monitor,
+  Key, Clock, Terminal, Database, Type, FileJson, AlignLeft, Shield,
+  Network, Cpu, Link, MapPin, FileVideo, FileAudio, Bluetooth
 } from 'lucide-react';
 import { ToolCategory } from '../types';
 
@@ -288,6 +288,13 @@ export const toolRegistry: ToolCategory[] = [
         description: 'tool.speaker-test.desc',
         icon: Headphones,
         component: () => import('./device/SpeakerTest'),
+      },
+      {
+        id: 'bluetooth-test',
+        name: 'tool.bluetooth-test.name',
+        description: 'tool.bluetooth-test.desc',
+        icon: Bluetooth,
+        component: () => import('./device/BluetoothTest'),
       },
     ],
   },
