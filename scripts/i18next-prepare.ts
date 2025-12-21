@@ -11,7 +11,7 @@ const registry = toolRegistry.flatMap(cate => [
   ...cate.tools.flatMap(tool => [
     tool.name,
     tool.description,
-  ])
+ ])
 ]);
 
 
@@ -50,16 +50,136 @@ const httpStatus = [
   )
 ];
 
-const dnsRecordsInfo = 
+const dnsRecordsInfo =
   DNS_RECORDS_INFO.flatMap(( {descriptionKey, exampleKey, useCaseKey}) => [descriptionKey, exampleKey, useCaseKey]);
 
 const qrBarCode = Array.from(new Set([...QR_LINE_STYLES, ...QR_DOT_STYLES, ...QR_CENTER_STYLES]), v => `tool.qr-barcode.generator.styles.${v}`);
 const passwordGenerator = ['uppercase', 'lowercase', 'numbers', 'symbols'].map(v => `tool.password-generator.${v}`);
 
 const unitConverter = Object.entries(UNIT_CATEGORIES).flatMap(([cat, { units }]) => [
-  `tool.unit-converter.categories.${cat}`, 
-  ...Object.keys(units).map(v => `tool.unit-converter.units.${v}`)
+  `tool.unit-converter.categories.${cat}`,
+ ...Object.keys(units).map(v => `tool.unit-converter.units.${v}`)
 ]);
+
+// Function to read and parse YAML files to extract Bluetooth service and characteristic names
+const parseYaml = (yamlText: string): any => {
+ const lines = yamlText.split('\n');
+  const result: any = { uuids: [] };
+ let currentEntry: any = null;
+  let inUuidsSection = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines and comments
+    if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+      continue;
+    }
+    
+    // Check if we're entering the uuids section
+    if (trimmedLine === 'uuids:') {
+      inUuidsSection = true;
+      continue;
+    }
+    
+    if (!inUuidsSection) {
+      continue;
+    }
+    
+    // Check for new entry (starts with -)
+    if (line.trimStart().startsWith('- ')) {
+      // Save previous entry if exists
+      if (currentEntry) {
+        result.uuids.push(currentEntry);
+      }
+      
+      // Start new entry
+      currentEntry = {};
+      
+      // Parse the current line for uuid
+      const uuidMatch = line.match(/- uuid:\s*(.+)/);
+      if (uuidMatch) {
+        currentEntry.uuid = uuidMatch[1].trim();
+      }
+      
+      // Look ahead for name and id on subsequent lines
+      let nextLineIndex = i + 1;
+      while (nextLineIndex < lines.length) {
+        const nextLine = lines[nextLineIndex];
+        const nextTrimmed = nextLine.trim();
+        
+        // Stop if we hit a new entry or end of file
+        if (nextTrimmed === '' || nextTrimmed.startsWith('#') || nextLine.trimStart().startsWith('- ')) {
+          break;
+        }
+        
+        // Check for name
+        const nameMatch = nextLine.match(/\s*name:\s*(.+)/);
+        if (nameMatch) {
+          currentEntry.name = nameMatch[1].trim();
+        }
+        
+        // Check for id
+        const idMatch = nextLine.match(/\s*id:\s*(.+)/);
+        if (idMatch) {
+          currentEntry.id = idMatch[1].trim();
+        }
+        
+        nextLineIndex++;
+      }
+      
+      // Skip the lines we've already processed
+      i = nextLineIndex - 1;
+    }
+  }
+  
+  // Add the last entry
+  if (currentEntry) {
+    result.uuids.push(currentEntry);
+  }
+  
+  return result;
+};
+
+// Function to extract Bluetooth service names and generate translation keys
+const getBluetoothServiceKeys = (): string[] => {
+  try {
+    const serviceYamlContent = fs.readFileSync('public/bluetooth/assigned_numbers/uuids/service_uuids.yaml', 'utf8');
+    const servicesYaml = parseYaml(serviceYamlContent);
+    
+    if (servicesYaml && Array.isArray(servicesYaml.uuids)) {
+      return servicesYaml.uuids.map((service: any) => {
+        // Convert service name to lowercase and replace spaces with underscores
+        const key = service.name.toLowerCase().replace(/\s+/g, '_');
+        return `tool.bluetooth-test.types.service.${key}`;
+      });
+    }
+  } catch (error) {
+    console.error('Error reading service UUIDs file:', error);
+  }
+ return [];
+};
+
+// Function to extract Bluetooth characteristic names and generate translation keys
+const getBluetoothCharacteristicKeys = (): string[] => {
+  try {
+    const characteristicYamlContent = fs.readFileSync('public/bluetooth/assigned_numbers/uuids/characteristic_uuids.yaml', 'utf8');
+    const characteristicsYaml = parseYaml(characteristicYamlContent);
+    
+    if (characteristicsYaml && Array.isArray(characteristicsYaml.uuids)) {
+      return characteristicsYaml.uuids.map((characteristic: any) => {
+        // Convert characteristic name to lowercase and replace spaces with underscores
+        const key = characteristic.name.toLowerCase().replace(/\s+/g, '_');
+        return `tool.bluetooth-test.types.characteristic.${key}`;
+      });
+    }
+ } catch (error) {
+    console.error('Error reading characteristic UUIDs file:', error);
+  }
+ return [];
+};
+
 
 const iNeedTheseTranslationKeys = [
   ...registry,
@@ -71,6 +191,8 @@ const iNeedTheseTranslationKeys = [
   ...qrBarCode,
   ...passwordGenerator,
   ...unitConverter,
+  ...getBluetoothServiceKeys(),
+  ...getBluetoothCharacteristicKeys(),
 ];
 
 
