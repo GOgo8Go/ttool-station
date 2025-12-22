@@ -11,7 +11,12 @@
       "device_info": "设备信息",
       "id": "ID",
       "class": "设备类",
-      "uuids": "UUID列表"
+      "uuids": "UUID列表",
+      "types": {
+        "characteristic": {
+          "plx_spot_check_measurement": "PLX点检测量"
+        }
+      }
     },
     "qr-barcode": {
       "generator": {

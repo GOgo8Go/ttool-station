@@ -90,6 +90,42 @@ declare global {
 
 const BluetoothTest: React.FC = () => {
     const { t } = useTranslation();
+
+    // Get translated name with original English name in parentheses
+    const getTranslatedName = (category: 'service' | 'characteristic', name: string) => {
+        // Convert name to key format (lowercase, spaces to underscores)
+        // Note: This matches the key generation in i18next-prepare.ts
+        const key = name.toLowerCase().replace(/\s+/g, '_');
+        
+        // Try to get translation
+        const translation = t(`tool.bluetooth-test.types.${category}.${key}`);
+        
+        // If translation exists and is different from the key, use it with original name
+        if (translation && translation !== key) {
+            return `${translation}(${name})`;
+        }
+        
+        // Otherwise, just use the original name
+        return name;
+    };
+
+    // Get original name with translation in parentheses for debug panel
+    const getDebugName = (category: 'service' | 'characteristic', name: string) => {
+        // Convert name to key format (lowercase, spaces to underscores)
+        // Note: This matches the key generation in i18next-prepare.ts
+        const key = name.toLowerCase().replace(/\s+/g, '_');
+        
+        // Try to get translation
+        const translation = t(`tool.bluetooth-test.types.${category}.${key}`);
+        
+        // If translation exists and is different from the key, use it with original name
+        if (translation && translation !== key) {
+            return `${name} (${translation})`;
+        }
+        
+        // Otherwise, just use the original name
+        return name;
+    };
     const [isSupported, setIsSupported] = useState<boolean | null>(null);
     const [isScanning, setIsScanning] = useState(false);
     const [devices, setDevices] = useState<BluetoothDevice[]>([]);
@@ -645,7 +681,7 @@ const BluetoothTest: React.FC = () => {
                             <div key={service.uuid} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                                 <div className="bg-gray-50 dark:bg-gray-900 p-3">
                                     <div className="font-medium text-gray-900 dark:text-white">
-                                        {service.name}
+                                        {getTranslatedName('service', service.name)}
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">
                                         {service.uuid}
@@ -657,7 +693,7 @@ const BluetoothTest: React.FC = () => {
                                             <div key={char.uuid} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700">
                                                 <div className="flex-1 min-w-0">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                        {char.name}
+                                                        {getTranslatedName('characteristic', char.name)}
                                                     </div>
                                                     <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                                                         {char.uuid}
@@ -773,7 +809,7 @@ const BluetoothTest: React.FC = () => {
                 >
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                         <Info className="w-5 h-5 text-blue-500" />
-                        Bluetooth UUID Mappings (Debug)
+                        {t("tool.bluetooth-test.uuid_mappings")}
                     </h3>
                     <Button
                         size="sm"
@@ -786,14 +822,9 @@ const BluetoothTest: React.FC = () => {
                 
                 {showDebugPanel && (
                     <div className="mt-4 space-y-6">
-                        {/* Loading Status */}
-                        <div className="text-sm">
-                            <span className="font-medium">UUID Maps Loaded:</span> {isUuidMapsLoaded() ? 'Yes' : 'No'}
-                        </div>
-                        
                         {/* Services Mapping */}
                         <div>
-                            <h4 className="font-medium text-gray-900 dark:text-white mb-2">Services ({getAllServiceMappings().length} total)</h4>
+                            <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('tool.bluetooth-test.serviceName')} ({getAllServiceMappings().length})</h4>
                             <div className="bg-white dark:bg-gray-800 rounded-lg p-3 max-h-60 overflow-y-auto">
                                 {getAllServiceMappings().length === 0 ? (
                                     <div className="text-gray-500 text-sm">No service mappings loaded</div>
@@ -809,7 +840,7 @@ const BluetoothTest: React.FC = () => {
                                             {getAllServiceMappings().map((service, index) => (
                                                 <tr key={index} className="border-b border-gray-100 dark:border-gray-700 last:border-0">
                                                     <td className="py-1 px-2 font-mono text-gray-600 dark:text-gray-300">{service.uuid}</td>
-                                                    <td className="py-1 px-2 text-gray-900 dark:text-white">{service.name}</td>
+                                                    <td className="py-1 px-2 text-gray-900 dark:text-white">{getDebugName('service', service.name)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -820,7 +851,7 @@ const BluetoothTest: React.FC = () => {
                         
                         {/* Characteristics Mapping */}
                         <div>
-                            <h4 className="font-medium text-gray-900 dark:text-white mb-2">Characteristics ({getAllCharacteristicMappings().length} total)</h4>
+                            <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('tool.bluetooth-test.characteristicName')} ({getAllCharacteristicMappings().length})</h4>
                             <div className="bg-white dark:bg-gray-800 rounded-lg p-3 max-h-60 overflow-y-auto">
                                 {getAllCharacteristicMappings().length === 0 ? (
                                     <div className="text-gray-500 text-sm">No characteristic mappings loaded</div>
@@ -836,7 +867,7 @@ const BluetoothTest: React.FC = () => {
                                             {getAllCharacteristicMappings().map((char, index) => (
                                                 <tr key={index} className="border-b border-gray-100 dark:border-gray-700 last:border-0">
                                                     <td className="py-1 px-2 font-mono text-gray-600 dark:text-gray-300">{char.uuid}</td>
-                                                    <td className="py-1 px-2 text-gray-900 dark:text-white">{char.name}</td>
+                                                    <td className="py-1 px-2 text-gray-900 dark:text-white">{getDebugName('characteristic', char.name)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
