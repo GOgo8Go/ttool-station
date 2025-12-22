@@ -149,11 +149,7 @@ const getBluetoothServiceKeys = (): string[] => {
     const servicesYaml = parseYaml(serviceYamlContent);
     
     if (servicesYaml && Array.isArray(servicesYaml.uuids)) {
-      return servicesYaml.uuids.map((service: any) => {
-        // Convert service name to lowercase and replace spaces with underscores
-        const key = service.name.toLowerCase().replace(/\s+/g, '_');
-        return `tool.bluetooth-test.types.service.${key}`;
-      });
+      return servicesYaml.uuids.map((service: any) => service.id);
     }
   } catch (error) {
     console.error('Error reading service UUIDs file:', error);
@@ -168,11 +164,7 @@ const getBluetoothCharacteristicKeys = (): string[] => {
     const characteristicsYaml = parseYaml(characteristicYamlContent);
     
     if (characteristicsYaml && Array.isArray(characteristicsYaml.uuids)) {
-      return characteristicsYaml.uuids.map((characteristic: any) => {
-        // Convert characteristic name to lowercase and replace spaces with underscores
-        const key = characteristic.name.toLowerCase().replace(/\s+/g, '_');
-        return `tool.bluetooth-test.types.characteristic.${key}`;
-      });
+      return characteristicsYaml.uuids.map((characteristic: any) => characteristic.id);
     }
  } catch (error) {
     console.error('Error reading characteristic UUIDs file:', error);
