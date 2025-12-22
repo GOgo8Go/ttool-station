@@ -97,8 +97,8 @@ const BluetoothTest: React.FC = () => {
         // Note: This matches the key generation in i18next-prepare.ts
         const key = name.toLowerCase().replace(/\s+/g, '_');
         
-        // Try to get translation
-        const translation = t(`tool.bluetooth-test.types.${category}.${key}`);
+        // Try to get translation using the org.bluetooth key format
+        const translation = t(`org.bluetooth.${category}.${key}`);
         
         // If translation exists and is different from the key, use it with original name
         if (translation && translation !== key) {
@@ -115,8 +115,8 @@ const BluetoothTest: React.FC = () => {
         // Note: This matches the key generation in i18next-prepare.ts
         const key = name.toLowerCase().replace(/\s+/g, '_');
         
-        // Try to get translation
-        const translation = t(`tool.bluetooth-test.types.${category}.${key}`);
+        // Try to get translation using the org.bluetooth key format
+        const translation = t(`org.bluetooth.${category}.${key}`);
         
         // If translation exists and is different from the key, use it with original name
         if (translation && translation !== key) {

@@ -995,8 +995,8 @@
       "info_3": "デバイスでBluetoothが有効になっており、テストしたいデバイスがペアリングモードになっていることを確認してください",
       "info_4": "一部のブラウザでは、セキュリティ上の理由でBluetoothの特定の機能へのアクセスが制限される場合があります",
       "uuid_mappings": "UUIDマッピング",
-      "serviceName": "サービス名",
-      "characteristicName": "キャラクタリスティック名"
+      "serviceName": "サービス",
+      "characteristicName": "キャラクタリスティック"
     },
     "dns-lookup": {
       "name": "DNS検索",

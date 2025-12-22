@@ -999,9 +999,9 @@
       "info_2": "Select the Bluetooth device to connect, supports all Bluetooth devices",
       "info_3": "After successful connection, you can view all services and characteristics of the device",
       "info_4": "Supports reading characteristic values and viewing detailed device information",
-      "uuid_mappings": "",
-      "serviceName": "",
-      "characteristicName": "",
+      "uuid_mappings": "UUID Mappings",
+      "serviceName": "Service",
+      "characteristicName": "Characteristic",
       "status_disconnected": "Disconnected",
       "status_connecting": "Connecting",
       "status_connected": "Connected"

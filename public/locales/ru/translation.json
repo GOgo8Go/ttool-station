@@ -1010,8 +1010,8 @@
       "info_3": "After successful connection, you can view all services and characteristics of the device",
       "info_4": "Supports reading characteristic values and viewing detailed device information",
       "uuid_mappings": "UUID-отображения",
-      "serviceName": "Имя службы",
-      "characteristicName": "Имя характеристики"
+      "serviceName": "Сервис",
+      "characteristicName": "Характеристика"
     },
     "dns-lookup": {
       "name": "DNS поиск",

@@ -1004,8 +1004,8 @@
       "info_3": "Assurez-vous que le Bluetooth est activé sur votre appareil et que les appareils que vous souhaitez tester sont en mode d'appariement",
       "info_4": "Certains navigateurs peuvent limiter l'accès à certaines fonctionnalités Bluetooth pour des raisons de sécurité",
       "uuid_mappings": "Mappings UUID",
-      "serviceName": "Nom du service",
-      "characteristicName": "Nom de la caractéristique"
+      "serviceName": "Service",
+      "characteristicName": "Caractéristique"
     },
     "dns-lookup": {
       "name": "Recherche DNS",
