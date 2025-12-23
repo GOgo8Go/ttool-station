@@ -1503,7 +1503,44 @@ const FFmpegTool: React.FC = () => {
       
       // Run FFmpeg or FFprobe command based on commandType
       if (commandType === 'ffprobe') {
-        await ffmpegRef.current.ffprobe(args);
+        // For ffprobe, we need to specify an output file to capture the result
+        // If the command doesn't already have an output file specified with -o, add one
+        const hasOutputFile = args.includes('-o') || args.includes('-print_format');
+        
+        if (!hasOutputFile) {
+          // Add output file to capture ffprobe results
+          args.push('-o', 'ffprobe_output.txt');
+        }
+        
+        // Execute ffprobe command
+        const exitCode = await ffmpegRef.current.ffprobe(args);
+        
+        // Check if the command was successful
+        if (exitCode === 0) {
+          // Try to read the output file if it was created
+          try {
+            let outputData;
+            if (!hasOutputFile) {
+              // If we added our own output file, read it
+              outputData = await ffmpegRef.current.readFile('ffprobe_output.txt');
+            } else {
+              // If the command specified its own output file, we can't easily know the name
+              // We'll just report that the command executed successfully
+              setLogs(prev => [...prev, t('tool.ffmpeg.command_executed_successfully')]);
+            }
+            
+            if (outputData && outputData.length > 0) {
+              // Convert the output data to string and add to logs
+              const outputText = new TextDecoder().decode(outputData as Uint8Array);
+              setLogs(prev => [...prev, t('tool.ffmpeg.ffprobe_output') + ':', outputText]);
+            }
+          } catch (error) {
+            // The output file might not have been created if ffprobe failed
+            setLogs(prev => [...prev, t('tool.ffmpeg.ffprobe_no_output_file')]);
+          }
+        } else {
+          setLogs(prev => [...prev, t('tool.ffmpeg.command_failed', { exitCode })]);
+        }
       } else {
         await ffmpegRef.current.exec(args);
       }
