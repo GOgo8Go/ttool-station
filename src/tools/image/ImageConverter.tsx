@@ -29,11 +29,12 @@ const formatSize = (bytes: number) => {
 
 const ImageConverter: React.FC = () => {
   const { t } = useTranslation();
+
   // File State
   const [file, setFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
-  
+
   // Stats State
   const [originalSize, setOriginalSize] = useState(0);
   const [processedSize, setProcessedSize] = useState(0);
@@ -58,14 +59,14 @@ const ImageConverter: React.FC = () => {
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const lastRequestId = useRef<number>(0);
   const urlsRef = useRef({ original: null as string | null, processed: null as string | null });
-  
+
   useEffect(() => {
     urlsRef.current = { original: originalUrl, processed: processedUrl };
   }, [originalUrl, processedUrl]);
@@ -99,7 +100,7 @@ const ImageConverter: React.FC = () => {
 
   const handleFileSelect = (selectedFile: File) => {
     if (!selectedFile.type.startsWith('image/')) return;
-    
+
     lastRequestId.current = Date.now();
     if (originalUrl) URL.revokeObjectURL(originalUrl);
     if (processedUrl) URL.revokeObjectURL(processedUrl);
@@ -108,9 +109,9 @@ const ImageConverter: React.FC = () => {
     const img = new Image();
     img.onload = () => {
       setDimensions({ width: img.width, height: img.height });
-      setSettings(prev => ({ 
-        ...prev, 
-        width: img.width, 
+      setSettings(prev => ({
+        ...prev,
+        width: img.width,
         height: img.height,
         scale: 1
       }));
@@ -126,7 +127,7 @@ const ImageConverter: React.FC = () => {
     setZoom(1);
     setError(null);
     setCopied(false);
-    
+
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -142,7 +143,7 @@ const ImageConverter: React.FC = () => {
     };
     document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
-  }, [originalUrl]); // Re-bind if url changes to ensure closure freshness if needed, though handleFileSelect is stable enough
+  }, []);
 
   useEffect(() => {
     if (!file || !originalUrl) return;
@@ -152,7 +153,7 @@ const ImageConverter: React.FC = () => {
 
   const processImage = async () => {
     if (!originalUrl || !file) return;
-    
+
     const requestId = Date.now();
     lastRequestId.current = requestId;
     setIsProcessing(true);
@@ -161,9 +162,9 @@ const ImageConverter: React.FC = () => {
     try {
       const img = new Image();
       img.crossOrigin = "anonymous";
-      
-      await new Promise((resolve, reject) => { 
-        img.onload = () => resolve(true); 
+
+      await new Promise((resolve, reject) => {
+        img.onload = () => resolve(true);
         img.onerror = () => reject(new Error(t('common.error.general') + ': ' + t('tool.converter.failed_to_load_original')));
         img.src = originalUrl;
       });
@@ -189,10 +190,10 @@ const ImageConverter: React.FC = () => {
       if (!ctx) throw new Error(t('tool.converter.canvas_context_failed'));
 
       if (settings.format === 'image/jpeg') {
-         ctx.fillStyle = settings.fillTransparent;
-         ctx.fillRect(0, 0, targetWidth, targetHeight);
+        ctx.fillStyle = settings.fillTransparent;
+        ctx.fillRect(0, 0, targetWidth, targetHeight);
       } else {
-         ctx.clearRect(0, 0, targetWidth, targetHeight);
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
       }
 
       ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
@@ -233,38 +234,33 @@ const ImageConverter: React.FC = () => {
   const handleCopy = async () => {
     if (!processedUrl) return;
     try {
-      // 1. Create an image from the current processed URL
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = processedUrl;
       await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = () => reject(new Error(t('tool.converter.failed_to_load_processed')));
+        img.onload = resolve;
+        img.onerror = () => reject(new Error(t('tool.converter.failed_to_load_processed')));
       });
-      
-      // 2. Draw it to a canvas to ensure we can export as PNG
-      // (Clipboard API requires PNG for consistent support, JPEG/WEBP often fail)
+
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      if(!ctx) throw new Error(t('tool.converter.canvas_context_failed'));
-      
+      if (!ctx) throw new Error(t('tool.converter.canvas_context_failed'));
+
       ctx.drawImage(img, 0, 0);
-      
-      // 3. Convert to PNG Blob
+
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error(t('tool.converter.png_blob_failed'));
 
-      // 4. Write to clipboard
       await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob })
       ]);
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy', err);
-      // setError('Failed to copy to clipboard. Format might not be supported by your browser.');
       alert(t('tool.converter.copy_failed') + (err instanceof Error ? err.message : ''));
     }
   };
@@ -273,18 +269,17 @@ const ImageConverter: React.FC = () => {
     setSettings(prev => {
       const next = { ...prev, [key]: value };
       if (prev.keepAspectRatio && prev.resizeMode === 'fixed') {
-        const ratio = dimensions.height / dimensions.width;
+        const ratio = dimensions.height / dimensions.width || 1;
         if (key === 'width' && dimensions.width > 0) {
-           next.height = Math.round((value as number) * ratio);
+          next.height = Math.round((value as number) * ratio);
         } else if (key === 'height' && dimensions.height > 0) {
-           next.width = Math.round((value as number) / ratio);
+          next.width = Math.round((value as number) / ratio);
         }
       }
       return next;
     });
   };
 
-  // Interaction Handlers (Wheel, Drag)
   const handleWheel = (e: React.WheelEvent) => {
     if (!viewportRef.current) return;
     e.preventDefault();
@@ -312,79 +307,56 @@ const ImageConverter: React.FC = () => {
   const handleMouseUp = () => setIsPanning(false);
 
   const handleClose = () => {
-     setFile(null); 
-     setOriginalUrl(null); 
-     setProcessedUrl(null);
-     setError(null);
+    setFile(null);
+    setOriginalUrl(null);
+    setProcessedUrl(null);
+    setError(null);
+    setDimensions({ width: 0, height: 0 });
+    setOriginalSize(0);
+    setProcessedSize(0);
+    setZoom(1);
+    setSplitPosition(50);
   };
-
-  if (!file || !originalUrl) {
-    return (
-      <div className="h-full flex flex-col">
-        <div 
-          className="flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer min-h-[400px] border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-             e.preventDefault();
-             if (e.dataTransfer.files?.[0]) handleFileSelect(e.dataTransfer.files[0]);
-          }}
-        >
-          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-6 group-hover:scale-110 transition-transform">
-            <Upload className="w-10 h-10 text-primary-600 dark:text-primary-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('tool.converter.upload_image')}</h3>
-          <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm mb-6">
-            {t('common.drag_drop_paste_or_click')}
-          </p>
-          <Button>{t('common.select_file')}</Button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*" 
-            onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} 
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-16rem)] -m-6 bg-gray-100 dark:bg-gray-950 overflow-hidden">
-      
-      {/* Main Canvas Area */}
-      <div 
+      {/* 左侧：图片预览区（始终显示） */}
+      <div
         className="flex-1 relative flex flex-col overflow-hidden min-h-[400px] lg:min-h-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjNmNGY2Ii8+PHJlY3QgeD0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2U1ZjdkYiIvPjxyZWN0IHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlNWU3ZGIiLz48cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg==')] dark:bg-none dark:bg-gray-900"
       >
+        {/* 工具栏 */}
         <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur shadow-sm rounded-lg p-1.5 pointer-events-auto flex items-center gap-1 border border-gray-200 dark:border-gray-700">
-             <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.max(0.1, z - 0.1))} className="h-8 w-8 p-0"><ZoomOut size={16} /></Button>
-             <span className="text-xs font-mono w-12 text-center select-none">{Math.round(zoom * 100)}%</span>
-             <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.min(5, z + 0.1))} className="h-8 w-8 p-0"><ZoomIn size={16} /></Button>
-             <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
-             <Button variant="ghost" size="sm" onClick={() => setZoom(1)} className="text-xs h-8 px-2">{t('common.fit')}</Button>
+            <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.max(0.1, z - 0.1))} className="h-8 w-8 p-0"><ZoomOut size={16} /></Button>
+            <span className="text-xs font-mono w-12 text-center select-none">{Math.round(zoom * 100)}%</span>
+            <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.min(5, z + 0.1))} className="h-8 w-8 p-0"><ZoomIn size={16} /></Button>
+            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <Button variant="ghost" size="sm" onClick={() => setZoom(1)} className="text-xs h-8 px-2">{t('common.fit')}</Button>
           </div>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur shadow-sm pointer-events-auto text-red-500 hover:text-red-600 border border-gray-200 dark:border-gray-700"
-            onClick={handleClose}
-          >
-            <X size={16} className="mr-2" /> {t('common.close')}
-          </Button>
+          {file && (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur shadow-sm pointer-events-auto text-red-500 hover:text-red-600 border border-gray-200 dark:border-gray-700"
+              onClick={handleClose}
+            >
+              <X size={16} className="mr-2" /> {t('common.close')}
+            </Button>
+          )}
         </div>
 
-        <div 
+        {/* 图片查看器或上传提示 */}
+        <div
           ref={viewportRef}
           className={`flex-1 overflow-auto flex items-center justify-center relative ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
-          onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
+          onWheel={file ? handleWheel : undefined}
+          onMouseDown={file ? handleMouseDown : undefined}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-           <div 
+          {file && originalUrl ? (
+            <div
               ref={containerRef}
               className="relative shadow-2xl transition-transform duration-75 ease-out origin-center"
               style={{
@@ -393,12 +365,12 @@ const ImageConverter: React.FC = () => {
                 minWidth: dimensions.width * zoom,
                 minHeight: dimensions.height * zoom,
               }}
-           >
+            >
               <img src={originalUrl} alt="Original" className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none" draggable={false} />
               <div className="absolute inset-0 overflow-hidden select-none pointer-events-none" style={{ clipPath: `inset(0 0 0 ${splitPosition}%)` }}>
-                 {processedUrl && <img src={processedUrl} alt="Processed" className="absolute inset-0 w-full h-full object-contain" draggable={false} />}
+                {processedUrl && <img src={processedUrl} alt="Processed" className="absolute inset-0 w-full h-full object-contain" draggable={false} />}
               </div>
-              <div 
+              <div
                 className="slider-handle absolute inset-y-0 w-1 bg-white cursor-ew-resize hover:bg-primary-400 active:bg-primary-500 transition-colors z-10 group"
                 style={{ left: `${splitPosition}%` }}
                 onMouseDown={(e) => {
@@ -421,149 +393,199 @@ const ImageConverter: React.FC = () => {
                 }}
               >
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform border border-gray-100">
-                   <ArrowLeftRight size={16} />
+                  <ArrowLeftRight size={16} />
                 </div>
               </div>
-           </div>
+            </div>
+          ) : (
+            /* 无图片时的上传提示 */
+            <div
+              className="flex flex-col items-center justify-center text-center p-8 cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files?.[0]) handleFileSelect(e.dataTransfer.files[0]);
+              }}
+            >
+              <div className="p-6 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-6">
+                <Upload className="w-16 h-16 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('tool.converter.upload_image')}</h3>
+              <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8">
+                {t('common.drag_drop_paste_or_click')}
+              </p>
+              <Button size="lg">{t('common.select_file')}</Button>
+            </div>
+          )}
         </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none opacity-50 text-xs bg-black/50 text-white px-2 py-1 rounded">
-          {t('common.scroll_to_zoom_drag_to_pan')}
-        </div>
+
+        {file && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none opacity-50 text-xs bg-black/50 text-white px-2 py-1 rounded">
+            {t('common.scroll_to_zoom_drag_to_pan')}
+          </div>
+        )}
       </div>
 
-      {/* Sidebar Controls */}
+      {/* 右侧：控制面板（始终显示） */}
       <div className="w-full lg:w-80 bg-white dark:bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 flex flex-col h-[50vh] lg:h-full z-10 shadow-xl lg:shadow-none">
-         <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar min-h-0">
-            {/* Stats */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-100 dark:border-gray-800 space-y-3">
-               <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
-                  <span>{t('tool.converter.compression')}</span>
-                  <span className={`${processedSize < originalSize ? 'text-green-500' : 'text-red-500'}`}>
-                    {Math.round((processedSize / originalSize) * 100 - 100)}%
-                  </span>
-               </div>
-               <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
-                 <div className="bg-white dark:bg-gray-800 p-2 text-center">
-                    <div className="text-[10px] text-gray-400">{t('common.original')}</div>
-                    <div className="font-mono text-sm font-medium">{formatSize(originalSize)}</div>
-                 </div>
-                 <div className="bg-white dark:bg-gray-800 p-2 text-center relative overflow-hidden">
-                    <div className="text-[10px] text-gray-400">{t('common.result')}</div>
-                    <div className="font-mono text-sm font-medium text-primary-600 dark:text-primary-400">{formatSize(processedSize)}</div>
-                    {isProcessing && <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center z-10"><Loader2 className="w-4 h-4 animate-spin text-primary-500" /></div>}
-                 </div>
-               </div>
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar min-h-0">
+          {/* Stats */}
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-100 dark:border-gray-800 space-y-3">
+            <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+              <span>{t('tool.converter.compression')}</span>
+              <span className={`${processedSize < originalSize && originalSize > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {originalSize > 0 ? Math.round((processedSize / originalSize) * 100 - 100) : 0}%
+              </span>
             </div>
-            
-            {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-100 dark:border-red-800/30 flex items-start">
-                <AlertCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                <span className="leading-tight">{error}</span>
+            <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 p-2 text-center">
+                <div className="text-[10px] text-gray-400">{t('common.original')}</div>
+                <div className="font-mono text-sm font-medium">{formatSize(originalSize)}</div>
               </div>
+              <div className="bg-white dark:bg-gray-800 p-2 text-center relative overflow-hidden">
+                <div className="text-[10px] text-gray-400">{t('common.result')}</div>
+                <div className="font-mono text-sm font-medium text-primary-600 dark:text-primary-400">{formatSize(processedSize)}</div>
+                {isProcessing && <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center z-10"><Loader2 className="w-4 h-4 animate-spin text-primary-500" /></div>}
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-100 dark:border-red-800/30 flex items-start">
+              <AlertCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+              <span className="leading-tight">{error}</span>
+            </div>
+          )}
+
+          {/* Settings */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('common.settings')}</h3>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.export_format')}</label>
+              <SegmentedControl<ImageFormat>
+                variant="grid"
+                value={settings.format}
+                onChange={(val) => updateSetting('format', val)}
+                options={(['image/jpeg', 'image/png', 'image/webp', 'image/avif'] as const).map(fmt => ({
+                  value: fmt,
+                  label: fmt.split('/')[1].toUpperCase().replace('JPEG', 'JPG')
+                }))}
+              />
+            </div>
+
+            {settings.format !== 'image/png' && (
+              <Slider
+                label={t('tool.converter.settings.quality')}
+                valueDisplay={`${Math.round(settings.quality * 100)}%`}
+                min="0.1"
+                max="1"
+                step="0.01"
+                value={settings.quality}
+                onChange={(e) => updateSetting('quality', parseFloat(e.target.value))}
+              />
             )}
 
-            {/* Settings */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('common.settings')}</h3>
-              
+            {settings.format === 'image/jpeg' && (
               <div className="space-y-2">
-                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.export_format')}</label>
-                <SegmentedControl<ImageFormat>
-                  variant="grid"
-                  value={settings.format}
-                  onChange={(val) => updateSetting('format', val)}
-                  options={(['image/jpeg', 'image/png', 'image/webp', 'image/avif'] as const).map(fmt => ({
-                    value: fmt,
-                    label: fmt.split('/')[1].toUpperCase().replace('JPEG', 'JPG')
-                  }))}
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.background_fill')}</label>
+                <div className="flex gap-2">
+                  <input type="color" value={settings.fillTransparent} onChange={(e) => updateSetting('fillTransparent', e.target.value)} className="h-8 w-12 rounded border border-gray-300 dark:border-gray-600 cursor-pointer" />
+                  <span className="text-xs font-mono self-center text-gray-500">{settings.fillTransparent}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <hr className="border-gray-100 dark:border-gray-800" />
+
+          {/* Resize */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('tool.converter.resize.title')}</h3>
+              <SegmentedControl<ResizeMode>
+                size="sm"
+                value={settings.resizeMode}
+                onChange={(v) => updateSetting('resizeMode', v)}
+                options={[
+                  { value: 'percent', label: '%' },
+                  { value: 'fixed', label: 'PX' }
+                ]}
+              />
+            </div>
+
+            {settings.resizeMode === 'percent' ? (
+              <div className="space-y-1">
+                <Slider
+                  label={t('tool.converter.resize.scale')}
+                  valueDisplay={`${Math.round(settings.scale * 100)}%`}
+                  min="0.1"
+                  max="1"
+                  step="0.05"
+                  value={settings.scale}
+                  onChange={(e) => updateSetting('scale', parseFloat(e.target.value))}
                 />
-              </div>
-
-              {settings.format !== 'image/png' && (
-                 <Slider
-                   label={t('tool.converter.settings.quality')}
-                   valueDisplay={`${Math.round(settings.quality * 100)}%`}
-                   min="0.1"
-                   max="1"
-                   step="0.01"
-                   value={settings.quality}
-                   onChange={(e) => updateSetting('quality', parseFloat(e.target.value))}
-                 />
-              )}
-
-              {settings.format === 'image/jpeg' && (
-                 <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.background_fill')}</label>
-                    <div className="flex gap-2">
-                       <input type="color" value={settings.fillTransparent} onChange={(e) => updateSetting('fillTransparent', e.target.value)} className="h-8 w-12 rounded border border-gray-300 dark:border-gray-600 cursor-pointer" />
-                       <span className="text-xs font-mono self-center text-gray-500">{settings.fillTransparent}</span>
-                    </div>
-                 </div>
-              )}
-            </div>
-
-            <hr className="border-gray-100 dark:border-gray-800" />
-
-            {/* Resize */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('tool.converter.resize.title')}</h3>
-                 <SegmentedControl<ResizeMode>
-                    size="sm"
-                    value={settings.resizeMode}
-                    onChange={(v) => updateSetting('resizeMode', v)}
-                    options={[
-                      { value: 'percent', label: '%' },
-                      { value: 'fixed', label: 'PX' }
-                    ]}
-                 />
-              </div>
-
-              {settings.resizeMode === 'percent' ? (
-                 <div className="space-y-1">
-                   <Slider
-                     label={t('tool.converter.resize.scale')}
-                     valueDisplay={`${Math.round(settings.scale * 100)}%`}
-                     min="0.1"
-                     max="1"
-                     step="0.05"
-                     value={settings.scale}
-                     onChange={(e) => updateSetting('scale', parseFloat(e.target.value))}
-                   />
-                   <div className="text-xs text-gray-400 text-center font-mono mt-1">
-                      {Math.round(dimensions.width * settings.scale)} x {Math.round(dimensions.height * settings.scale)}
-                   </div>
+                <div className="text-xs text-gray-400 text-center font-mono mt-1">
+                  {Math.round(dimensions.width * settings.scale)} x {Math.round(dimensions.height * settings.scale)}
                 </div>
-              ) : (
-                <div className="space-y-3">
-                   <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs text-gray-500 block mb-1">{t('tool.converter.resize.width')}</label>
-                        <input type="number" value={settings.width} onChange={(e) => updateSetting('width', parseInt(e.target.value) || 0)} className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500 block mb-1">{t('tool.converter.resize.height')}</label>
-                        <input type="number" value={settings.height} onChange={(e) => updateSetting('height', parseInt(e.target.value) || 0)} className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700" />
-                      </div>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <input type="checkbox" id="ratio" checked={settings.keepAspectRatio} onChange={(e) => updateSetting('keepAspectRatio', e.target.checked)} className="rounded text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600" />
-                      <label htmlFor="ratio" className="text-xs text-gray-600 dark:text-gray-300 select-none">{t('tool.converter.resize.lock_aspect_ratio')}</label>
-                   </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">{t('tool.converter.resize.width')}</label>
+                    <input
+                      type="number"
+                      value={settings.width ?? ''}
+                      onChange={(e) => updateSetting('width', parseInt(e.target.value) || 0)}
+                      className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">{t('tool.converter.resize.height')}</label>
+                    <input
+                      type="number"
+                      value={settings.height ?? ''}
+                      onChange={(e) => updateSetting('height', parseInt(e.target.value) || 0)}
+                      className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700"
+                    />
+                  </div>
                 </div>
-              )}
-            </div>
-         </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="ratio"
+                    checked={settings.keepAspectRatio}
+                    onChange={(e) => updateSetting('keepAspectRatio', e.target.checked)}
+                    className="rounded text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600"
+                  />
+                  <label htmlFor="ratio" className="text-xs text-gray-600 dark:text-gray-300 select-none">{t('tool.converter.resize.lock_aspect_ratio')}</label>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-         <div className="flex-shrink-0 p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm z-20 flex gap-2">
-            <Button onClick={handleCopy} disabled={isProcessing || !!error} variant="secondary" className="flex-1 h-11 text-sm">
-                {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />} {t('common.copy')}
-            </Button>
-            <Button onClick={handleDownload} disabled={isProcessing || !!error} className="flex-[2] h-11 text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-               {isProcessing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('common.processing')}...</> : <><Download className="w-4 h-4 mr-2" /> {t('common.download')}</>}
-            </Button>
-         </div>
+        {/* 底部按钮 */}
+        <div className="flex-shrink-0 p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm z-20 flex gap-2">
+          <Button onClick={handleCopy} disabled={isProcessing || !!error || !file} variant="secondary" className="flex-1 h-11 text-sm">
+            {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />} {t('common.copy')}
+          </Button>
+          <Button onClick={handleDownload} disabled={isProcessing || !!error || !file} className="flex-[2] h-11 text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+            {isProcessing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('common.processing')}...</> : <><Download className="w-4 h-4 mr-2" /> {t('common.download')}</>}
+          </Button>
+        </div>
       </div>
+
+      {/* 隐藏的文件输入 */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+      />
     </div>
   );
 };
