@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="免费在线HTML预览工具，支持实时预览、代码格式化、HTML反转义等功能。提供分屏编辑和预览，支持代码美化，让HTML开发更高效。">
+    <meta name="keywords" content="HTML预览,HTML编辑器,HTML格式化,HTML美化,HTML反转义,在线工具,代码预览,Web开发工具">
+   
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="HTML在线预览工具 ">
+    <meta property="og:description" content="专业的HTML在线预览工具，支持实时预览、代码格式化、反转义等功能，让HTML开发更轻松。提供分屏显示，所见即所得。">
+    <meta property="og:image" content="../tools.png">
+    <meta property="og:url" content="https://your-domain.com/pages/html_preview.html">
+    <meta property="og:type" content="website">
+    
+    <!-- Additional SEO Tags -->
+    <meta name="application-name" content=" ">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="canonical" href="https://your-domain.com/pages/html_preview.html">
+    
+    <!-- 引入html2canvas库 -->
+    <script src="../libs/html2canvas.min.js"></script>
+    <title>HTML在线预览工具 </title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 引入苹果字体 -->
+    <!-- <link href="https://fonts.googleapis.com/css?family=SF+Pro+Display:400,600&display=swap" rel="stylesheet"> -->
+    <!-- 引入图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.css" />
+    <!-- 引入自定义CSS -->
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/sidebar.css">
+    <link rel="stylesheet" href="../styles/html-preview.css">
+    <!-- Umami 统计脚本延迟加载器 -->
+    <script src="../scripts/umami-loader.js"></script>
+</head>
+
+<body>
+    <!-- 侧边栏由 sidebar.js 动态加载 -->
+
+    <!-- 主内容 -->
+    <main class="html-preview">
+        <div class="editor-wrapper">
+            <div class="toolbar-toggle">
+                <button id="toolbar-toggle-btn">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="toolbar">
+                <h1>HTML在线预览工具</h1>
+                <div class="buttons">
+                    <button id="format-html-btn"><i class="fas fa-code"></i> 格式化</button>
+                    <button id="unescape-btn"><i class="fas fa-undo"></i> 反转义</button>
+                    <button id="maximize-btn"><i class="fas fa-expand"></i> 最大化</button>
+                    <button id="restore-btn" style="display:none;"><i class="fas fa-compress"></i> 还原</button>
+                    <button id="clear-html-btn"><i class="fas fa-trash"></i> 清空</button>
+                    <button id="paste-html-btn"><i class="fas fa-paste"></i> 清空并粘贴</button>
+                    <button id="capture-preview-btn"><i class="fas fa-camera"></i> 截图预览</button>
+                    <button id="copy-preview-btn"><i class="fas fa-copy"></i> 复制预览</button>
+                    <button id="save-html-btn"><i class="fas fa-download"></i> 保存HTML</button>
+                </div>
+            </div>
+            <div class="editor-container">
+                <div class="editor-pane" id="input-pane">
+                    <textarea id="html-input" placeholder="在此处编写您的HTML代码"></textarea>
+                </div>
+                <div class="dragbar" id="dragbar"></div>
+                <div class="editor-pane" id="output-pane">
+                    <iframe id="html-output" title="预览"></iframe>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 引入自定义JS -->
+    
+    <script src="../scripts/index.js"></script>
+    <script src="../scripts/html-preview.js"></script>
+    <!-- 引入代码格式化库（如js-beautify） -->
+    <script src="https://cdn.jsdelivr.net/npm/js-beautify@1.14.0/js/lib/beautify-html.js"></script>
+</body>
+
+</html> 
