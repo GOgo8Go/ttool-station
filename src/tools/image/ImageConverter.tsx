@@ -229,7 +229,6 @@ const ImageConverter: React.FC = () => {
 
   const handleCopy = async () => {
     if (!processedUrl || !file) return;
-    // ...（复制逻辑不变，省略以节省篇幅）
     try {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -265,11 +264,11 @@ const ImageConverter: React.FC = () => {
   const updateSetting = <K extends keyof ImageSettings>(key: K, value: ImageSettings[K]) => {
     setSettings(prev => {
       const next = { ...prev, [key]: value };
-      if (prev.keepAspectRatio && prev.resizeMode === 'fixed' && file) {
-        const ratio = dimensions.height / dimensions.width || 1;
-        if (key === 'width' && dimensions.width > 0) {
+      if (prev.keepAspectRatio && prev.resizeMode === 'fixed' && dimensions.width > 0) {
+        const ratio = dimensions.height / dimensions.width;
+        if (key === 'width') {
           next.height = Math.round((value as number) * ratio);
-        } else if (key === 'height' && dimensions.height > 0) {
+        } else if (key === 'height') {
           next.width = Math.round((value as number) / ratio);
         }
       }
@@ -312,19 +311,15 @@ const ImageConverter: React.FC = () => {
     setProcessedSize(0);
     setZoom(1);
     setSplitPosition(50);
-    setSettings(prev => ({
-      ...prev,
-      scale: 1,
-      width: undefined,
-      height: undefined
-    }));
   };
 
   const hasImage = !!file && !!originalUrl;
 
+  // 关键：删除了原来的 if (!file || !originalUrl) return (...) 
+  // 现在始终渲染完整布局
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-16rem)] -m-6 bg-gray-100 dark:bg-gray-950 overflow-hidden">
-      {/* 左侧：预览区 */}
+      {/* 左侧：图片区域 */}
       <div className="flex-1 relative flex flex-col overflow-hidden min-h-[400px] lg:min-h-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjNmNGY2Ii8+PHJlY3QgeD0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2U1ZjdkYiIvPjxyZWN0IHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlNWU3ZGIiLz48cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg==')] dark:bg-none dark:bg-gray-900">
         <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur shadow-sm rounded-lg p-1.5 pointer-events-auto flex items-center gap-1 border border-gray-200 dark:border-gray-700">
@@ -352,7 +347,7 @@ const ImageConverter: React.FC = () => {
 
         <div
           ref={viewportRef}
-          className={`flex-1 overflow-auto flex items-center justify-center relative ${hasImage && (isPanning ? 'cursor-grabbing' : 'cursor-grab')}`}
+          className={`flex-1 overflow-auto flex items-center justify-center relative ${hasImage ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
           onWheel={hasImage ? handleWheel : undefined}
           onMouseDown={hasImage ? handleMouseDown : undefined}
           onMouseMove={hasImage ? handleMouseMove : undefined}
@@ -401,7 +396,7 @@ const ImageConverter: React.FC = () => {
             </div>
           ) : (
             <div
-              className="flex flex-col items-center justify-center text-center p-8"
+              className="flex flex-col items-center justify-center text-center p-8 cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -428,14 +423,14 @@ const ImageConverter: React.FC = () => {
         )}
       </div>
 
-      {/* 右侧：控制面板 - 始终可见 */}
+      {/* 右侧控制区：现在始终存在！ */}
       <div className="w-full lg:w-80 bg-white dark:bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 flex flex-col h-[50vh] lg:h-full shadow-xl lg:shadow-none">
-        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
-          {/* 统计信息 */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar min-h-0">
+          {/* 统计 */}
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-100 dark:border-gray-800 space-y-3">
             <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
               <span>{t('tool.converter.compression')}</span>
-              <span className={hasImage && processedSize < originalSize && originalSize > 0 ? 'text-green-500' : 'text-gray-400'}>
+              <span className={hasImage && processedSize < originalSize ? 'text-green-500' : 'text-gray-400'}>
                 {hasImage ? Math.round((processedSize / originalSize) * 100 - 100) : 0}%
               </span>
             </div>
@@ -447,7 +442,7 @@ const ImageConverter: React.FC = () => {
               <div className="bg-white dark:bg-gray-800 p-2 text-center relative overflow-hidden">
                 <div className="text-[10px] text-gray-400">{t('common.result')}</div>
                 <div className="font-mono text-sm font-medium text-primary-600 dark:text-primary-400">{formatSize(processedSize)}</div>
-                {isProcessing && <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center"><Loader2 className="w-4 h-4 animate-spin text-primary-500" /></div>}
+                {isProcessing && <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center z-10"><Loader2 className="w-4 h-4 animate-spin text-primary-500" /></div>}
               </div>
             </div>
           </div>
@@ -455,14 +450,14 @@ const ImageConverter: React.FC = () => {
           {error && (
             <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-100 dark:border-red-800/30 flex items-start">
               <AlertCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
+              <span className="leading-tight">{error}</span>
             </div>
           )}
 
-          {/* 设置区域 - 始终显示 */}
+          {/* 设置 */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('common.settings')}</h3>
-
+            
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.export_format')}</label>
               <SegmentedControl<ImageFormat>
@@ -501,7 +496,7 @@ const ImageConverter: React.FC = () => {
 
           <hr className="border-gray-100 dark:border-gray-800" />
 
-          {/* 调整大小 */}
+          {/* 缩放设置 */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('tool.converter.resize.title')}</h3>
@@ -529,7 +524,7 @@ const ImageConverter: React.FC = () => {
                 />
                 {hasImage && (
                   <div className="text-xs text-gray-400 text-center font-mono mt-1">
-                    {Math.round(dimensions.width * settings.scale)} × {Math.round(dimensions.height * settings.scale)}
+                    {Math.round(dimensions.width * settings.scale)} x {Math.round(dimensions.height * settings.scale)}
                   </div>
                 )}
               </div>
@@ -542,7 +537,6 @@ const ImageConverter: React.FC = () => {
                       type="number"
                       value={settings.width ?? ''}
                       onChange={(e) => updateSetting('width', parseInt(e.target.value) || 0)}
-                      placeholder={hasImage ? undefined : "上传后自动填充"}
                       className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700"
                       disabled={!hasImage}
                     />
@@ -553,7 +547,6 @@ const ImageConverter: React.FC = () => {
                       type="number"
                       value={settings.height ?? ''}
                       onChange={(e) => updateSetting('height', parseInt(e.target.value) || 0)}
-                      placeholder={hasImage ? undefined : "上传后自动填充"}
                       className="w-full px-2 py-1.5 text-sm border rounded bg-transparent dark:border-gray-700"
                       disabled={!hasImage}
                     />
@@ -574,8 +567,7 @@ const ImageConverter: React.FC = () => {
           </div>
         </div>
 
-        {/* 底部操作按钮 */}
-        <div className="flex-shrink-0 p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm flex gap-2">
+        <div className="flex-shrink-0 p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm z-20 flex gap-2">
           <Button onClick={handleCopy} disabled={!hasImage || isProcessing || !!error} variant="secondary" className="flex-1 h-11 text-sm">
             {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />} {t('common.copy')}
           </Button>
