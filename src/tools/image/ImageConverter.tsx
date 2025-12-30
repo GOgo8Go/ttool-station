@@ -315,11 +315,10 @@ const ImageConverter: React.FC = () => {
 
   const hasImage = !!file && !!originalUrl;
 
-  // 关键：删除了原来的 if (!file || !originalUrl) return (...) 
-  // 现在始终渲染完整布局
+  // ==================== 关键：没有了早返回的 if 判断！始终渲染完整布局 ====================
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-16rem)] -m-6 bg-gray-100 dark:bg-gray-950 overflow-hidden">
-      {/* 左侧：图片区域 */}
+      {/* 左侧：预览区（有图显示对比，无图显示上传提示） */}
       <div className="flex-1 relative flex flex-col overflow-hidden min-h-[400px] lg:min-h-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjNmNGY2Ii8+PHJlY3QgeD0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2U1ZjdkYiIvPjxyZWN0IHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlNWU3ZGIiLz48cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg==')] dark:bg-none dark:bg-gray-900">
         <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur shadow-sm rounded-lg p-1.5 pointer-events-auto flex items-center gap-1 border border-gray-200 dark:border-gray-700">
@@ -355,6 +354,7 @@ const ImageConverter: React.FC = () => {
           onMouseLeave={handleMouseUp}
         >
           {hasImage ? (
+            /* 有图片：显示对比视图 */
             <div
               ref={containerRef}
               className="relative shadow-2xl transition-transform duration-75 ease-out origin-center"
@@ -395,8 +395,9 @@ const ImageConverter: React.FC = () => {
               </div>
             </div>
           ) : (
+            /* 无图片：显示上传提示 */
             <div
-              className="flex flex-col items-center justify-center text-center p-8 cursor-pointer"
+              className="flex flex-col items-center justify-center text-center p-8 cursor-pointer w-full h-full"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -423,15 +424,15 @@ const ImageConverter: React.FC = () => {
         )}
       </div>
 
-      {/* 右侧控制区：现在始终存在！ */}
+      {/* 右侧控制面板：始终显示！ */}
       <div className="w-full lg:w-80 bg-white dark:bg-gray-900 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 flex flex-col h-[50vh] lg:h-full shadow-xl lg:shadow-none">
         <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar min-h-0">
-          {/* 统计 */}
+          {/* 统计信息 */}
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-100 dark:border-gray-800 space-y-3">
             <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
               <span>{t('tool.converter.compression')}</span>
               <span className={hasImage && processedSize < originalSize ? 'text-green-500' : 'text-gray-400'}>
-                {hasImage ? Math.round((processedSize / originalSize) * 100 - 100) : 0}%
+                {hasImage ? `${Math.round((processedSize / originalSize) * 100 - 100)}%` : '0%'}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
@@ -454,10 +455,10 @@ const ImageConverter: React.FC = () => {
             </div>
           )}
 
-          {/* 设置 */}
+          {/* 设置区域 */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('common.settings')}</h3>
-            
+
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('tool.converter.settings.export_format')}</label>
               <SegmentedControl<ImageFormat>
@@ -496,7 +497,7 @@ const ImageConverter: React.FC = () => {
 
           <hr className="border-gray-100 dark:border-gray-800" />
 
-          {/* 缩放设置 */}
+          {/* 调整大小 */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('tool.converter.resize.title')}</h3>
@@ -567,6 +568,7 @@ const ImageConverter: React.FC = () => {
           </div>
         </div>
 
+        {/* 底部按钮 */}
         <div className="flex-shrink-0 p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm z-20 flex gap-2">
           <Button onClick={handleCopy} disabled={!hasImage || isProcessing || !!error} variant="secondary" className="flex-1 h-11 text-sm">
             {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />} {t('common.copy')}
@@ -577,6 +579,7 @@ const ImageConverter: React.FC = () => {
         </div>
       </div>
 
+      {/* 隐藏的文件输入 */}
       <input
         type="file"
         ref={fileInputRef}
